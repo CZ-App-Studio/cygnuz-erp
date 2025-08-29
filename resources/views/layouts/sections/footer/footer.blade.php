@@ -13,7 +13,7 @@
         @if(isset($settings->footer_text) && $settings->footer_text)
           {!! $settings->footer_text !!}
         @else
-          , madesss made with with ❤️ by <a href="{{ (!empty(config('variables.creatorUrl')) ? config('variables.creatorUrl') : '') }}"
+          , made with with ❤️ by <a href="{{ (!empty(config('variables.creatorUrl')) ? config('variables.creatorUrl') : '') }}"
                              target="_blank"
                              class="footer-link">{{ (!empty(config('variables.creatorName')) ? config('variables.creatorName') : '') }}</a>
         @endif
