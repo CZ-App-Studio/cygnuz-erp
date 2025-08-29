@@ -14,7 +14,7 @@
   
   **Built with ❤️ by [CZ App Studio](https://czappstudio.com)**
   
-  [🤖 AI Features](#-ai-core-the-game-changer) • [Demo](#-demo) • [Features](#-features) • [Installation](#-installation) • [Documentation](#-documentation)
+  [🤖 AI Features](#-ai-core-the-game-changer) • [Demo](https://demo.cygnuzerp.com) • [Features](#-features) • [Installation](#-installation) • [Documentation](#-documentation)
 </div>
 
 ---
