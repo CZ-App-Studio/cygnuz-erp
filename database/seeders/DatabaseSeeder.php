@@ -32,19 +32,19 @@ class DatabaseSeeder extends Seeder
     // Step 1: Seed basic permissions first
     $this->command->info('Step 1: Seeding permissions...');
     $this->call(ERPPermissionSeeder::class);
-    
+
     // Step 2: Run module permission seeders
     $this->command->info('Step 2: Seeding module permissions...');
     $this->runModuleSeeders();
-    
+
     // Step 3: Create roles after all permissions are available
     $this->command->info('Step 3: Creating roles...');
     $this->call(ERPRoleSeeder::class);
-    
+
     // Step 4: Seed system settings
     $this->command->info('Step 4: Seeding system settings...');
     $this->call(SystemSettingsSeeder::class);
-    
+
     // Step 5: Seed HRCore base data
     $this->command->info('Step 5: Seeding HRCore base data...');
     if (class_exists('\Modules\HRCore\database\seeders\LeaveTypeSeeder')) {
@@ -56,17 +56,17 @@ class DatabaseSeeder extends Seeder
     if (class_exists('\Modules\HRCore\database\seeders\HRCoreSettingsSeeder')) {
         $this->call(\Modules\HRCore\database\seeders\HRCoreSettingsSeeder::class);
     }
-    
+
     // Step 6: Seed HRCore demo data (teams, shifts, departments, etc.)
     $this->command->info('Step 6: Seeding HRCore demo data...');
     if (class_exists('\Modules\HRCore\database\seeders\HRCoreDemoDataSeeder')) {
         $this->call(\Modules\HRCore\database\seeders\HRCoreDemoDataSeeder::class);
     }
-    
+
     // Step 7: Create demo user accounts
     $this->command->info('Step 7: Creating demo user accounts...');
     $this->call(DemoSeeder::class);
-    
+
     // Step 8: Seed tenant demo if enabled
     if (class_exists('\Modules\MultiTenancyCore\Database\Seeders\TenantDemoSeeder')) {
         $this->command->info('Step 8: Seeding multi-tenancy demo data...');
@@ -96,7 +96,6 @@ class DatabaseSeeder extends Seeder
           '\Modules\WMSInventoryCore\Database\Seeders\WMSInventoryCorePermissionSeeder',
           '\Modules\AICore\Database\Seeders\AICorePermissionSeeder',
           '\Modules\FileManagerCore\Database\Seeders\FileManagerCorePermissionSeeder',
-          '\Modules\FormBuilder\Database\Seeders\FormBuilderPermissionSeeder',
       ];
 
       foreach ($modulePermissionSeeders as $seederClass) {
