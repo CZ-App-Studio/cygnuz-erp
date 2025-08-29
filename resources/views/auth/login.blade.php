@@ -263,6 +263,31 @@
               </div>
             </div>
           @endif
+          
+          {{-- Version Information --}}
+          <div class="text-center mt-4 pt-3 border-top">
+            <small class="text-muted">
+              <strong>Cygnuz ERP</strong> v{{ config('app.version') }}
+              @if(config('app.version_codename'))
+                <span class="text-primary">({{ config('app.version_codename') }})</span>
+              @endif
+              @if(config('app.version_stage') && config('app.version_stage') !== 'stable')
+                <span class="badge bg-{{ config('app.version_stage') === 'alpha' ? 'danger' : (config('app.version_stage') === 'beta' ? 'warning' : 'info') }} ms-1">
+                  {{ ucfirst(config('app.version_stage')) }}
+                </span>
+              @endif
+              <br>
+              <small>
+                Laravel {{ app()->version() }}
+                <span class="mx-1">•</span>
+                PHP {{ PHP_VERSION }}
+                <span class="mx-1">•</span>
+                Released: {{ config('app.version_date', date('Y-m-d')) }}
+              </small>
+              <br>
+              <span class="text-primary">© {{ date('Y') }} CZ App Studio</span>
+            </small>
+          </div>
         </div>
       </div>
       <!-- /Login -->

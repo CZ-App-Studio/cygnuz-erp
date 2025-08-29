@@ -29,7 +29,7 @@ return [
   */
 
   'version' => env('APP_VERSION', '0.1.0-alpha'),
-  'version_date' => '2025-01-01',
+  'version_date' => '29-09-2025',
   'version_codename' => 'Genesis',
   'version_stage' => 'alpha', // alpha, beta, rc, stable
 
