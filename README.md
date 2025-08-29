@@ -6,6 +6,7 @@
   ### 🚀 Complete ERP Ecosystem with AI, Mobile Apps & 40+ Add-ons
   
   [![Status](https://img.shields.io/badge/Status-Alpha-red?style=for-the-badge)](https://github.com/CZ-App-Studio/cygnuz-erp)
+  [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
   [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
   [![PHP](https://img.shields.io/badge/PHP-8.4%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
   [![AI Powered](https://img.shields.io/badge/AI_Powered-OpenAI%20Free%20%2B%20Premium-4A90E2?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com)
@@ -523,9 +524,6 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 #### Future Vision
 - [ ] **POS System** - Modern point of sale
-- [ ] **Voice Commands** - Voice-controlled operations
-- [ ] **AR Inventory** - Augmented reality warehouse
-- [ ] **Blockchain Integration** - Secure transactions
 - [ ] **IoT Integration** - Smart device connectivity
 
 ---
