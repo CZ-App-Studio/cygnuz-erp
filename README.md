@@ -3,7 +3,7 @@
 ### By CZ App Studio [https://czappstudio.com]
 
 ```sh
-composer update --ignore-platform-reqs
+composer install
 ```
 
 ## DB Migration and Data Seeding
@@ -129,40 +129,3 @@ php artisan module:seed Calendar
 php artisan module:seed PMCore
 php artisan module:seed HRCore
 ```
-
-## TODO
-
-- File Manager Storage Unification S3, disk so on
-- Dynamic Drag and Drop Workflow
-- AI Agents & Features
-- PDF reader image reader Agent (Auto PO creation and so on)
--
-
-//Flow
-
-# Claude Flow generated files
-
-.claude-flow/
-.claude/settings.local.json
-.mcp.json
-claude-flow.config.json
-.swarm/
-.hive-mind/
-memory/claude-flow-data.json
-memory/sessions/_
-!memory/sessions/README.md
-memory/agents/_
-!memory/agents/README.md
-coordination/memory*bank/*
-coordination/subtasks/_
-coordination/orchestration/\*
-_.db
-_.db-journal
-_.db-wal
-_.sqlite
-_.sqlite-journal
-\_.sqlite-wal
-claude-flow
-claude-flow.bat
-claude-flow.ps1
-hive-mind-prompt-\*.txt
