@@ -25,12 +25,12 @@ command_exists() {
 echo "
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
-║   ╔═══╗╦ ╦╔═══╗╔╗╔╦ ╦╔═══╗  ╔═══╗╔═══╗╔═══╗             ║
-║   ║    ╚╦╝║ ╔═╝║╚╝║║ ║╠═══║  ║═══╣║ ╔═╝║ ╔═╝             ║
-║   ╚═══╝ ╩ ╚═══╝╩   ╚═╝╚═══╝  ╚═══╝╩ ╩  ╩                 ║
+║        ╔═══╗╦ ╦╔═══╗╔╗╔╦ ╦╔═══╗  ╔═══╗╔═══╗╔═══╗        ║
+║        ║    ╚╦╝║ ╔═╝║╚╝║║ ║╠═══║  ║═══╣║ ╔═╝║ ╔═╝        ║
+║        ╚═══╝ ╩ ╚═══╝╩   ╚═╝╚═══╝  ╚═══╝╩ ╩  ╩            ║
 ║                                                           ║
-║              Enterprise Resource Planning                 ║
-║                 Docker Setup Wizard                       ║
+║             Enterprise Resource Planning                  ║
+║                Docker Setup Wizard                        ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
 "
@@ -42,8 +42,12 @@ if ! command_exists docker; then
     exit 1
 fi
 
-# Check for Docker Compose
-if ! command_exists docker-compose && ! docker compose version >/dev/null 2>&1; then
+# Check for Docker Compose and set the appropriate command
+if docker compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+elif command_exists docker-compose; then
+    DOCKER_COMPOSE="docker-compose"
+else
     print_message "❌ Docker Compose is not installed. Please install Docker Compose first." "$RED"
     print_message "Visit: https://docs.docker.com/compose/install/" "$YELLOW"
     exit 1
@@ -108,10 +112,12 @@ EOF
     if ! grep -q "APP_KEY=base64:" .env; then
         print_message "🔑 Generating application key..." "$YELLOW"
         APP_KEY=$(docker run --rm -v $(pwd):/app -w /app php:8.3-cli php -r "echo 'base64:' . base64_encode(random_bytes(32));")
+        # Escape forward slashes in the APP_KEY to prevent sed issues
+        APP_KEY_ESCAPED=$(echo "$APP_KEY" | sed 's/\//\\\//g')
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s/APP_KEY=.*/APP_KEY=$APP_KEY/" .env
+            sed -i '' "s/APP_KEY=.*/APP_KEY=$APP_KEY_ESCAPED/" .env
         else
-            sed -i "s/APP_KEY=.*/APP_KEY=$APP_KEY/" .env
+            sed -i "s/APP_KEY=.*/APP_KEY=$APP_KEY_ESCAPED/" .env
         fi
         print_message "✅ Application key generated" "$GREEN"
     fi
@@ -125,9 +131,9 @@ start_services() {
     print_message "\n🚀 Starting Docker containers..." "$YELLOW"
     
     if [ "$PROFILE" == "dev" ]; then
-        docker-compose -f $COMPOSE_FILE --profile dev up -d
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --profile dev up -d
     else
-        docker-compose -f $COMPOSE_FILE up -d
+        $DOCKER_COMPOSE -f $COMPOSE_FILE up -d
     fi
     
     print_message "✅ Docker containers started!" "$GREEN"
@@ -139,7 +145,7 @@ wait_for_services() {
     
     # Wait for MySQL
     echo -n "Waiting for MySQL..."
-    until docker-compose exec -T mysql mysqladmin ping -h localhost --silent 2>/dev/null; do
+    until $DOCKER_COMPOSE exec -T mysql mysqladmin ping -h localhost --silent 2>/dev/null; do
         echo -n "."
         sleep 2
     done
@@ -147,7 +153,7 @@ wait_for_services() {
     
     # Wait for Redis
     echo -n "Waiting for Redis..."
-    until docker-compose exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; do
+    until $DOCKER_COMPOSE exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; do
         echo -n "."
         sleep 2
     done
@@ -162,16 +168,16 @@ run_initial_setup() {
     
     # Run migrations
     print_message "Running database migrations..." "$YELLOW"
-    docker-compose exec -T app php artisan migrate --force
+    $DOCKER_COMPOSE exec -T app php artisan migrate --force
     
     # Create storage link
     print_message "Creating storage link..." "$YELLOW"
-    docker-compose exec -T app php artisan storage:link || true
+    $DOCKER_COMPOSE exec -T app php artisan storage:link || true
     
     # Clear caches
     print_message "Clearing caches..." "$YELLOW"
-    docker-compose exec -T app php artisan config:clear
-    docker-compose exec -T app php artisan cache:clear
+    $DOCKER_COMPOSE exec -T app php artisan config:clear
+    $DOCKER_COMPOSE exec -T app php artisan cache:clear
     
     print_message "✅ Initial setup completed!" "$GREEN"
 }
@@ -183,8 +189,8 @@ seed_database() {
     read -p "Do you want to seed the database with demo data? (y/n): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        docker-compose exec -T app php artisan db:seed --force || true
-        docker-compose exec -T app php artisan module:seed HRCore --force || true
+        $DOCKER_COMPOSE exec -T app php artisan db:seed --force || true
+        $DOCKER_COMPOSE exec -T app php artisan module:seed HRCore --force || true
         print_message "✅ Database seeded with demo data!" "$GREEN"
         print_message "\n📧 Demo Accounts:" "$YELLOW"
         echo "  Super Admin: superadmin@demo.com / 123456"
@@ -238,26 +244,26 @@ main() {
                 ;;
             3)
                 print_message "\n🛑 Stopping all services..." "$YELLOW"
-                docker-compose down
+                $DOCKER_COMPOSE down
                 print_message "✅ All services stopped!" "$GREEN"
                 ;;
             4)
                 print_message "\n📋 Showing logs (Ctrl+C to exit)..." "$YELLOW"
-                docker-compose logs -f
+                $DOCKER_COMPOSE logs -f
                 ;;
             5)
                 read -p "Enter artisan command (e.g., 'migrate:status'): " cmd
-                docker-compose exec app php artisan $cmd
+                $DOCKER_COMPOSE exec app php artisan $cmd
                 ;;
             6)
                 print_message "\n🐚 Accessing container shell..." "$YELLOW"
-                docker-compose exec app /bin/sh
+                $DOCKER_COMPOSE exec app /bin/sh
                 ;;
             7)
                 print_message "\n⚠️  WARNING: This will delete all data!" "$RED"
                 read -p "Are you sure? (yes/no): " confirm
                 if [ "$confirm" == "yes" ]; then
-                    docker-compose down -v
+                    $DOCKER_COMPOSE down -v
                     rm -f .env
                     print_message "✅ Everything has been reset!" "$GREEN"
                 fi
