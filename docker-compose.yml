@@ -7,9 +7,10 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-cygnuz_erp}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-Pa$$word@}
       MYSQL_USER: ${DB_USERNAME:-cygnuz_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-Pa$$word@}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
     ports:
       - "${DB_PORT:-3306}:3306"  # Use standard port, override with DB_PORT env if needed
     volumes:
