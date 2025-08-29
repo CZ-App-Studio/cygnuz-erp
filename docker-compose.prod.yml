@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Application with Nginx and PHP-FPM
   app:
