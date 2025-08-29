@@ -15,7 +15,7 @@ use Modules\FileManagerCore\Contracts\FileManagerInterface;
 use Modules\FileManagerCore\Enums\FileType;
 use Modules\FileManagerCore\Traits\HasFiles;
 use Modules\FileManagerCore\Traits\TracksStorage;
-use Modules\LocationManagement\app\Traits\HasLocation;
+// use Modules\LocationManagement\app\Traits\HasLocation; // Module not available
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Spatie\Permission\Traits\HasRoles;
@@ -23,7 +23,7 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements AuditableContract, JWTSubject
 {
-    use Auditable, HasApiTokens, HasFactory, HasFiles, HasLocation, HasRoles, Notifiable, SoftDeletes, TracksStorage, UserActionsTrait, UserOptionsTrait;
+    use Auditable, HasApiTokens, HasFactory, HasFiles, HasRoles, Notifiable, SoftDeletes, TracksStorage, UserActionsTrait, UserOptionsTrait;
 
     /**
      * The attributes that are mass assignable.
