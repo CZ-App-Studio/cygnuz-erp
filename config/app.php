@@ -23,9 +23,15 @@ return [
   | This value represents the version of your application. This is used to
   | display version information in the UI and system status page.
   |
+  | Version Format: MAJOR.MINOR.PATCH-STAGE
+  | Stages: alpha, beta, rc (release candidate), stable
+  |
   */
 
-  'version' => env('APP_VERSION', '1.0.0'),
+  'version' => env('APP_VERSION', '0.1.0-alpha'),
+  'version_date' => '2025-01-01',
+  'version_codename' => 'Genesis',
+  'version_stage' => 'alpha', // alpha, beta, rc, stable
 
   /*
   |--------------------------------------------------------------------------

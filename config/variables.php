@@ -9,7 +9,7 @@ return [
   "templateName" => "Cygnuz ERP",
   "templateFullName" => "Cygnuz ERP",
   "templateSuffix" => "",
-  "templateVersion" => "1.0.0",
+  "templateVersion" => "0.1.0-alpha",
   "templateFree" => false,
   "templateDescription" => "Cygnuz ERP is a comprehensive HR management system designed to streamline and automate various HR processes, including employee management, leave management, attendance tracking, payroll processing, recruitment, performance appraisal, training and development, expense management, task and project management, team collaboration, communication, notification management, workflow automation, reporting and analytics, and admin panel functionalities.",
   "templateKeyword" => "hr, hr management, hr system, human resource management, employee management, leave management, attendance tracking, payroll processing, recruitment, performance appraisal, training and development, expense management, task management, project management, team collaboration, communication, notification management, workflow automation, reporting and analytics",
