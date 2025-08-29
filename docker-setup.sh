@@ -60,9 +60,33 @@ generate_password() {
     openssl rand -base64 32 | tr -d "=+/" | cut -c1-25
 }
 
+# Function to check if port is in use
+check_port() {
+    local port=$1
+    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+        return 0  # Port is in use
+    else
+        return 1  # Port is free
+    fi
+}
+
 # Function to setup environment
 setup_environment() {
     print_message "\n📝 Setting up environment configuration..." "$YELLOW"
+    
+    # Check for port conflicts
+    if check_port 3306; then
+        print_message "⚠️  Port 3306 is already in use (probably local MySQL)" "$YELLOW"
+        print_message "   You can either:" "$YELLOW"
+        echo "   1. Stop your local MySQL: brew services stop mysql"
+        echo "   2. Use a different port by setting DB_PORT=3307 in .env"
+        read -p "   Use port 3307 instead? (y/n): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            export DB_PORT=3307
+            print_message "   Using port 3307 for MySQL" "$GREEN"
+        fi
+    fi
     
     # Check if .env exists
     if [ ! -f .env ]; then
@@ -80,7 +104,7 @@ APP_URL=http://localhost:8000
 
 DB_CONNECTION=mysql
 DB_HOST=mysql
-DB_PORT=3306
+DB_PORT=${DB_PORT:-3306}
 DB_DATABASE=cygnuz_erp
 DB_USERNAME=cygnuz_user
 DB_PASSWORD=$(generate_password)
@@ -105,7 +129,16 @@ EOF
             print_message "✅ Created basic .env file" "$GREEN"
         fi
     else
-        print_message "ℹ️  .env file already exists, skipping..." "$YELLOW"
+        print_message "ℹ️  .env file already exists" "$YELLOW"
+        # Update DB_PORT if needed
+        if [ ! -z "$DB_PORT" ]; then
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                sed -i '' "s/DB_PORT=.*/DB_PORT=$DB_PORT/" .env
+            else
+                sed -i "s/DB_PORT=.*/DB_PORT=$DB_PORT/" .env
+            fi
+            print_message "   Updated DB_PORT to $DB_PORT in .env" "$GREEN"
+        fi
     fi
     
     # Generate app key if not set

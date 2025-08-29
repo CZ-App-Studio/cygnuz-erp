@@ -4,6 +4,7 @@ services:
   # MySQL Database
   mysql:
     image: mysql:8.0
+    platform: linux/amd64  # Works on both Intel and ARM64
     container_name: cygnuz_mysql
     restart: unless-stopped
     environment:
@@ -12,7 +13,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-password}
       MYSQL_USER: ${DB_USERNAME:-cygnuz_user}
     ports:
-      - "${DB_PORT:-3306}:3306"
+      - "${DB_PORT:-3306}:3306"  # Use standard port, override with DB_PORT env if needed
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -142,6 +143,7 @@ services:
   # Mailhog (for local email testing - optional)
   mailhog:
     image: mailhog/mailhog
+    platform: linux/amd64  # Platform compatibility
     container_name: cygnuz_mailhog
     restart: unless-stopped
     ports:
@@ -155,6 +157,7 @@ services:
   # phpMyAdmin (optional - for database management)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    platform: linux/amd64  # Platform compatibility
     container_name: cygnuz_phpmyadmin
     restart: unless-stopped
     environment:
