@@ -1,131 +1,514 @@
-## Cygnuz ERP
+<div align="center">
+  <img src="public/assets/img/logo.png" alt="Cygnuz ERP Logo" width="200"/>
+  
+  # Cygnuz ERP
+  
+  ### 🚀 Complete ERP Ecosystem with AI, Mobile Apps & 40+ Add-ons
+  
+  [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+  [![PHP](https://img.shields.io/badge/PHP-8.4%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+  [![AI Powered](https://img.shields.io/badge/AI_Powered-OpenAI%20Free%20%2B%20Premium-4A90E2?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com)
+  [![Add-ons](https://img.shields.io/badge/40%2B_Premium_Addons-Available-FF6B6B?style=for-the-badge)](https://czappstudio.com/cygnuz-erp-addons/)
+  
+  **Built with ❤️ by [CZ App Studio](https://czappstudio.com)**
+  
+  [🤖 AI Features](#-ai-core-the-game-changer) • [Demo](#-demo) • [Features](#-features) • [Installation](#-installation) • [Documentation](#-documentation)
+</div>
 
-### By CZ App Studio [https://czappstudio.com]
+---
 
-```sh
+## 🤖 AI Core: The Game Changer
+
+**Cygnuz ERP pioneers AI integration in ERP systems** with a flexible freemium model that lets you start with powerful AI features for free and scale up as needed. Our **AICore module** provides the foundation for transforming traditional ERP into an intelligent business assistant.
+
+### 🌟 Freemium AI Model - Start Free, Scale Smart
+
+<table>
+<tr>
+<td width="50%">
+
+#### 🆓 **Free AI Features**
+- **OpenAI Integration** included in core
+- **GPT-4o, GPT-4o Mini** models
+- **AI Chat Assistant** for general queries
+- **Basic AI capabilities** for all modules
+- **Usage tracking** and monitoring
+
+</td>
+<td width="50%">
+
+#### 💎 **Premium AI Add-ons**
+- **Gemini AI Provider** (Advanced Google AI)
+- **HR AI Assistant** (Specialized HR automation)
+- **AI Description Generator** (Smart content creation)
+- **Claude AI Provider** (Coming soon)
+- **Azure OpenAI** (Coming soon)
+
+</td>
+</tr>
+</table>
+
+### 📊 Current & Upcoming AI Features
+
+| Feature | Status | Type | Description |
+|---------|--------|------|-------------|
+| **AI Chat Assistant** | ✅ Live | Free | General AI chat interface with OpenAI |
+| **OpenAI Provider** | ✅ Live | Free | GPT-4o, GPT-4o Mini, DALL-E, Whisper |
+| **Gemini Provider** | ✅ Live | Premium | Google's Gemini 2.0 models |
+| **HR AI Assistant** | ✅ Live | Premium | Automated HR workflows & insights |
+| **AI Description** | ✅ Live | Premium | Intelligent content generation |
+| **Claude Provider** | 🔄 Coming | Premium | Anthropic's Claude models |
+| **Smart Document Processing** | 🔄 Coming | Premium | AI-powered OCR & extraction |
+| **Predictive Analytics** | 🔄 Coming | Premium | Business forecasting |
+| **Voice Commands** | 🔄 Coming | Premium | Voice-controlled operations |
+| **Multi-Provider Failover** | 🔄 Coming | Premium | Automatic provider switching |
+
+### 🎯 Why Our AI Approach is Different
+
+- **Start Free**: Begin with powerful OpenAI integration at no extra cost
+- **Pay As You Grow**: Add premium AI features only when needed
+- **Provider Choice**: Not locked into a single AI provider
+- **Module-Specific AI**: Each module can have tailored AI capabilities
+- **Future-Ready**: Architecture supports any AI provider
+
+## 🚀 About Cygnuz ERP
+
+Cygnuz ERP is a **complete business ecosystem** that combines traditional ERP functionality with cutting-edge AI, mobile applications, and an extensive marketplace of 40+ premium add-ons. Built on Laravel 11, it's designed to grow with your business through our innovative freemium model.
+
+### 🎯 What Makes Cygnuz ERP Different
+
+- **🆓 Freemium Model** - Start with powerful free features, scale with premium add-ons
+- **🤖 AI Integration** - Free OpenAI integration with optional premium AI providers
+- **📱 Mobile Ecosystem** - Field Manager app (Android) with more apps coming soon
+- **🏪 Add-on Marketplace** - 40+ premium modules to extend functionality
+- **🌍 Field Operations** - Complete field force management with GPS tracking
+- **💼 Industry Agnostic** - Adaptable for any business vertical
+- **🔧 Modular Architecture** - Enable only what you need, keep it lightweight
+
+## ✨ Features
+
+### 📊 Core Modules
+
+| Module | Description | Status |
+|--------|-------------|--------|
+| **HRCore** | Complete HR management with attendance, leave, payroll | ✅ Active |
+| **AccountingCore** | Financial management, transactions, reporting | ✅ Active |
+| **CRMCore** | Customer relationship management | ✅ Active |
+| **PMCore** | Project management with tasks and timelines | ✅ Active |
+| **WMSInventoryCore** | Warehouse and inventory management | ✅ Active |
+| **AICore** | AI integration framework for smart features | ✅ Active |
+| **SystemCore** | System-wide settings and configurations | ✅ Active |
+| **AiChat** | AI Chat assistant | ✅ Active |
+
+### 🤖 AI Core Features Available Now
+
+#### Free Features (OpenAI Powered)
+- **💬 AI Chat Assistant**: Direct chat interface for instant AI assistance
+- **🎨 Image Generation**: DALL-E 2/3 for creating visuals
+- **🎤 Speech-to-Text**: Whisper for audio transcription
+- **🔊 Text-to-Speech**: TTS-1 for voice synthesis
+- **📊 Usage Tracking**: Monitor your AI usage and costs
+
+#### Premium Add-ons Available
+- **🧑‍💼 HR AI Assistant**: Specialized AI for HR operations (leave management, employee queries)
+- **✍️ AI Description Generator**: Automated product/service descriptions
+- **🌟 Gemini Provider**: Access to Google's latest Gemini models
+
+#### Coming Soon (Roadmap)
+- **🔄 Multi-Provider Support**: Claude, Azure OpenAI, AWS Bedrock
+- **🧠 Smart Document Processing**: OCR with AI extraction
+- **📈 Predictive Analytics**: AI-powered business insights
+- **🎯 Workflow Automation**: AI-driven process optimization
+- **🌐 Real-time Translation**: Multi-language support
+
+### 🌍 Field Manager - Complete Field Force Automation
+
+Our flagship **Field Manager Android App** revolutionizes field operations:
+
+#### Core Features
+- **📍 Real-Time GPS Tracking** - Live location of field employees
+- **📴 Offline Mode** - Work without internet, auto-sync when online
+- **🏢 Customer Management** - Complete CRM on mobile
+- **📦 Order Taking** - Process orders directly from field
+- **📊 Visit Reports** - Digital visit logs with photos
+- **🗺️ Route Planning** - Optimized travel routes
+- **📸 Photo Capture** - Document visits with geotagged photos
+- **📈 Performance Analytics** - Field team productivity metrics
+
+#### Perfect For
+- Sales teams
+- Service technicians
+- Delivery personnel
+- Field inspectors
+- Marketing teams
+
+### 📱 Mobile & Desktop Applications (Ecosystem)
+
+#### Available Now
+- **🌍 Field Manager (Android)** - Complete field sales & service app
+
+#### Coming Soon
+- **📲 ESS App (Flutter)** - Employee self-service mobile app
+- **💬 Chat App** - Internal communication (no third-party SDK)
+- **📅 Calendar App** - Mobile event management
+- **📊 Mobile CRM** - CRM on the go
+- **💻 Desktop Tracker** - Employee productivity monitoring (Electron)
+- **💳 POS System** - Point of Sale application (React/TypeScript)
+
+### 💎 Premium Add-ons Marketplace
+
+Visit our [Add-ons Store](https://czappstudio.com/cygnuz-erp-addons/) for 40+ premium modules:
+
+#### 🏢 HR & Payroll
+- **Payroll Management** - Complete salary processing
+- **Loan Management** - Employee loan lifecycle
+- **Recruitment** - End-to-end hiring process
+- **Disciplinary Actions** - Track warnings & actions
+- **HR Policies** - Policy management & acknowledgment
+
+#### ⏰ Advanced Attendance
+- **QR Attendance** - Static QR code scanning
+- **Face Attendance** - Biometric face recognition
+- **IP Address Attendance** - Office network-based
+- **Geofence System** - GPS boundary attendance
+- **Offline Tracking** - Work without internet
+
+#### 💰 Finance & Billing
+- **Billing System** *(Coming Soon)* - Complete invoicing solution
+- **Multi-Currency** *(Coming Soon)* - Forex & multi-currency support
+- **Payment Gateways**:
+  - PayPal Gateway
+  - Stripe Gateway
+  - Razorpay Gateway (India)
+
+#### 🤖 AI Enhancements
+- **Gemini Provider** - Google AI integration
+- **HR AI Assistant** - Smart HR automation
+- **AI Description Generator** - Content creation
+- **Claude Provider** *(Coming Soon)*
+- **Azure OpenAI** *(Coming Soon)*
+
+#### 📋 Productivity Tools
+- **Search Plus** *(Coming Soon)* - Advanced AI search
+- **Approvals** *(Coming Soon)* - Mobile approval workflows
+- **Document Management** - Request & approval system
+- **Data Import/Export** - Bulk data operations
+- **Form Builder** - Drag-and-drop forms
+- **File Manager Plus** - Advanced file explorer
+
+#### 🔒 Security & Systems
+- **Audit Log** - Complete activity tracking
+- **Google reCAPTCHA** - Bot protection
+- **One Tap Login** - Quick UID login
+- **SOS Emergency** - Field employee safety
+- **Digital ID Card** - Employee digital IDs
+
+#### 🎓 Other Premium Modules
+- **Asset Management** - Track company assets
+- **LMS** - Learning management system
+- **Agora Call** - Video conferencing
+- **Communication Center** - Announcements hub
+- **Notes** - Personal & shared notes
+- **Landing Page** - Marketing website
+
+## 📋 Requirements
+
+- PHP >= 8.4
+- MySQL >= 8.0 or MariaDB >= 10.3
+- Node.js >= 18.x
+- Composer >= 2.0
+- Redis (optional, for caching)
+
+## 🚀 Quick Start with AI
+
+### Enable AI Features (After Installation)
+
+1. **Configure OpenAI (Free)** in `.env`:
+```env
+# Free AI features with OpenAI
+OPENAI_API_KEY=your-openai-key
+```
+
+2. **For Premium Features** (Optional):
+```env
+# Gemini Provider (Premium Add-on)
+GOOGLE_API_KEY=your-gemini-key
+
+# Coming Soon
+# ANTHROPIC_API_KEY=your-claude-key
+# AZURE_OPENAI_KEY=your-azure-key
+```
+
+3. **Activate AI Modules**:
+```bash
+# Core AI Module (Free)
+php artisan module:enable AICore
+php artisan module:enable AiChat
+php artisan module:seed AICore
+
+# Premium Add-ons (if purchased)
+php artisan module:enable GeminiProvider
+php artisan module:enable HRAIAssistant
+php artisan module:enable AIDescription
+```
+
+4. **Access AI Features**:
+- **AI Chat**: Navigate to `/ai-chat`
+- **AI Dashboard**: `/ai/dashboard`
+- **Configure providers**: Settings → AI Configuration
+- **Monitor usage**: Reports → AI Usage
+
+## 🛠 Installation
+
+### Quick Start
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/CZ-App-Studio/cygnuz-erp
+cd cygnuz-erp
+```
+
+2. **Install PHP dependencies**
+```bash
 composer install
 ```
 
-## DB Migration and Data Seeding
+3. **Install JavaScript dependencies**
+```bash
+npm install
+```
 
-For complete setup with migrations and seeding:
+4. **Environment setup**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-```sh
-# Development/Demo Environment
+5. **Configure your database** in `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=cygnuz_erp
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+6. **Run migrations and seeders**
+```bash
+# For development/demo environment
 php artisan migrate:erp --seed-demo
 
-# Production Environment
+# For production environment
 php artisan migrate:erp --seed-production
 ```
 
-For detailed seeding documentation, see [docs/SEEDING_GUIDE.md](docs/SEEDING_GUIDE.md)
-
-```sh
-npm run serve
-or
-php artisan serve --host=192.168.29.192 --port=44313
+7. **Build assets**
+```bash
+npm run build
 ```
 
-- Run API Document Generator
-
-```sh
-php artisan l5-swagger:generate
-
-http://127.0.0.1:8000/docs
-http://127.0.0.1:8000/api/documentation
+8. **Start the development server**
+```bash
+php artisan serve
+# Or with custom host/port
+php artisan serve --host=0.0.0.0 --port=8000
 ```
 
-## Module Management
+9. **Access the application**
+```
+http://localhost:8000
+```
 
-### Module Toggle Utility
+### 🔑 Default Credentials
 
-A powerful command-line utility for managing module states, particularly useful for testing core functionality without non-core modules.
+**Demo Environment:**
+- Super Admin: `superadmin@demo.com` / `123456`
+- Admin: `admin@demo.com` / `123456`
+- HR Manager: `hr.manager@demo.com` / `123456`
+- Employee: `employee@demo.com` / `123456`
 
-#### Quick Usage
+> ⚠️ **Important**: Change all default passwords immediately in production!
+
+## 📦 Module Management
+
+### Enable/Disable Modules
 
 ```bash
 # List all modules with their status
 php artisan module:toggle list
 
-# Disable all non-core modules for testing
+# Disable non-core modules
 php artisan module:toggle disable-non-core
 
-# Re-enable all non-core modules
-php artisan module:toggle enable-non-core
-
-# Backup current module status
-php artisan module:toggle backup
-
-# Restore previous module status
-php artisan module:toggle restore
-```
-
-#### Available Actions
-
-| Action | Description | Example |
-|--------|-------------|---------|
-| `list` | Display all modules with status | `php artisan module:toggle list` |
-| `enable-non-core` | Enable all non-core modules | `php artisan module:toggle enable-non-core` |
-| `disable-non-core` | Disable all non-core modules | `php artisan module:toggle disable-non-core` |
-| `enable-all` | Enable ALL modules (including core) | `php artisan module:toggle enable-all --force` |
-| `disable-all` | Disable ALL modules (dangerous!) | `php artisan module:toggle disable-all --force` |
-| `backup` | Create backup of current status | `php artisan module:toggle backup` |
-| `restore` | Restore from backup | `php artisan module:toggle restore` |
-
-#### Options
-
-- `--dry-run` - Preview changes without applying them
-- `--force` - Skip confirmation prompts
-- `--exclude=Module1 --exclude=Module2` - Exclude specific modules from operation
-- `--include=Module1 --include=Module2` - Only operate on specific modules
-
-#### Examples
-
-```bash
-# Test core modules only
-php artisan module:toggle disable-non-core --force
-
-# Disable non-core except specific modules
-php artisan module:toggle disable-non-core --exclude=Calendar --exclude=Notes
-
-# Enable specific modules only
-php artisan module:toggle enable-non-core --include=Calendar --include=Kanban
-
-# Preview what would be disabled
-php artisan module:toggle disable-non-core --dry-run
-
-# Backup before major changes
-php artisan module:toggle backup
-php artisan module:toggle disable-all --force
-# ... do testing ...
-php artisan module:toggle restore
-```
-
-#### Testing Workflow
-
-```bash
-# 1. Backup current state
-php artisan module:toggle backup
-
-# 2. Disable non-core modules for core testing
-php artisan module:toggle disable-non-core --force
-
-# 3. Run your tests
-php artisan test
-
-# 4. Restore original state
-php artisan module:toggle restore
+# Enable specific modules
+php artisan module:enable Calendar
+php artisan module:disable Calendar
 ```
 
 ### Module Seeding
 
-For individual module seeding:
+```bash
+# Seed individual modules
+php artisan module:seed HRCore
+php artisan module:seed AccountingCore
+php artisan module:seed WMSInventoryCore
+```
+
+## 🔧 Development
+
+### Running Tests
 
 ```bash
-php artisan module:seed WMSInventoryCore
-php artisan module:seed CRMCore
-php artisan module:seed MultiCurrency
-php artisan module:seed Calendar
-php artisan module:seed PMCore
-php artisan module:seed HRCore
+# Run all tests
+php artisan test
+
+# Run specific test suite
+php artisan test --testsuite=Feature
+./vendor/bin/phpunit tests/Feature/HRCore
 ```
+
+### Code Quality
+
+```bash
+# Format code with Laravel Pint
+./vendor/bin/pint
+
+# Generate API documentation
+php artisan l5-swagger:generate
+```
+
+### Asset Development
+
+```bash
+# Watch for changes
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## 📚 Documentation
+
+- [Installation Guide](docs/installation.md)
+- [User Manual](docs/user-manual.md)
+- [API Documentation](http://localhost:8000/api/documentation)
+- [Module Development Guide](docs/module-development.md)
+- [Seeding Guide](docs/SEEDING_GUIDE.md)
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### How to Contribute
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 🏗 Architecture
+
+```
+cygnuz_erp/
+├── app/                    # Core application code
+├── Modules/               # Modular components
+│   ├── HRCore/           # Human Resources
+│   ├── AccountingCore/   # Accounting
+│   ├── CRMCore/         # CRM
+│   └── ...              # Other modules
+├── resources/            # Views, assets, languages
+├── database/            # Migrations and seeders
+├── public/              # Public assets
+├── tests/               # Test suites
+└── projects/            # External applications
+    ├── desktop-tracker/ # Employee tracker
+    └── cygnuz-pos/     # POS system
+```
+
+## 🔒 Security
+
+If you discover any security-related issues, please email security@czappstudio.com instead of using the issue tracker.
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](LICENSE).
+
+## 👥 Team
+
+**CZ App Studio** - Enterprise Software Solutions
+
+- Website: [https://czappstudio.com](https://czappstudio.com)
+- Email: support@czappstudio.com
+- LinkedIn: [CZ App Studio](https://linkedin.com/company/czappstudio)
+
+## 🙏 Acknowledgments
+
+- [Laravel](https://laravel.com) - The PHP Framework
+- [Bootstrap](https://getbootstrap.com) - UI Framework
+- [nWidart/laravel-modules](https://github.com/nWidart/laravel-modules) - Module Management
+- All our contributors and supporters
+
+## 🏆 Why Choose Cygnuz ERP?
+
+### Competitive Advantages
+
+| Feature | Traditional ERP | Cygnuz ERP (Free) | Cygnuz ERP (Premium) |
+|---------|----------------|-------------------|---------------------|
+| **AI Support** | None | OpenAI Integration | Multiple AI Providers |
+| **Chat Assistant** | None | ✅ AI Chat | ✅ Specialized Assistants |
+| **Image Generation** | Manual design | ✅ DALL-E | ✅ DALL-E + More |
+| **Voice Features** | None | ✅ TTS & STT | ✅ Advanced Voice |
+| **HR Automation** | Manual | Basic AI Help | ✅ HR AI Assistant |
+| **Content Creation** | Manual writing | AI Suggestions | ✅ AI Description Generator |
+| **Provider Options** | N/A | OpenAI | OpenAI + Gemini + More |
+| **Cost Model** | High license fees | Free Core + Pay per use | Flexible premium add-ons |
+
+### Freemium Benefits
+
+- **🆓 Start Free**: No upfront AI costs with OpenAI included
+- **📈 Scale Gradually**: Add premium features as you grow
+- **💰 Pay for What You Use**: No unnecessary features
+- **🔓 No Vendor Lock-in**: Switch providers anytime
+- **🚀 Future-Proof**: New AI features added regularly
+
+## 📈 Project Status
+
+🟢 **Active Development** - Regular updates and new features
+
+### Roadmap 2025
+
+#### Q1-Q2 2025
+- [ ] **ESS Flutter App** - Employee self-service (Android + iOS)
+- [ ] **Chat App** - Internal communication platform
+- [ ] **Dynamic QR Attendance** - Enhanced security attendance
+- [ ] **Billing System** - Complete invoicing solution
+- [ ] **Multi-Currency** - Global business support
+- [ ] **Search Plus** - AI-powered advanced search
+
+#### Q3-Q4 2025
+- [ ] **Mobile CRM App** - CRM on the go
+- [ ] **Calendar App** - Mobile event management
+- [ ] **Desktop Tracker** - Employee productivity monitoring
+- [ ] **Approvals App** - Mobile approval workflows
+- [ ] **Claude AI Provider** - Anthropic integration
+- [ ] **Azure OpenAI** - Enterprise AI
+
+#### Future Vision
+- [ ] **POS System** - Modern point of sale
+- [ ] **Voice Commands** - Voice-controlled operations
+- [ ] **AR Inventory** - Augmented reality warehouse
+- [ ] **Blockchain Integration** - Secure transactions
+- [ ] **IoT Integration** - Smart device connectivity
+
+---
+
+<div align="center">
+  
+  **⭐ Star this repository if you find it helpful!**
+  
+  Made with ❤️ by [CZ App Studio](https://czappstudio.com)
+  
+  Copyright © 2025 CZ App Studio. All rights reserved.
+</div>
