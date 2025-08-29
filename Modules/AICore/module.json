@@ -1,0 +1,30 @@
+{
+    "name": "AICore",
+    "alias": "aicore",
+    "displayName": "AI Core",
+    "version": "1.0.0",
+    "description": "Core AI infrastructure module that provides AI provider management, request routing, usage tracking, and foundational services for all AI-powered features in the ERP system.",
+    "documentationUrl": "https://czappstudio.com/ai-core-documentation",
+    "changelogUrl": "https://czappstudio.com/ai-core-changelog",
+    "tutorialUrl": "https://czappstudio.com/ai-core-tutorial",
+    "isCoreModule": true,
+    "keywords": [
+        "ai",
+        "artificial intelligence",
+        "machine learning",
+        "openai",
+        "claude",
+        "gemini",
+        "automation",
+        "nlp"
+    ],
+    "priority": 1,
+    "providers": [
+        "Modules\\AICore\\Providers\\AICoreServiceProvider"
+    ],
+    "files": [],
+    "category": "Core",
+    "dependencies": [
+        "SystemCore"
+    ]
+}

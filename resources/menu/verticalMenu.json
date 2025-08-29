@@ -1,0 +1,1411 @@
+{
+    "menu": [
+        {
+            "menuHeader": "Dashboard"
+        },
+        {
+            "url": "/",
+            "name": "Dashboard",
+            "icon": "menu-icon bx bx-home",
+            "slug": "dashboard"
+        },
+        {
+            "menuHeader": "Business Operations"
+        },
+        {
+            "name": "Project Management",
+            "icon": "menu-icon bx bx-folder",
+            "slug": [
+                "pmcore.dashboard.index",
+                "pmcore.projects.index",
+                "pmcore.timesheets.index",
+                "pmcore.resources.index",
+                "pmcore.reports.index"
+            ],
+            "addon": "PMCore",
+            "submenu": [
+                {
+                    "url": "/projects/dashboard",
+                    "name": "PM Dashboard",
+                    "slug": "pmcore.dashboard.index"
+                },
+                {
+                    "url": "/projects",
+                    "name": "All Projects",
+                    "slug": "pmcore.projects.index"
+                },
+                {
+                    "url": "/projects/timesheets",
+                    "name": "Timesheets",
+                    "slug": "pmcore.timesheets.index"
+                },
+                {
+                    "url": "/projects/resources",
+                    "name": "Resources",
+                    "slug": "pmcore.resources.index"
+                },
+                {
+                    "url": "/projects/resources/capacity",
+                    "name": "Capacity Planning",
+                    "slug": "pmcore.resources.capacity"
+                },
+                {
+                    "name": "Reports",
+                    "slug": [
+                        "pmcore.reports.index",
+                        "pmcore.reports.time",
+                        "pmcore.reports.budget",
+                        "pmcore.reports.resource"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "/projects/reports",
+                            "name": "Overview",
+                            "slug": "pmcore.reports.index"
+                        },
+                        {
+                            "url": "/projects/reports/time",
+                            "name": "Time Report",
+                            "slug": "pmcore.reports.time"
+                        },
+                        {
+                            "url": "/projects/reports/budget",
+                            "name": "Budget Report",
+                            "slug": "pmcore.reports.budget"
+                        },
+                        {
+                            "url": "/projects/reports/resource",
+                            "name": "Resource Report",
+                            "slug": "pmcore.reports.resource"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "url": "/tasks",
+            "name": "Tasks & Calendar",
+            "icon": "menu-icon bx bx-task",
+            "slug": [
+                "tasks.index",
+                "calendar.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/tasks",
+                    "name": "All Tasks",
+                    "slug": "tasks.index"
+                }
+            ]
+        },
+        {
+            "menuHeader": "Finance & Accounting"
+        },
+        {
+            "name": "Financial Management",
+            "icon": "menu-icon bx bx-money",
+            "slug": [
+                "paymentcollection.index",
+                "expenseRequests.index",
+                "loan.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/paymentcollection",
+                    "name": "Accounts Receivable",
+                    "slug": "paymentcollection.index",
+                    "addon": "PaymentCollection"
+                },
+                {
+                    "url": "/expenseRequests",
+                    "name": "Expense Management",
+                    "slug": "expenseRequests.index"
+                },
+                {
+                    "name": "Loan Management",
+                    "slug": [
+                        "loan.admin.index",
+                        "loan.my-loans",
+                        "loan.admin.types.index",
+                        "loan.admin.repayments.index",
+                        "loan.admin.repayments.overdue"
+                    ],
+                    "addon": "LoanManagement",
+                    "submenu": [
+                        {
+                            "url": "/ess/my-loans",
+                            "name": "My Loans",
+                            "slug": "loan.my-loans"
+                        },
+                        {
+                            "url": "/loan",
+                            "name": "All Loan Requests",
+                            "slug": "loan.admin.index"
+                        },
+                        {
+                            "url": "/loan/types",
+                            "name": "Loan Types",
+                            "slug": "loan.admin.types.index"
+                        },
+                        {
+                            "url": "/loan/repayments",
+                            "name": "Repayments",
+                            "slug": "loan.admin.repayments.index"
+                        },
+                        {
+                            "url": "/loan/repayments/overdue",
+                            "name": "Overdue Loans",
+                            "slug": "loan.admin.repayments.overdue"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Payroll Management",
+            "icon": "menu-icon bx bx-wallet",
+            "slug": [
+                "payroll.index",
+                "payroll.cycles.index",
+                "payroll.adjustments.index",
+                "payroll.salaries.index",
+                "payroll.settings.index"
+            ],
+            "addon": "Payroll",
+            "submenu": [
+                {
+                    "url": "/payroll",
+                    "name": "Payroll Records",
+                    "slug": "payroll.index"
+                },
+                {
+                    "url": "/payroll/cycles",
+                    "name": "Payroll Cycles",
+                    "slug": "payroll.cycles.index"
+                },
+                {
+                    "url": "/payroll/adjustments",
+                    "name": "Adjustments",
+                    "slug": "payroll.adjustments.index"
+                },
+                {
+                    "url": "/payroll/salaries",
+                    "name": "Employee Salaries",
+                    "slug": "payroll.salaries.index"
+                },
+                {
+                    "url": "/payroll/settings",
+                    "name": "Payroll Settings",
+                    "slug": "payroll.settings.index"
+                }
+            ]
+        },
+        {
+            "menuHeader": "Inventory & Sales"
+        },
+        {
+            "name": "Store Management",
+            "icon": "menu-icon bx bx-store-alt",
+            "slug": [
+                "storemanager.stores.index"
+            ],
+            "addon": "StoreManager",
+            "submenu": [
+                {
+                    "url": "/storemanager/stores",
+                    "name": "Stores",
+                    "slug": "storemanager.stores.index"
+                }
+            ]
+        },
+        {
+            "name": "POS System",
+            "icon": "menu-icon bx bx-credit-card-front",
+            "slug": [
+                "pos.terminals.index",
+                "pos.sessions.index",
+                "pos.sales.index",
+                "pos.reports.daily",
+                "poscoupons.coupons.index"
+            ],
+            "addon": "POSSystem",
+            "submenu": [
+                {
+                    "url": "/pos/terminals",
+                    "name": "POS Terminals",
+                    "slug": "pos.terminals.index"
+                },
+                {
+                    "url": "/pos/sessions",
+                    "name": "Cash Sessions",
+                    "slug": "pos.sessions.index"
+                },
+                {
+                    "url": "/pos/sales",
+                    "name": "POS Sales",
+                    "slug": "pos.sales.index"
+                },
+                {
+                    "url": "/poscoupons/coupons",
+                    "name": "Coupons",
+                    "slug": "poscoupons.coupons.index",
+                    "addon": "POSCoupons"
+                },
+                {
+                    "url": "/pos/reports/daily",
+                    "name": "Daily Reports",
+                    "slug": "pos.reports.daily"
+                }
+            ]
+        },
+        {
+            "menuHeader": "Human Resources"
+        },
+        {
+            "name": "Employee Management",
+            "icon": "menu-icon bx bx-group",
+            "slug": [
+                "hrcore.employees.index",
+                "recruitment.jobOpenings.index",
+                "recruitment.onboardingTasks.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/hrcore/employees",
+                    "name": "All Employees",
+                    "slug": "hrcore.employees.index"
+                },
+                {
+                    "name": "Recruitment",
+                    "slug": [
+                        "recruitment.jobOpenings.index",
+                        "recruitment.onboardingTasks.index"
+                    ],
+                    "addon": "Recruitment",
+                    "submenu": [
+                        {
+                            "url": "/recruitment/jobOpenings",
+                            "name": "Job Openings",
+                            "slug": "recruitment.jobOpenings.index"
+                        },
+                        {
+                            "url": "/recruitment/onboardingTasks",
+                            "name": "Onboarding Tasks",
+                            "slug": "recruitment.onboardingTasks.index"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Attendance Management",
+            "icon": "menu-icon bx bx-time-five",
+            "slug": [
+                "hrcore.attendance.index",
+                "hrcore.attendance.web-attendance",
+                "hrcore.attendance-regularization.index",
+                "hrcore.attendance-dashboard.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/hrcore/attendance",
+                    "name": "Attendance Records",
+                    "slug": "hrcore.attendance.index"
+                },
+                {
+                    "url": "/hrcore/attendance/web-attendance",
+                    "name": "Web Check-in",
+                    "slug": "hrcore.attendance.web-attendance"
+                },
+                {
+                    "url": "/hrcore/attendance-regularization",
+                    "name": "Regularization",
+                    "slug": "hrcore.attendance-regularization.index"
+                },
+                {
+                    "url": "/hrcore/attendance-dashboard",
+                    "name": "Manager Dashboard",
+                    "slug": "hrcore.attendance-dashboard.index"
+                }
+            ]
+        },
+        {
+            "name": "Leave Management",
+            "icon": "menu-icon bx bx-calendar-x",
+            "slug": [
+                "hrcore.leaves.index",
+                "hrcore.leave-types.index",
+                "hrcore.leave-balance.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/hrcore/leaves",
+                    "name": "Leave Requests",
+                    "slug": "hrcore.leaves.index"
+                },
+                {
+                    "url": "/hrcore/leave-types",
+                    "name": "Leave Types",
+                    "slug": "hrcore.leave-types.index"
+                },
+                {
+                    "url": "/hrcore/leave-balance",
+                    "name": "Balance Management",
+                    "slug": "hrcore.leave-balance.index"
+                }
+            ]
+        },
+        {
+            "name": "Employee Tracking",
+            "icon": "menu-icon bx bx-desktop",
+            "slug": [
+                "desktoptracker.dashboard.index",
+                "shiftplus.index"
+            ],
+            "submenu": [
+                {
+                    "name": "Desktop Tracker",
+                    "slug": [
+                        "desktoptracker.dashboard.index",
+                        "desktoptracker.users.index"
+                    ],
+                    "addon": "DesktopTracker",
+                    "submenu": [
+                        {
+                            "url": "/desktoptracker/dashboard",
+                            "name": "Tracker Dashboard",
+                            "slug": "desktoptracker.dashboard.index"
+                        },
+                        {
+                            "url": "/desktoptracker/users",
+                            "name": "User Activity",
+                            "slug": "desktoptracker.users.index"
+                        }
+                    ]
+                },
+                {
+                    "name": "Shift Management",
+                    "slug": [
+                        "shiftplus.index",
+                        "shiftplus.roster.index",
+                        "shiftplus.templates.index"
+                    ],
+                    "addon": "ShiftPlus",
+                    "submenu": [
+                        {
+                            "url": "/shiftplus",
+                            "name": "Shift Dashboard",
+                            "slug": "shiftplus.index"
+                        },
+                        {
+                            "url": "/shiftplus/rosters",
+                            "name": "Rosters",
+                            "slug": "shiftplus.roster.index"
+                        },
+                        {
+                            "url": "/shiftplus/templates",
+                            "name": "Shift Templates",
+                            "slug": "shiftplus.templates.index"
+                        },
+                        {
+                            "url": "/shiftplus/shift-swap",
+                            "name": "Shift Swaps",
+                            "slug": "shiftplus.shift-swap.index"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "HR Policies & Compliance",
+            "icon": "menu-icon bx bx-shield",
+            "slug": [
+                "hrpolicies.dashboard.index",
+                "disciplinaryactions.warnings.index"
+            ],
+            "submenu": [
+                {
+                    "name": "Policy Management",
+                    "slug": [
+                        "hrpolicies.dashboard.index",
+                        "hrpolicies.policies.index",
+                        "hrpolicies.policy-categories.index"
+                    ],
+                    "addon": "HRPolicies",
+                    "submenu": [
+                        {
+                            "url": "/hrpolicies/dashboard",
+                            "name": "Policies Dashboard",
+                            "slug": "hrpolicies.dashboard.index"
+                        },
+                        {
+                            "url": "/hrpolicies/policies",
+                            "name": "All Policies",
+                            "slug": "hrpolicies.policies.index"
+                        },
+                        {
+                            "url": "/hrpolicies/policy-categories",
+                            "name": "Policy Categories",
+                            "slug": "hrpolicies.policy-categories.index"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Learning & Development",
+            "icon": "menu-icon bx bx-book",
+            "slug": [
+                "lms.categories.index",
+                "lms.courses.index"
+            ],
+            "addon": "LMS",
+            "submenu": [
+                {
+                    "url": "/lms/courses",
+                    "name": "Course Management",
+                    "slug": "lms.courses.index"
+                },
+                {
+                    "url": "/lms/categories",
+                    "name": "Course Categories",
+                    "slug": "lms.categories.index"
+                }
+            ]
+        },
+        {
+            "menuHeader": "Organization & Documents"
+        },
+        {
+            "name": "Company Structure",
+            "icon": "menu-icon bx bx-building",
+            "slug": [
+                "hrcore.teams.index",
+                "hrcore.departments.index",
+                "hrcore.designations.index",
+                "hrcore.organization-hierarchy.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/hrcore/teams",
+                    "name": "Teams",
+                    "slug": "hrcore.teams.index"
+                },
+                {
+                    "url": "/departments",
+                    "name": "Departments",
+                    "slug": "hrcore.departments.index"
+                },
+                {
+                    "url": "/hrcore/designations",
+                    "name": "Designations",
+                    "slug": "hrcore.designations.index"
+                },
+                {
+                    "url": "/hrcore/organization-hierarchy",
+                    "name": "Organization Hierarchy",
+                    "slug": "hrcore.organization-hierarchy.index"
+                }
+            ]
+        },
+        {
+            "name": "Communication",
+            "icon": "menu-icon bx bx-chat",
+            "slug": [
+                "announcements.index",
+                "notifications.myNotifications"
+            ],
+            "submenu": [
+                {
+                    "url": "/notifications/my",
+                    "name": "Notifications",
+                    "slug": "notifications.myNotifications"
+                }
+            ]
+        },
+        {
+            "menuHeader": "System Management"
+        },
+        {
+            "name": "User Management",
+            "icon": "menu-icon bx bx-group",
+            "slug": [
+                "roles.index",
+                "permissions.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/roles",
+                    "name": "Roles",
+                    "slug": "roles.index"
+                },
+                {
+                    "url": "/permissions",
+                    "name": "Permissions",
+                    "slug": "permissions.index"
+                }
+            ]
+        },
+        {
+            "name": "System Configuration",
+            "icon": "menu-icon bx bx-cog",
+            "slug": [
+                "settings.index",
+                "admin.system-status.index",
+                "master-data.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/settings",
+                    "name": "General Settings",
+                    "slug": "settings.index"
+                },
+                {
+                    "url": "/admin/system-status",
+                    "name": "System Status",
+                    "slug": "admin.system-status.index"
+                },
+                {
+                    "url": "/master-data",
+                    "name": "Master Data",
+                    "slug": "master-data.index"
+                },
+                {
+                    "url": "/projects/project-statuses",
+                    "name": "Project Statuses",
+                    "slug": "pmcore.project-statuses.index"
+                }
+            ]
+        },
+        {
+            "name": "Device Management",
+            "icon": "menu-icon bx bx-devices",
+            "slug": [
+                "device.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/device",
+                    "name": "Registered Devices",
+                    "slug": "device.index"
+                }
+            ]
+        },
+        {
+            "name": "Customer Management",
+            "icon": "menu-icon bx bx-group",
+            "slug": [
+                "systemcore.customers.index",
+                "systemcore.customer-groups.index"
+            ],
+            "addon": "SystemCore",
+            "submenu": [
+                {
+                    "url": "/systemcore/customers",
+                    "name": "Customers",
+                    "slug": "systemcore.customers.index"
+                },
+                {
+                    "url": "/systemcore/customer-groups",
+                    "name": "Customer Groups",
+                    "slug": "systemcore.customer-groups.index"
+                }
+            ]
+        },
+        {
+            "menuHeader": "Tools & Extensions"
+        },
+        {
+            "name": "Form Management",
+            "icon": "menu-icon bx bx-file",
+            "slug": [
+                "formbuilder.index",
+                "forms.index",
+                "formSubmissions.index"
+            ],
+            "submenu": [
+                {
+                    "name": "Form Builder",
+                    "slug": [
+                        "formbuilder.index",
+                        "formbuilder.create"
+                    ],
+                    "addon": "FormBuilder",
+                    "submenu": [
+                        {
+                            "url": "/forms",
+                            "name": "Manage Forms",
+                            "slug": "formbuilder.index"
+                        },
+                        {
+                            "url": "/forms/create",
+                            "name": "Create Form",
+                            "slug": "formbuilder.create"
+                        }
+                    ]
+                },
+                {
+                    "name": "Dynamic Forms",
+                    "slug": [
+                        "forms.index",
+                        "formSubmissions.index",
+                        "formAssignments.index"
+                    ],
+                    "addon": "DynamicForms",
+                    "submenu": [
+                        {
+                            "url": "/forms",
+                            "name": "Forms",
+                            "slug": "forms.index"
+                        },
+                        {
+                            "url": "/formSubmissions",
+                            "name": "Submissions",
+                            "slug": "formSubmissions.index"
+                        },
+                        {
+                            "url": "/formAssignments",
+                            "name": "Assignments",
+                            "slug": "formAssignments.index"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "menuHeader": "Multi-tenancy (Super Admin Only)"
+        },
+        {
+            "url": "/multitenancy/admin/dashboard",
+            "name": "SaaS Dashboard",
+            "icon": "menu-icon bx bx-grid-alt",
+            "slug": "multitenancycore.admin.dashboard",
+            "addon": "MultiTenancyCore",
+            "role": "super_admin"
+        },
+        {
+            "name": "Tenant Management",
+            "icon": "menu-icon bx bx-buildings",
+            "slug": [
+                "multitenancycore.admin.tenants.index",
+                "multitenancycore.admin.tenants.approval-queue"
+            ],
+            "addon": "MultiTenancyCore",
+            "role": "super_admin",
+            "submenu": [
+                {
+                    "url": "/multitenancy/admin/tenants",
+                    "name": "All Tenants",
+                    "slug": "multitenancycore.admin.tenants.index"
+                },
+                {
+                    "url": "/multitenancy/admin/tenants/approval-queue",
+                    "name": "Approval Queue",
+                    "slug": "multitenancycore.admin.tenants.approval-queue"
+                }
+            ]
+        },
+        {
+            "name": "Subscription Management",
+            "icon": "menu-icon bx bx-package",
+            "slug": [
+                "multitenancycore.admin.plans.index",
+                "multitenancycore.admin.subscriptions.index"
+            ],
+            "addon": "MultiTenancyCore",
+            "role": "super_admin",
+            "submenu": [
+                {
+                    "url": "/multitenancy/admin/plans",
+                    "name": "Plans",
+                    "slug": "multitenancycore.admin.plans.index"
+                },
+                {
+                    "url": "/multitenancy/admin/subscriptions",
+                    "name": "Subscriptions",
+                    "slug": "multitenancycore.admin.subscriptions.index"
+                }
+            ]
+        },
+        {
+            "name": "Payment Management",
+            "icon": "menu-icon bx bx-dollar",
+            "slug": [
+                "multitenancycore.admin.payments.approval-queue",
+                "multitenancycore.admin.payments.history"
+            ],
+            "addon": "MultiTenancyCore",
+            "role": "super_admin",
+            "submenu": [
+                {
+                    "url": "/multitenancy/admin/payments/approval-queue",
+                    "name": "Payment Approval Queue",
+                    "slug": "multitenancycore.admin.payments.approval-queue"
+                },
+                {
+                    "url": "/multitenancy/admin/payments/history",
+                    "name": "Payment History",
+                    "slug": "multitenancycore.admin.payments.history"
+                }
+            ]
+        },
+        {
+            "name": "System Administration",
+            "icon": "menu-icon bx bx-server",
+            "slug": [
+                "multitenancycore.admin.provisioning.index",
+                "multitenancycore.admin.saas-settings.index",
+                "landingPage.settings.index"
+            ],
+            "role": "super_admin",
+            "submenu": [
+                {
+                    "url": "/multitenancy/admin/provisioning",
+                    "name": "Database Provisioning",
+                    "slug": "multitenancycore.admin.provisioning.index",
+                    "addon": "MultiTenancyCore"
+                },
+                {
+                    "url": "/multitenancy/admin/saas-settings",
+                    "name": "SaaS Settings",
+                    "slug": "multitenancycore.admin.saas-settings.index",
+                    "addon": "MultiTenancyCore"
+                },
+                {
+                    "name": "Landing Page",
+                    "slug": [
+                        "landingPage.settings.index",
+                        "landingPage.features.index",
+                        "landingPage.reviews.index"
+                    ],
+                    "addon": "LandingPage",
+                    "submenu": [
+                        {
+                            "url": "/landingPage/settings",
+                            "name": "Page Settings",
+                            "slug": "landingPage.settings.index"
+                        },
+                        {
+                            "url": "/landingFeatures",
+                            "name": "Features",
+                            "slug": "landingPage.features.index"
+                        },
+                        {
+                            "url": "/landingReviews",
+                            "name": "Reviews",
+                            "slug": "landingPage.reviews.index"
+                        },
+                        {
+                            "url": "/teamMembers",
+                            "name": "Team Members",
+                            "slug": "landingPage.teamMembers.index"
+                        },
+                        {
+                            "url": "/faqs",
+                            "name": "FAQs",
+                            "slug": "landingPage.faqs.index"
+                        },
+                        {
+                            "url": "/contactSubmissions",
+                            "name": "Contact Submissions",
+                            "slug": "landingPage.contactSubmissions.index"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "menuHeader": "Inventory & WMS"
+        },
+        {
+            "name": "Inventory Management",
+            "icon": "menu-icon bx bx-package",
+            "slug": [
+                "wmsinventorycore.dashboard.index",
+                "wmsinventorycore.products.index",
+                "wmsinventorycore.warehouses.index",
+                "wmsinventorycore.adjustments.index",
+                "wmsinventorycore.transfers.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/inventory/dashboard",
+                    "name": "Inventory Dashboard",
+                    "slug": "wmsinventorycore.dashboard.index"
+                },
+                {
+                    "url": "/inventory/products",
+                    "name": "Products",
+                    "slug": "wmsinventorycore.products.index"
+                },
+                {
+                    "url": "/inventory/warehouses",
+                    "name": "Warehouses",
+                    "slug": "wmsinventorycore.warehouses.index"
+                },
+                {
+                    "url": "/inventory/adjustments",
+                    "name": "Stock Adjustments",
+                    "slug": "wmsinventorycore.adjustments.index"
+                },
+                {
+                    "url": "/inventory/transfers",
+                    "name": "Stock Transfers",
+                    "slug": "wmsinventorycore.transfers.index"
+                },
+                {
+                    "name": "Inventory Reports",
+                    "slug": [
+                        "wmsinventorycore.reports.inventory-valuation",
+                        "wmsinventorycore.reports.stock-movement",
+                        "wmsinventorycore.reports.low-stock"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "/inventory/reports/inventory-valuation",
+                            "name": "Inventory Valuation",
+                            "slug": "wmsinventorycore.reports.inventory-valuation"
+                        },
+                        {
+                            "url": "/inventory/reports/stock-movement",
+                            "name": "Stock Movement",
+                            "slug": "wmsinventorycore.reports.stock-movement"
+                        },
+                        {
+                            "url": "/inventory/reports/low-stock",
+                            "name": "Low Stock Alert",
+                            "slug": "wmsinventorycore.reports.low-stock"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Accounting Core",
+            "icon": "menu-icon bx bx-calculator",
+            "slug": [
+                "accountingcore.dashboard",
+                "accountingcore.transactions.index",
+                "accountingcore.categories.index",
+                "accountingcore.reports.index"
+            ],
+            "submenu": [
+                {
+                    "url": "accountingcore/dashboard",
+                    "name": "Accounting Dashboard",
+                    "slug": "accountingcore.dashboard"
+                },
+                {
+                    "url": "accountingcore/transactions",
+                    "name": "Transactions",
+                    "slug": "accountingcore.transactions.index"
+                },
+                {
+                    "url": "accountingcore/categories",
+                    "name": "Categories",
+                    "slug": "accountingcore.categories.index"
+                },
+                {
+                    "url": "accountingcore/tax-rates",
+                    "name": "Tax Rates",
+                    "slug": "accountingcore.tax-rates.index"
+                },
+                {
+                    "url": "accountingcore/reports",
+                    "name": "Reports",
+                    "slug": "accountingcore.reports.index"
+                }
+            ]
+        },
+        {
+            "name": "Accounting Pro",
+            "icon": "menu-icon bx bx-calculator",
+            "slug": [
+                "accountingpro.dashboard",
+                "accountingpro.settings.chart-of-accounts.index",
+                "accountingpro.transactions.journal-entries.index",
+                "accountingpro.reports.general_ledger.index"
+            ],
+            "addon": "AccountingPro",
+            "submenu": [
+                {
+                    "url": "accountingpro/dashboard",
+                    "name": "Pro Dashboard",
+                    "slug": "accountingpro.dashboard"
+                },
+                {
+                    "name": "Setup",
+                    "slug": [
+                        "accountingpro.settings.chart-of-accounts.index",
+                        "accountingpro.settings.tax-rates.index",
+                        "accountingpro.settings.fiscal-periods.index"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "accountingpro/settings/chart-of-accounts",
+                            "name": "Chart of Accounts",
+                            "slug": "accountingpro.settings.chart-of-accounts.index"
+                        },
+                        {
+                            "url": "accountingpro/settings/tax-rates",
+                            "name": "Tax Rates",
+                            "slug": "accountingpro.settings.tax-rates.index"
+                        },
+                        {
+                            "url": "accountingpro/settings/fiscal-periods",
+                            "name": "Fiscal Periods",
+                            "slug": "accountingpro.settings.fiscal-periods.index"
+                        }
+                    ]
+                },
+                {
+                    "name": "Transactions",
+                    "slug": [
+                        "accountingpro.transactions.journal-entries.index",
+                        "accountingpro.transactions.bank-reconciliation.index"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "accountingpro/transactions/journal-entries",
+                            "name": "Journal Entries",
+                            "slug": "accountingpro.transactions.journal-entries.index"
+                        },
+                        {
+                            "url": "accountingpro/transactions/bank-reconciliation",
+                            "name": "Bank Reconciliation",
+                            "slug": "accountingpro.transactions.bank-reconciliation.index"
+                        }
+                    ]
+                },
+                {
+                    "name": "Financial Reports",
+                    "slug": [
+                        "accountingpro.reports.general_ledger.index",
+                        "accountingpro.reports.profit_loss.index",
+                        "accountingpro.reports.balance_sheet.index",
+                        "accountingpro.reports.trial_balance.index"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "accountingpro/reports/general-ledger",
+                            "name": "General Ledger",
+                            "slug": "accountingpro.reports.general_ledger.index"
+                        },
+                        {
+                            "url": "accountingpro/reports/profit-loss",
+                            "name": "Profit & Loss",
+                            "slug": "accountingpro.reports.profit_loss.index"
+                        },
+                        {
+                            "url": "accountingpro/reports/balance-sheet",
+                            "name": "Balance Sheet",
+                            "slug": "accountingpro.reports.balance_sheet.index"
+                        },
+                        {
+                            "url": "accountingpro/reports/trial-balance",
+                            "name": "Trial Balance",
+                            "slug": "accountingpro.reports.trial_balance.index"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Artificial Intelligence",
+            "icon": "menu-icon bx bx-brain",
+            "slug": [
+                "aicore.dashboard",
+                "aiChat.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/aiChat",
+                    "name": "AI Assistant",
+                    "slug": "aiChat.index",
+                    "addon": "AiChat",
+                    "badge": [
+                        "danger",
+                        "Beta"
+                    ]
+                }
+            ]
+        },
+        {
+            "url": "/aiChat",
+            "name": "AI Assistant",
+            "slug": "aiChat.index",
+            "addon": "AiChat",
+            "badge": [
+                "danger",
+                "Beta"
+            ]
+        },
+        {
+            "name": "Announcements",
+            "slug": [
+                "announcements.index",
+                "announcements.my"
+            ],
+            "addon": "Announcement",
+            "submenu": [
+                {
+                    "url": "/announcements",
+                    "name": "Manage Announcements",
+                    "slug": "announcements.index"
+                },
+                {
+                    "url": "/announcements/my/list",
+                    "name": "My Announcements",
+                    "slug": "announcements.my"
+                }
+            ]
+        },
+        {
+            "name": "System Monitoring",
+            "icon": "menu-icon bx bx-shield",
+            "slug": [
+                "auditlog.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/auditlog",
+                    "name": "Audit Logs",
+                    "slug": "auditlog.index",
+                    "addon": "AuditLog"
+                }
+            ]
+        },
+        {
+            "name": "Assets Management",
+            "icon": "menu-icon bx bx-box",
+            "slug": "assets.index",
+            "submenu": [
+                {
+                    "url": "/assets",
+                    "name": "All Assets",
+                    "slug": "assets.index"
+                },
+                {
+                    "url": "/assets/categories",
+                    "name": "Categories",
+                    "slug": "assets.categories.index"
+                }
+            ]
+        },
+        {
+            "name": "Billing & Invoicing",
+            "icon": "menu-icon bx bx-receipt",
+            "slug": [
+                "invoice.invoices.index",
+                "invoice.proposals.index",
+                "billing.settings.index",
+                "settings.invoice.documentNumbering.index"
+            ],
+            "addon": "Billing",
+            "submenu": [
+                {
+                    "url": "invoice/invoices",
+                    "name": "Invoices",
+                    "slug": "invoice.invoices.index"
+                },
+                {
+                    "url": "invoice/proposals",
+                    "name": "Proposals",
+                    "slug": "invoice.proposals.index"
+                },
+                {
+                    "url": "billing/settings",
+                    "name": "Billing Settings",
+                    "slug": "billing.settings.index"
+                },
+                {
+                    "url": "settings/invoice/document-numbering",
+                    "name": "Document Numbering",
+                    "slug": "settings.invoice.documentNumbering.index"
+                }
+            ]
+        },
+        {
+            "name": "Customer Relationship",
+            "icon": "menu-icon bx bx-group",
+            "slug": [
+                "crm.dashboard.index",
+                "companies.index",
+                "contacts.index",
+                "leads.index",
+                "deals.index"
+            ],
+            "addon": "CRMCore",
+            "submenu": [
+                {
+                    "url": "/crm/dashboard",
+                    "name": "CRM Dashboard",
+                    "slug": "crm.dashboard.index"
+                },
+                {
+                    "url": "/companies",
+                    "name": "Companies",
+                    "slug": "companies.index"
+                },
+                {
+                    "url": "/contacts",
+                    "name": "Contacts",
+                    "slug": "contacts.index"
+                },
+                {
+                    "url": "/leads",
+                    "name": "Leads",
+                    "slug": "leads.index"
+                },
+                {
+                    "url": "/deals",
+                    "name": "Deals",
+                    "slug": "deals.index"
+                }
+            ]
+        },
+        {
+            "url": "/calendar",
+            "name": "Calendar",
+            "icon": "menu-icon bx bx-calendar",
+            "slug": "calendar.index",
+            "addon": "Calendar"
+        },
+        {
+            "name": "Data Management",
+            "icon": "menu-icon bx bx-transfer-alt",
+            "slug": [
+                "dataImportExport.index"
+            ],
+            "addon": "DataImportExport",
+            "submenu": [
+                {
+                    "url": "/dataImportExport",
+                    "name": "Import/Export",
+                    "slug": "dataImportExport.index"
+                }
+            ]
+        },
+        {
+            "name": "Disciplinary Actions",
+            "slug": [
+                "disciplinaryactions.warnings.index",
+                "disciplinaryactions.warning-types.index",
+                "disciplinaryactions.appeals.index"
+            ],
+            "addon": "DisciplinaryActions",
+            "submenu": [
+                {
+                    "url": "/disciplinary-actions/warnings",
+                    "name": "Warnings",
+                    "slug": "disciplinaryactions.warnings.index"
+                },
+                {
+                    "url": "/disciplinary-actions/warning-types",
+                    "name": "Warning Types",
+                    "slug": "disciplinaryactions.warning-types.index"
+                },
+                {
+                    "url": "/disciplinary-actions/appeals",
+                    "name": "Appeals",
+                    "slug": "disciplinaryactions.appeals.index"
+                }
+            ]
+        },
+        {
+            "name": "Document Management",
+            "icon": "menu-icon bx bx-folder",
+            "slug": [
+                "documentmanagement.dashboard",
+                "documentmanagement.employee-documents.index",
+                "documentmanagement.document-categories.index"
+            ],
+            "addon": "DocumentManagement",
+            "submenu": [
+                {
+                    "url": "/documents-dashboard",
+                    "name": "Documents Dashboard",
+                    "slug": "documentmanagement.dashboard"
+                },
+                {
+                    "url": "/employee-documents",
+                    "name": "Employee Documents",
+                    "slug": "documentmanagement.employee-documents.index"
+                },
+                {
+                    "url": "/document-categories",
+                    "name": "Document Categories",
+                    "slug": "documentmanagement.document-categories.index"
+                }
+            ]
+        },
+        {
+            "url": "/dynamicqrattendance",
+            "name": "QR Attendance Devices",
+            "icon": "menu-icon bx bx-qr",
+            "slug": "dynamicqrattendance.index",
+            "addon": "DynamicQrAttendance"
+        },
+        {
+            "name": "Field Operations",
+            "icon": "menu-icon bx bx-map-pin",
+            "slug": [
+                "liveLocationView",
+                "timelineView",
+                "cardView",
+                "sos.index",
+                "visits.index",
+                "field-orders.index"
+            ],
+            "addon": "FieldManager",
+            "submenu": [
+                {
+                    "url": "/liveLocation",
+                    "name": "Live Location",
+                    "slug": "liveLocationView"
+                },
+                {
+                    "url": "/timeline",
+                    "name": "Timeline View",
+                    "slug": "timelineView"
+                },
+                {
+                    "url": "/cardView",
+                    "name": "Card View",
+                    "slug": "cardView"
+                },
+                {
+                    "url": "/sos",
+                    "name": "SOS Emergency",
+                    "slug": "sos.index"
+                },
+                {
+                    "url": "/visits",
+                    "name": "Customer Visits",
+                    "slug": "visits.index"
+                },
+                {
+                    "url": "/field-orders",
+                    "name": "Field Orders",
+                    "slug": "field-orders.index"
+                }
+            ]
+        },
+        {
+            "url": "multi-currency",
+            "name": "Multi Currency",
+            "icon": "bx bx-money",
+            "slug": "multi-currency",
+            "submenu": [
+                {
+                    "url": "multi-currency/currencies",
+                    "name": "Currencies",
+                    "slug": "multi-currency-currencies"
+                },
+                {
+                    "url": "multi-currency/exchange-rates",
+                    "name": "Exchange Rates",
+                    "slug": "multi-currency-exchange-rates"
+                },
+                {
+                    "url": "multi-currency/settings",
+                    "name": "Settings",
+                    "slug": "multi-currency-settings"
+                }
+            ]
+        },
+        {
+            "name": "Loan Management",
+            "icon": "menu-icon bx bx-wallet",
+            "slug": [
+                "loan.admin.index",
+                "loan.my-loans",
+                "loan.admin.types.index",
+                "loan.admin.repayments.index",
+                "loan.admin.repayments.overdue"
+            ],
+            "addon": "LoanManagement",
+            "submenu": [
+                {
+                    "url": "/ess/my-loans",
+                    "name": "My Loans",
+                    "slug": "loan.my-loans"
+                },
+                {
+                    "url": "/loan",
+                    "name": "All Loan Requests",
+                    "slug": "loan.admin.index"
+                },
+                {
+                    "url": "/loan/types",
+                    "name": "Loan Types",
+                    "slug": "loan.admin.types.index"
+                },
+                {
+                    "url": "/loan/repayments",
+                    "name": "Repayments",
+                    "slug": "loan.admin.repayments.index"
+                },
+                {
+                    "url": "/loan/repayments/overdue",
+                    "name": "Overdue Loans",
+                    "slug": "loan.admin.repayments.overdue"
+                }
+            ]
+        },
+        {
+            "url": "/currencies",
+            "name": "Currencies",
+            "icon": "menu-icon bx bx-money",
+            "slug": "multi-currency.admin.index"
+        },
+        {
+            "menuHeader": "Hari Finance & Accounting"
+        },
+        {
+            "name": "CRM Settings",
+            "icon": "menu-icon bx bx-cog",
+            "slug": [
+                "settings.leadStatuses.index",
+                "settings.leadSources.index",
+                "settings.dealPipelines.index",
+                "settings.dealStages.index",
+                "settings.taskStatuses.index",
+                "settings.taskPriorities.index"
+            ],
+            "addon": "CRMCore",
+            "submenu": [
+                {
+                    "url": "/settings/lead-statuses",
+                    "name": "Lead Statuses",
+                    "slug": "settings.leadStatuses.index"
+                },
+                {
+                    "url": "/settings/lead-sources",
+                    "name": "Lead Sources",
+                    "slug": "settings.leadSources.index"
+                },
+                {
+                    "url": "/settings/deal-pipelines",
+                    "name": "Deal Pipelines",
+                    "slug": "settings.dealPipelines.index"
+                },
+                {
+                    "url": "/settings/deal-stages",
+                    "name": "Deal Stages",
+                    "slug": "settings.dealStages.index"
+                },
+                {
+                    "url": "/settings/task-statuses",
+                    "name": "Task Statuses",
+                    "slug": "settings.taskStatuses.index"
+                },
+                {
+                    "url": "/settings/task-priorities",
+                    "name": "Task Priorities",
+                    "slug": "settings.taskPriorities.index"
+                }
+            ]
+        }
+    ]
+}

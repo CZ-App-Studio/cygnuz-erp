@@ -1,0 +1,19 @@
+{
+    "name": "FileManagerCore",
+    "alias": "filemanagercore",
+    "displayName": "File Manager Core",
+    "version": "1.0.0",
+    "description": "Core file management system with storage abstraction",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "isCoreModule": true,
+    "keywords": ["file", "storage", "upload", "manager"],
+    "priority": 5,
+    "providers": [
+        "Modules\\FileManagerCore\\Providers\\FileManagerCoreServiceProvider"
+    ],
+    "files": [],
+    "category": "Core",
+    "dependencies": []
+}

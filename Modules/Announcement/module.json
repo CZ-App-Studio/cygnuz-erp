@@ -1,0 +1,21 @@
+{
+    "name": "Announcement",
+    "alias": "announcement",
+    "displayName": "Announcement",
+    "description": "Comprehensive announcement management system for organizational communication with employees",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "keywords": ["announcements", "notifications", "communication", "hr", "notices"],
+    "priority": 10,
+    "providers": [
+        "Modules\\Announcement\\app\\Providers\\AnnouncementServiceProvider",
+        "Modules\\Announcement\\app\\Providers\\RouteServiceProvider",
+        "Modules\\Announcement\\app\\Providers\\EventServiceProvider"
+    ],
+    "files": [],
+    "category": "Human Resources",
+    "dependencies": [
+        "HRCore"
+    ]
+}

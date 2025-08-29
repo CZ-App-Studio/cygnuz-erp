@@ -1,0 +1,19 @@
+{
+    "name": "SystemCore",
+    "alias": "systemcore",
+    "displayName": "System Core",
+    "version": "1.0.0",
+    "description": "Core System Module",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "isCoreModule": true,
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\SystemCore\\Providers\\SystemCoreServiceProvider"
+    ],
+    "files": [],
+    "category": "Core",
+    "dependencies": []
+}

@@ -1,0 +1,25 @@
+{
+    "menu": [
+        {
+            "name": "Customer Management",
+            "icon": "menu-icon bx bx-group",
+            "slug": [
+                "systemcore.customers.index",
+                "systemcore.customer-groups.index"
+            ],
+            "addon": "SystemCore",
+            "submenu": [
+                {
+                    "url": "/systemcore/customers",
+                    "name": "Customers",
+                    "slug": "systemcore.customers.index"
+                },
+                {
+                    "url": "/systemcore/customer-groups",
+                    "name": "Customer Groups",
+                    "slug": "systemcore.customer-groups.index"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+{
+    "name": "nwidart/filemanagercore",
+    "description": "Core file management system with storage abstraction",
+    "authors": [
+        {
+            "name": "CZ App Studio",
+            "email": "support@czappstudio.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\FileManagerCore\\": "app/",
+            "Modules\\FileManagerCore\\Database\\Factories\\": "database/factories/",
+            "Modules\\FileManagerCore\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\FileManagerCore\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "intervention/image": "^3.0"
+    }
+}

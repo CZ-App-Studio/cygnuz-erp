@@ -1,0 +1,46 @@
+{
+  "menu": [
+    {
+      "url": "/inventory/dashboard",
+      "name": "Inventory Dashboard",
+      "icon": "menu-icon bx bx-tachometer",
+      "slug": "wmsinventorycore.dashboard.index"
+    },
+    {
+      "url": "/inventory/products",
+      "name": "Products",
+      "icon": "menu-icon bx bx-package",
+      "slug": "wmsinventorycore.products.index"
+    },
+    {
+      "url": "/inventory/vendors",
+      "name": "Vendors",
+      "icon": "menu-icon bx bx-group",
+      "slug": "wmsinventorycore.vendors.index"
+    },
+    {
+      "url": "/inventory/sales",
+      "name": "Sales Orders",
+      "icon": "menu-icon bx bx-cart",
+      "slug": "wmsinventorycore.sales.index"
+    },
+    {
+      "url": "/inventory/warehouses",
+      "name": "Warehouses",
+      "icon": "menu-icon bx bx-store",
+      "slug": "wmsinventorycore.warehouses.index"
+    },
+    {
+      "url": "/inventory/adjustments",
+      "name": "Stock Adjustments",
+      "icon": "menu-icon bx bx-adjust",
+      "slug": "wmsinventorycore.adjustments.index"
+    },
+    {
+      "url": "/inventory/transfers",
+      "name": "Stock Transfers",
+      "icon": "menu-icon bx bx-transfer-alt",
+      "slug": "wmsinventorycore.transfers.index"
+    }
+  ]
+}

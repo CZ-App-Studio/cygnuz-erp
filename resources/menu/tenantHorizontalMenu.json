@@ -1,0 +1,62 @@
+{
+  "menu": [
+    {
+      "url": "/multitenancy/tenant/dashboard",
+      "name": "Dashboard",
+      "icon": "menu-icon bx bx-home",
+      "slug": "multitenancycore.tenant.dashboard"
+    },
+    {
+      "url": "/multitenancy/tenant/subscription",
+      "name": "Subscription",
+      "icon": "menu-icon bx bx-credit-card",
+      "slug": "multitenancycore.tenant.subscription"
+    },
+    {
+      "url": "/multitenancy/tenant/billing",
+      "name": "Billing & Payments",
+      "icon": "menu-icon bx bx-receipt",
+      "slug": "multitenancycore.tenant.billing"
+    },
+    {
+      "url": "/multitenancy/tenant/invoices",
+      "name": "Invoices",
+      "icon": "menu-icon bx bx-file",
+      "slug": "multitenancycore.tenant.invoices"
+    },
+    {
+      "url": "/multitenancy/tenant/usage",
+      "name": "Usage & Limits",
+      "icon": "menu-icon bx bx-chart",
+      "slug": "multitenancycore.tenant.usage"
+    },
+    {
+      "icon": "menu-icon bx bx-cog",
+      "name": "Settings",
+      "slug": [
+        "multitenancycore.tenant.profile",
+        "multitenancycore.tenant.database"
+      ],
+      "submenu": [
+        {
+          "url": "/multitenancy/tenant/profile",
+          "name": "Company Profile",
+          "icon": "menu-icon bx bx-building",
+          "slug": "multitenancycore.tenant.profile"
+        },
+        {
+          "url": "/multitenancy/tenant/database",
+          "name": "Database Info",
+          "icon": "menu-icon bx bx-data",
+          "slug": "multitenancycore.tenant.database"
+        }
+      ]
+    },
+    {
+      "url": "/multitenancy/tenant/support",
+      "name": "Support",
+      "icon": "menu-icon bx bx-help-circle",
+      "slug": "multitenancycore.tenant.support"
+    }
+  ]
+}

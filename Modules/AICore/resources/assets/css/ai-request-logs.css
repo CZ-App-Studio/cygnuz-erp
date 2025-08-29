@@ -1,0 +1,68 @@
+/* AI Request Logs Styling */
+
+/* Flag toggle switch styling */
+.flag-toggle {
+    cursor: pointer;
+}
+
+.form-check.form-switch.mb-0 {
+    min-height: auto;
+    padding-left: 2.5rem;
+}
+
+/* Table cell adjustments */
+#logsTable td {
+    vertical-align: middle;
+}
+
+/* Token display styling */
+.tokens-display small {
+    font-size: 0.75rem;
+}
+
+/* Prompt and response preview */
+.text-truncate {
+    max-width: 300px !important;
+}
+
+/* Status badges in table */
+#logsTable .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Action dropdown */
+#logsTable .dropdown-toggle::after {
+    display: none;
+}
+
+/* Statistics cards */
+.card-icon .badge {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Filter select2 styling */
+.filter-input.select2-hidden-accessible + .select2-container {
+    width: 100% !important;
+}
+
+/* Date picker inputs */
+.date-picker {
+    background-color: #fff;
+}
+
+/* Details modal */
+#detailsModal pre {
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 0.875rem;
+}
+
+/* Review modal */
+#reviewModal textarea {
+    min-height: 120px;
+}

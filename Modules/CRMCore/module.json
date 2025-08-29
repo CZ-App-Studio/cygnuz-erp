@@ -1,0 +1,19 @@
+{
+    "name": "CRMCore",
+    "alias": "crmcore",
+    "displayName": "CRM Core",
+    "version": "1.0.0",
+    "description": "Core Customer Relationship Management Module",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "isCoreModule": true,
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\CRMCore\\Providers\\CRMCoreServiceProvider"
+    ],
+    "files": [],
+    "category": "Core",
+    "dependencies": []
+}

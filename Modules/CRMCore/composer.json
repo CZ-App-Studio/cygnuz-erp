@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/crmcore",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CRMCore\\": "app/",
+            "Modules\\CRMCore\\Database\\Factories\\": "database/factories/",
+            "Modules\\CRMCore\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\CRMCore\\Tests\\": "tests/"
+        }
+    }
+}

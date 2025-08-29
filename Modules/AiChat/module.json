@@ -1,0 +1,20 @@
+{
+    "name": "AiChat",
+    "alias": "aichat",
+    "version": "1.0.0",
+    "description": "AI chat enables you to interact with an AI bot that can answer questions, provide information, and assist with various tasks. It uses advanced natural language processing to understand and respond to user queries effectively.",
+    "displayName": "AI Chat",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AiChat\\Providers\\AiChatServiceProvider"
+    ],
+    "files": [],
+    "category": "Communication & Collaboration",
+    "dependencies": [
+        "AICore"
+    ]
+}

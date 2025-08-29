@@ -1,0 +1,569 @@
+{
+  "menu": [
+    {
+      "url": "/dashboard",
+      "name": "Dashboard",
+      "icon": "menu-icon bx bx-home",
+      "slug": "dashboard"
+    },
+    {
+      "icon": "menu-icon bx bx-user",
+      "name": "My Profile",
+      "slug": [
+        "hrcore.self-service.profile",
+        "hrcore.self-service.personal-info",
+        "hrcore.self-service.emergency-contacts"
+      ],
+      "submenu": [
+        {
+          "url": "/hrcore/self-service/profile",
+          "name": "Profile & Settings",
+          "icon": "menu-icon bx bx-user-circle",
+          "slug": "hrcore.self-service.profile"
+        },
+        {
+          "url": "/hrcore/self-service/personal-info",
+          "name": "Personal Information",
+          "icon": "menu-icon bx bx-id-card",
+          "slug": "hrcore.self-service.personal-info"
+        },
+        {
+          "url": "/hrcore/self-service/emergency-contacts",
+          "name": "Emergency Contacts",
+          "icon": "menu-icon bx bx-phone",
+          "slug": "hrcore.self-service.emergency-contacts"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-time-five",
+      "name": "Time & Attendance",
+      "slug": [
+        "hrcore.attendance.web-attendance",
+        "hrcore.attendance.my-attendance",
+        "hrcore.attendance.regularization",
+        "hrcore.attendance.reports",
+        "hrcore.leaves.apply",
+        "hrcore.leaves.index",
+        "hrcore.leaves.balance",
+        "hrcore.holidays.my-holidays"
+      ],
+      "submenu": [
+        {
+          "url": "/hrcore/attendance/web-attendance",
+          "name": "Web Check-in",
+          "icon": "menu-icon bx bx-log-in",
+          "slug": "hrcore.attendance.web-attendance"
+        },
+        {
+          "url": "/hrcore/attendance/my-attendance",
+          "name": "My Attendance",
+          "icon": "menu-icon bx bx-calendar-check",
+          "slug": "hrcore.attendance.my-attendance"
+        },
+        {
+          "url": "/hrcore/attendance/regularization",
+          "name": "Regularization",
+          "icon": "menu-icon bx bx-edit",
+          "slug": "hrcore.attendance.regularization"
+        },
+        {
+          "url": "/hrcore/leaves/apply",
+          "name": "Apply Leave",
+          "icon": "menu-icon bx bx-plus-circle",
+          "slug": "hrcore.leaves.apply"
+        },
+        {
+          "url": "/hrcore/leaves",
+          "name": "My Leaves",
+          "icon": "menu-icon bx bx-calendar-x",
+          "slug": "hrcore.leaves.index"
+        },
+        {
+          "url": "/hrcore/leaves/balance",
+          "name": "Leave Balance",
+          "icon": "menu-icon bx bx-pie-chart-alt",
+          "slug": "hrcore.leaves.balance"
+        },
+        {
+          "url": "/hrcore/holidays/my-holidays",
+          "name": "Holiday Calendar",
+          "icon": "menu-icon bx bx-calendar-event",
+          "slug": "hrcore.holidays.my-holidays"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-briefcase",
+      "name": "My Work",
+      "slug": [
+        "tasks.index",
+        "calendar.index",
+        "pmcore.my-projects",
+        "pmcore.timesheets.my"
+      ],
+      "submenu": [
+        {
+          "url": "/tasks",
+          "name": "My Tasks",
+          "icon": "menu-icon bx bx-task",
+          "slug": "tasks.index"
+        },
+        {
+          "url": "/calendar",
+          "name": "My Calendar",
+          "icon": "menu-icon bx bx-calendar",
+          "slug": "calendar.index"
+        },
+        {
+          "url": "/pmcore/my-projects",
+          "name": "My Projects",
+          "icon": "menu-icon bx bx-folder",
+          "slug": "pmcore.my-projects",
+          "addon": "PMCore",
+          "permission": "pmcore.view-own-projects"
+        },
+        {
+          "url": "/pmcore/timesheets/my",
+          "name": "My Timesheets",
+          "icon": "menu-icon bx bx-time",
+          "slug": "pmcore.timesheets.my",
+          "addon": "PMCore",
+          "permission": "pmcore.log-time"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-group",
+      "name": "Team Management",
+      "slug": [
+        "hrcore.leaves.team",
+        "hrcore.attendance.reports",
+        "hrcore.employees.team",
+        "pmcore.team-projects"
+      ],
+      "permission": "hrcore.manage-team",
+      "submenu": [
+        {
+          "url": "/hrcore/leaves/team",
+          "name": "Team Calendar",
+          "icon": "menu-icon bx bx-calendar-week",
+          "slug": "hrcore.leaves.team",
+          "permission": "hrcore.view-team-leaves"
+        },
+        {
+          "url": "/hrcore/attendance/reports",
+          "name": "Team Attendance",
+          "icon": "menu-icon bx bx-bar-chart",
+          "slug": "hrcore.attendance.reports",
+          "permission": "hrcore.view-team-attendance"
+        },
+        {
+          "url": "/hrcore/employees/team",
+          "name": "My Team",
+          "icon": "menu-icon bx bx-group",
+          "slug": "hrcore.employees.team",
+          "permission": "hrcore.view-team-members"
+        },
+        {
+          "url": "/pmcore/team-projects",
+          "name": "Team Projects",
+          "icon": "menu-icon bx bx-folder-open",
+          "slug": "pmcore.team-projects",
+          "addon": "PMCore",
+          "permission": "pmcore.view-team-projects"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-users",
+      "name": "HR Management",
+      "slug": [
+        "hrcore.employees.index",
+        "hrcore.attendance.index",
+        "hrcore.leaves.index",
+        "payroll.index"
+      ],
+      "permission": "hrcore.manage-employees",
+      "submenu": [
+        {
+          "url": "/hrcore/employees",
+          "name": "All Employees",
+          "icon": "menu-icon bx bx-group",
+          "slug": "hrcore.employees.index",
+          "permission": "hrcore.view-employees"
+        },
+        {
+          "url": "/hrcore/attendance",
+          "name": "Attendance Management",
+          "icon": "menu-icon bx bx-time-five",
+          "slug": "hrcore.attendance.index",
+          "permission": "hrcore.manage-attendance"
+        },
+        {
+          "url": "/hrcore/leaves",
+          "name": "Leave Management",
+          "icon": "menu-icon bx bx-calendar-x",
+          "slug": "hrcore.leaves.index",
+          "permission": "hrcore.manage-leaves"
+        },
+        {
+          "url": "/hrcore/attendance-dashboard",
+          "name": "HR Dashboard",
+          "icon": "menu-icon bx bx-dashboard",
+          "slug": "hrcore.attendance-dashboard.index",
+          "permission": "hrcore.view-hr-dashboard"
+        },
+        {
+          "url": "/payroll",
+          "name": "Payroll Management",
+          "icon": "menu-icon bx bx-wallet",
+          "slug": "payroll.index",
+          "addon": "Payroll",
+          "permission": "payroll.manage-payroll"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-building",
+      "name": "CRM & Sales",
+      "slug": [
+        "crm.dashboard.index",
+        "companies.index",
+        "contacts.index",
+        "leads.index",
+        "deals.index"
+      ],
+      "permission": "crm.access",
+      "submenu": [
+        {
+          "url": "/crm/dashboard",
+          "name": "CRM Dashboard",
+          "icon": "menu-icon bx bx-bar-chart-alt-2",
+          "slug": "crm.dashboard.index",
+          "addon": "CRMCore",
+          "permission": "crm.view-dashboard"
+        },
+        {
+          "url": "/companies",
+          "name": "Companies",
+          "icon": "menu-icon bx bx-building",
+          "slug": "companies.index",
+          "permission": "crm.view-companies"
+        },
+        {
+          "url": "/contacts",
+          "name": "Contacts",
+          "icon": "menu-icon bx bx-user",
+          "slug": "contacts.index",
+          "permission": "crm.view-contacts"
+        },
+        {
+          "url": "/leads",
+          "name": "Leads",
+          "icon": "menu-icon bx bx-briefcase",
+          "slug": "leads.index",
+          "permission": "crm.view-leads"
+        },
+        {
+          "url": "/deals",
+          "name": "Deals",
+          "icon": "menu-icon bx bx-dollar-circle",
+          "slug": "deals.index",
+          "permission": "crm.view-deals"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-folder",
+      "name": "Project Management",
+      "slug": [
+        "pmcore.dashboard.index",
+        "pmcore.projects.index",
+        "pmcore.timesheets.index",
+        "pmcore.resources.index"
+      ],
+      "permission": "pmcore.access",
+      "submenu": [
+        {
+          "url": "/projects/dashboard",
+          "name": "PM Dashboard",
+          "icon": "menu-icon bx bx-bar-chart-alt-2",
+          "slug": "pmcore.dashboard.index",
+          "addon": "PMCore",
+          "permission": "pmcore.view-dashboard"
+        },
+        {
+          "url": "/projects",
+          "name": "All Projects",
+          "icon": "menu-icon bx bx-folder",
+          "slug": "pmcore.projects.index",
+          "addon": "PMCore",
+          "permission": "pmcore.view-projects"
+        },
+        {
+          "url": "/projects/timesheets",
+          "name": "Timesheets",
+          "icon": "menu-icon bx bx-time-five",
+          "slug": "pmcore.timesheets.index",
+          "addon": "PMCore",
+          "permission": "pmcore.manage-timesheets"
+        },
+        {
+          "url": "/projects/resources",
+          "name": "Resources",
+          "icon": "menu-icon bx bx-group",
+          "slug": "pmcore.resources.index",
+          "addon": "PMCore",
+          "permission": "pmcore.manage-resources"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-calculator",
+      "name": "Accounting & Finance",
+      "slug": [
+        "accountingcore.dashboard",
+        "accountingcore.transactions.index",
+        "invoice.invoices.index",
+        "payroll.my-payslips"
+      ],
+      "permission": "accounting.access",
+      "submenu": [
+        {
+          "url": "/accountingcore/dashboard",
+          "name": "Accounting Dashboard",
+          "icon": "menu-icon bx bx-home-circle",
+          "slug": "accountingcore.dashboard",
+          "addon": "AccountingCore",
+          "permission": "accounting.view-dashboard"
+        },
+        {
+          "url": "/accountingcore/transactions",
+          "name": "Transactions",
+          "icon": "menu-icon bx bx-transfer",
+          "slug": "accountingcore.transactions.index",
+          "addon": "AccountingCore",
+          "permission": "accounting.view-transactions"
+        },
+        {
+          "url": "/invoice/invoices",
+          "name": "Invoices",
+          "icon": "menu-icon bx bx-receipt",
+          "slug": "invoice.invoices.index",
+          "addon": "Billing",
+          "permission": "billing.view-invoices"
+        },
+        {
+          "url": "/payroll/my-payslips",
+          "name": "My Payslips",
+          "icon": "menu-icon bx bx-file",
+          "slug": "payroll.my-payslips",
+          "addon": "Payroll"
+        },
+        {
+          "url": "/expenseRequests",
+          "name": "Expense Requests",
+          "icon": "menu-icon bx bx-receipt",
+          "slug": "expenseRequests.index",
+          "permission": "accounting.manage-expenses"
+        },
+        {
+          "url": "/ess/my-loans",
+          "name": "My Loans",
+          "icon": "menu-icon bx bx-money",
+          "slug": "loan.my-loans",
+          "addon": "LoanManagement"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-package",
+      "name": "Inventory & Sales",
+      "slug": [
+        "wmsinventorycore.dashboard.index",
+        "wmsinventorycore.products.index",
+        "pos.sales.index",
+        "storemanager.stores.index"
+      ],
+      "permission": "inventory.access",
+      "submenu": [
+        {
+          "url": "/inventory/dashboard",
+          "name": "Inventory Dashboard",
+          "icon": "menu-icon bx bx-analyse",
+          "slug": "wmsinventorycore.dashboard.index",
+          "addon": "WMSInventoryCore",
+          "permission": "inventory.view-dashboard"
+        },
+        {
+          "url": "/inventory/products",
+          "name": "Products",
+          "icon": "menu-icon bx bx-box",
+          "slug": "wmsinventorycore.products.index",
+          "addon": "WMSInventoryCore",
+          "permission": "inventory.view-products"
+        },
+        {
+          "url": "/pos/sales",
+          "name": "POS Sales",
+          "icon": "menu-icon bx bx-credit-card-front",
+          "slug": "pos.sales.index",
+          "addon": "POSSystem",
+          "permission": "pos.access"
+        },
+        {
+          "url": "/storemanager/stores",
+          "name": "Store Management",
+          "icon": "menu-icon bx bx-store",
+          "slug": "storemanager.stores.index",
+          "addon": "StoreManager",
+          "permission": "store.manage-stores"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-map-pin",
+      "name": "Field Operations",
+      "slug": [
+        "liveLocationView",
+        "visits.index",
+        "field-orders.index",
+        "sos.index"
+      ],
+      "permission": "field.access",
+      "submenu": [
+        {
+          "url": "/liveLocation",
+          "name": "Live Location",
+          "icon": "menu-icon bx bx-current-location",
+          "slug": "liveLocationView",
+          "addon": "FieldManager",
+          "permission": "field.view-location"
+        },
+        {
+          "url": "/visits",
+          "name": "Customer Visits",
+          "icon": "menu-icon bx bx-map",
+          "slug": "visits.index",
+          "addon": "FieldManager",
+          "permission": "field.manage-visits"
+        },
+        {
+          "url": "/field-orders",
+          "name": "Field Orders",
+          "icon": "menu-icon bx bx-shopping-bag",
+          "slug": "field-orders.index",
+          "permission": "field.manage-orders"
+        },
+        {
+          "url": "/sos",
+          "name": "SOS Emergency",
+          "icon": "menu-icon bx bx-error-circle",
+          "slug": "sos.index",
+          "addon": "SOS",
+          "permission": "field.sos-access"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-info-circle",
+      "name": "Information & Documents",
+      "slug": [
+        "documentmanagement.my-documents",
+        "hrpolicies.my-policies.index",
+        "announcements.my",
+        "notifications.my",
+        "lms.my.courses"
+      ],
+      "submenu": [
+        {
+          "url": "/announcements/my/list",
+          "name": "My Announcements",
+          "icon": "menu-icon bx bx-megaphone",
+          "slug": "announcements.my",
+          "addon": "Announcement"
+        },
+        {
+          "url": "/hrpolicies/my-policies",
+          "name": "Company Policies",
+          "icon": "menu-icon bx bx-book-open",
+          "slug": "hrpolicies.my-policies.index",
+          "addon": "HRPolicies"
+        },
+        {
+          "url": "/documentmanagement/my-documents",
+          "name": "My Documents",
+          "icon": "menu-icon bx bx-file",
+          "slug": "documentmanagement.my-documents",
+          "addon": "DocumentManagement"
+        },
+        {
+          "url": "/disciplinary-actions/warnings/my-warnings",
+          "name": "My Warnings",
+          "icon": "menu-icon bx bx-error",
+          "slug": "disciplinaryactions.warnings.my-warnings",
+          "addon": "DisciplinaryActions"
+        },
+        {
+          "url": "/notifications/my",
+          "name": "My Notifications",
+          "icon": "menu-icon bx bx-bell",
+          "slug": "notifications.my"
+        },
+        {
+          "url": "/my-learning",
+          "name": "My Learning",
+          "icon": "menu-icon bx bx-book",
+          "slug": "lms.my.courses",
+          "addon": "LMS"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-shield",
+      "name": "Management Tools",
+      "slug": [
+        "hrpolicies.dashboard.index",
+        "disciplinaryactions.warnings.index",
+        "recruitment.jobOpenings.index",
+        "lms.courses.index"
+      ],
+      "permission": "management.access",
+      "submenu": [
+        {
+          "url": "/hrpolicies/dashboard",
+          "name": "Policy Management",
+          "icon": "menu-icon bx bx-shield",
+          "slug": "hrpolicies.dashboard.index",
+          "addon": "HRPolicies",
+          "permission": "hrpolicies.manage-policies"
+        },
+        {
+          "url": "/disciplinary-actions/warnings",
+          "name": "Disciplinary Actions",
+          "icon": "menu-icon bx bx-shield-x",
+          "slug": "disciplinaryactions.warnings.index",
+          "addon": "DisciplinaryActions",
+          "permission": "disciplinary.manage-warnings"
+        },
+        {
+          "url": "/recruitment/jobOpenings",
+          "name": "Recruitment",
+          "icon": "menu-icon bx bx-user-plus",
+          "slug": "recruitment.jobOpenings.index",
+          "addon": "Recruitment",
+          "permission": "recruitment.manage-jobs"
+        },
+        {
+          "url": "/lms/courses",
+          "name": "Course Management",
+          "icon": "menu-icon bx bx-book-open",
+          "slug": "lms.courses.index",
+          "addon": "LMS",
+          "permission": "lms.manage-courses"
+        }
+      ]
+    }
+  ]
+}

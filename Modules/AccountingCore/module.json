@@ -1,0 +1,19 @@
+{
+    "name": "AccountingCore",
+    "alias": "accountingcore",
+    "displayName": "Accounting Core",
+    "version": "1.0.0",
+    "description": "Basic Accounting System for Income and Expense Tracking",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "isCoreModule": true,
+    "keywords": ["accounting", "income", "expense", "basic", "financial"],
+    "priority": 0,
+    "providers": [
+        "Modules\\AccountingCore\\Providers\\AccountingCoreServiceProvider"
+    ],
+    "files": [],
+    "category": "Finance & Accounting",
+    "dependencies": []
+}

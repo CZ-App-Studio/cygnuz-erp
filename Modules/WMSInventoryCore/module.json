@@ -1,0 +1,19 @@
+{
+    "name": "WMSInventoryCore",
+    "alias": "wmsinventorycore",
+    "displayName": "WMS & Inventory Core",
+    "version": "1.0.0",
+    "description": "Core WMS & Inventory",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "isCoreModule": true,
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\WMSInventoryCore\\Providers\\WMSInventoryCoreServiceProvider"
+    ],
+    "files": [],
+    "category": "Core",
+    "dependencies": []
+}

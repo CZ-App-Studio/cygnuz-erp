@@ -1,0 +1,22 @@
+{
+    "View Announcement": "عرض الإعلان", 
+    "No announcements found": "لا يوجد إعلانات",
+    "There are no announcements for you at this time.": "لا يوجد إعلانات لك في هذا الوقت.",
+    "Announcements": "الإعلانات",
+    "My Announcements": "إعلاناتي",
+    "Pinned Announcements": "الإعلانات المثبتة",
+    "Target Audience": "الجنس المستهدف",
+    "Read Statistics": "إحصائيات القراءة",
+    "Read Progress": "تقدم القراءة",
+    "Total Recipients:": "إجمالي المستلمين:",
+    "Total Reads:": "إجمالي القراءات:",
+    "Acknowledged:": "مقروء:",
+    "Recent Readers": "القراء الأحدث",
+    "Acknowledgment Required": "التصريح مطلوب",
+    "Please acknowledge that you have read and understood this announcement.": "يرجى التصريح بأنك قرأت وفهمت هذا الإعلان.",
+    "Announcements List": "قائمة الإعلانات",
+    "Add Announcement": "إضافة إعلان",
+    "All Priorities": "جميع الأولويات",
+    "Normal": "عادي",
+    "Manage Announcements": "إدارة الإعلانات"
+}

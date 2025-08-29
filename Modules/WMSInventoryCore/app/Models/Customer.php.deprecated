@@ -1,0 +1,108 @@
+<?php
+
+namespace Modules\WMSInventoryCore\app\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Customer extends Model
+{
+    protected $fillable = [
+        'name',
+        'company_name',
+        'email',
+        'phone_number',
+        'address',
+        'city',
+        'state',
+        'country',
+        'postal_code',
+        'tax_number',
+        'website',
+        'status',
+        'notes',
+        'price_list_id',
+        'credit_limit',
+        'payment_terms',
+        'created_by_id',
+        'updated_by_id'
+    ];
+
+    protected $casts = [
+        'credit_limit' => 'decimal:2'
+    ];
+
+    /**
+     * Get the sales for this customer.
+     */
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    /**
+     * Get the price list associated with this customer.
+     */
+    public function priceList(): BelongsTo
+    {
+        return $this->belongsTo(PriceList::class);
+    }
+
+    /**
+     * Get the user who created this customer.
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(config('auth.providers.users.model'), 'created_by_id');
+    }
+
+    /**
+     * Get the user who updated this customer.
+     */
+    public function updatedBy(): BelongsTo
+    {
+        return $this->belongsTo(config('auth.providers.users.model'), 'updated_by_id');
+    }
+
+    /**
+     * Get the full address.
+     */
+    public function getFullAddressAttribute()
+    {
+        $parts = [$this->address];
+
+        if ($this->city) $parts[] = $this->city;
+        if ($this->state) $parts[] = $this->state;
+        if ($this->postal_code) $parts[] = $this->postal_code;
+        if ($this->country) $parts[] = $this->country;
+
+        return implode(', ', $parts);
+    }
+
+    /**
+     * Scope a query to only include active customers.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    /**
+     * Calculate the total sales amount for this customer.
+     */
+    public function getTotalSalesAttribute()
+    {
+        return $this->sales->sum('total_amount');
+    }
+
+    /**
+     * Calculate the outstanding balance for this customer.
+     */
+    public function getOutstandingBalanceAttribute()
+    {
+        return $this->sales->sum(function($sale) {
+            return $sale->total_amount - $sale->paid_amount;
+        });
+    }
+}

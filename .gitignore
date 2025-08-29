@@ -1,0 +1,258 @@
+/.phpunit.cache
+/node_modules
+
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.playsright-mcp/
+
+# .env
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+
+docker-compose.override.yml
+
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+
+!/public/assets
+!/public/assets/*
+/public/css
+/public/js
+/storage/logs/laravel.log
+
+storage/*
+
+# Exclude these specific directories from being ignored
+!storage/app/
+!storage/framework/
+!storage/logs/
+
+# Ignore everything inside app and logs, but keep framework structure
+storage/app/*
+storage/logs/*
+
+# Keep framework directory structure
+!storage/framework/
+!storage/framework/cache/
+!storage/framework/cache/.gitignore
+!storage/framework/cache/data/
+!storage/framework/cache/data/.gitignore
+!storage/framework/sessions/
+!storage/framework/sessions/.gitignore
+!storage/framework/testing/
+!storage/framework/testing/.gitignore
+!storage/framework/views/
+!storage/framework/views/.gitignore
+
+# Allow hidden `.gitignore` files in the storage subdirectories to keep them in Git
+!storage/app/.gitignore
+!storage/logs/.gitignore
+
+
+
+# Claude Flow generated files
+
+.claude/settings.local.json
+.mcp.json
+claude-flow.config.json
+.swarm/
+.hive-mind/
+memory/claude-flow-data.json
+memory/sessions/_
+!memory/sessions/README.md
+memory/agents/_
+!memory/agents/README.md
+coordination/memory*bank/*
+coordination/subtasks/_
+coordination/orchestration/\*
+_.db
+_.db-journal
+_.db-wal
+_.sqlite
+_.sqlite-journal
+\_.sqlite-wal
+claude-flow
+claude-flow.bat
+claude-flow.ps1
+hive-mind-prompt-\*.txt
+
+.claude-flow/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+.DS_Store
+
+# Task files
+# tasks.json
+# tasks/
+
+# Open Source Preparation
+# ========================
+
+# IDE and Editor Files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.cursor/
+.windsurf/
+
+# OS Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.Spotlight-V100
+.Trashes
+
+# Build and Dependencies
+/public/mix-manifest.json
+/public/vendor/
+package-lock.json
+yarn.lock
+composer.lock
+
+# Testing and Coverage
+/coverage/
+.phpunit.cache/
+.pest/
+phpunit.xml
+.phpunit.result.cache
+tests/coverage/
+tests/reports/
+
+# Development Tools
+.php_cs.cache
+.php-cs-fixer.cache
+psalm.xml
+phpstan.neon
+.phpactor.json
+.phpactor.cache/
+
+# Documentation (for development)
+/docs/internal/
+/docs/drafts/
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.rej
+
+# Database Files
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+database/*.sqlite
+database/*.sqlite-journal
+
+# Laravel Specific
+/public/modules/
+/bootstrap/cache/*.php
+storage/debugbar/
+storage/telescope/
+
+# Deployment
+.deployer/
+.deploy/
+deployment-config.php
+
+# Security and Credentials
+firebase_credentials.json
+google-credentials.json
+aws-credentials.json
+*.pem
+*.key
+*.crt
+*.pfx
+private/
+secrets/
+
+# Task Master Files (internal development)
+.taskmaster/
+!.taskmaster/templates/  # Keep example templates if needed
+.taskmaster/tasks/
+.taskmaster/docs/
+.taskmaster/reports/
+.taskmaster/config.json
+.taskmaster/state.json
+memory/
+
+# MCP and Claude Configuration (local)
+.mcp.local.json
+
+# Module Development
+modules_statuses.local.json
+Modules/*/node_modules/
+Modules/*/vendor/
+
+# Ignore all modules by default
+/Modules/*
+
+# But keep these specific modules (currently in repo)
+!/Modules/AccountingCore/
+!/Modules/AiChat/
+!/Modules/AICore/
+!/Modules/Announcement/
+!/Modules/AuditLog/
+!/Modules/Calendar/
+!/Modules/CRMCore/
+!/Modules/FileManagerCore/
+!/Modules/HRCore/
+!/Modules/PMCore/
+!/Modules/SystemCore/
+!/Modules/WMSInventoryCore/
+
+# Ignore node_modules and vendor in kept modules
+/Modules/*/node_modules/
+/Modules/*/vendor/
+
+# Generated Documentation
+/public/api-docs/
+/storage/api-docs/
+
+# Cache Files
+.sass-cache/
+.parcel-cache/
+
+# Monitoring and Logs
+/storage/clockwork/
+newrelic.ini
+
+# Development Databases
+docker/mysql/
+docker/postgres/
+docker/redis/

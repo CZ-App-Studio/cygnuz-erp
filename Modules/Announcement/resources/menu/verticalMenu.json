@@ -1,0 +1,24 @@
+{
+    "menu": [
+        {
+            "name": "Announcements",
+            "icon": "menu-icon fas fa-bullhorn",
+            "slug": [
+                "announcements.index",
+                "announcements.my"
+            ],
+            "submenu": [
+                {
+                    "url": "/announcements",
+                    "name": "Manage Announcements",
+                    "slug": "announcements.index"
+                },
+                {
+                    "url": "/announcements/my/list",
+                    "name": "My Announcements",
+                    "slug": "announcements.my"
+                }
+            ]
+        }
+    ]
+}

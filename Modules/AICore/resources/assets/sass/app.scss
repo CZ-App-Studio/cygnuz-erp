@@ -1,0 +1,253 @@
+/**
+ * AI Core Module Styles
+ * Custom styles for the AI Core administration interface
+ */
+
+// AI Dashboard specific styles
+.ai-dashboard {
+  .provider-status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+    
+    &.online {
+      background-color: #28a745;
+    }
+    
+    &.offline {
+      background-color: #dc3545;
+    }
+  }
+
+  .usage-chart-container {
+    min-height: 300px;
+  }
+
+  .stats-card {
+    transition: transform 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Provider management styles
+.provider-form {
+  .api-key-group {
+    .input-group-text {
+      cursor: pointer;
+    }
+  }
+
+  .provider-help {
+    position: sticky;
+    top: 1rem;
+  }
+
+  .connection-test-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    
+    &.success {
+      background-color: #d1e7dd;
+      border: 1px solid #badbcc;
+      color: #0f5132;
+    }
+    
+    &.error {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+  }
+}
+
+// Models management styles
+.models-table {
+  .model-icon {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    margin-right: 0.75rem;
+  }
+
+  .cost-display {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 0.875rem;
+  }
+}
+
+// Usage analytics styles
+.usage-analytics {
+  .metric-card {
+    border-left: 4px solid transparent;
+    
+    &.requests { border-left-color: #7367f0; }
+    &.tokens { border-left-color: #28c76f; }
+    &.cost { border-left-color: #ff9f43; }
+    &.time { border-left-color: #00cfe8; }
+  }
+
+  .chart-container {
+    min-height: 350px;
+  }
+
+  .top-models-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .usage-logs-table {
+    .status-badge {
+      &.success { background-color: #28a745; }
+      &.error { background-color: #dc3545; }
+      &.timeout { background-color: #ffc107; }
+    }
+  }
+}
+
+// Configuration styles
+.config-sidebar {
+  .list-group-item {
+    border: none;
+    padding: 0.75rem 1rem;
+    
+    &.active {
+      background-color: #7367f0;
+      color: white;
+    }
+    
+    &:hover:not(.active) {
+      background-color: #f8f9fa;
+    }
+    
+    i {
+      width: 20px;
+    }
+  }
+}
+
+.config-section {
+  .form-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+
+  .alert {
+    border-radius: 0.375rem;
+  }
+}
+
+// Common AI Core styles
+.ai-core-module {
+  .badge-dot {
+    position: relative;
+    padding-left: 1rem;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: currentColor;
+    }
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #7367f0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .info-item {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+    
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .ai-dashboard {
+    .stats-card {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .usage-analytics {
+    .chart-container {
+      min-height: 250px;
+    }
+  }
+  
+  .config-sidebar {
+    margin-bottom: 1rem;
+  }
+}
+
+// Dark mode support (if your theme supports it)
+@media (prefers-color-scheme: dark) {
+  .ai-core-module {
+    .info-item {
+      border-bottom-color: #444;
+    }
+    
+    .connection-test-result {
+      &.success {
+        background-color: #1e4d2b;
+        border-color: #2d5a3d;
+        color: #a3cfbb;
+      }
+      
+      &.error {
+        background-color: #4d1e1e;
+        border-color: #5a2d2d;
+        color: #cfb3a3;
+      }
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .ai-core-module {
+    .btn, .dropdown, .pagination {
+      display: none !important;
+    }
+    
+    .card {
+      border: 1px solid #ddd !important;
+      box-shadow: none !important;
+    }
+  }
+}

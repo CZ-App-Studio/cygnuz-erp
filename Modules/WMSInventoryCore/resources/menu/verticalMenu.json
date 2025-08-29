@@ -1,0 +1,108 @@
+{
+    "menu": [
+        {
+            "name": "Inventory Management",
+            "icon": "menu-icon bx bx-package",
+            "slug": [
+                "wmsinventorycore.dashboard.index",
+                "wmsinventorycore.products.index",
+                "wmsinventorycore.units.index",
+                "wmsinventorycore.vendors.index",
+                "wmsinventorycore.purchases.index",
+                "wmsinventorycore.sales.index",
+                "wmsinventorycore.warehouses.index",
+                "wmsinventorycore.adjustments.index",
+                "wmsinventorycore.transfers.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/inventory/dashboard",
+                    "name": "Inventory Dashboard",
+                    "slug": "wmsinventorycore.dashboard.index"
+                },
+                {
+                    "url": "/inventory/products",
+                    "name": "Products",
+                    "slug": "wmsinventorycore.products.index"
+                },
+                {
+                    "url": "/inventory/units",
+                    "name": "Units",
+                    "slug": "wmsinventorycore.units.index"
+                },
+                {
+                    "name": "Procurement",
+                    "slug": [
+                        "wmsinventorycore.vendors.index",
+                        "wmsinventorycore.purchases.index"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "/inventory/vendors",
+                            "name": "Vendors",
+                            "slug": "wmsinventorycore.vendors.index"
+                        },
+                        {
+                            "url": "/inventory/purchases",
+                            "name": "Purchase Orders",
+                            "slug": "wmsinventorycore.purchases.index"
+                        }
+                    ]
+                },
+                {
+                    "name": "Sales",
+                    "slug": [
+                        "wmsinventorycore.sales.index"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "/inventory/sales",
+                            "name": "Sales Orders",
+                            "slug": "wmsinventorycore.sales.index"
+                        }
+                    ]
+                },
+                {
+                    "url": "/inventory/warehouses",
+                    "name": "Warehouses",
+                    "slug": "wmsinventorycore.warehouses.index"
+                },
+                {
+                    "url": "/inventory/adjustments",
+                    "name": "Stock Adjustments",
+                    "slug": "wmsinventorycore.adjustments.index"
+                },
+                {
+                    "url": "/inventory/transfers",
+                    "name": "Stock Transfers",
+                    "slug": "wmsinventorycore.transfers.index"
+                },
+                {
+                    "name": "Inventory Reports",
+                    "slug": [
+                        "wmsinventorycore.reports.inventory-valuation",
+                        "wmsinventorycore.reports.stock-movement",
+                        "wmsinventorycore.reports.low-stock"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "/inventory/reports/inventory-valuation",
+                            "name": "Inventory Valuation",
+                            "slug": "wmsinventorycore.reports.inventory-valuation"
+                        },
+                        {
+                            "url": "/inventory/reports/stock-movement",
+                            "name": "Stock Movement",
+                            "slug": "wmsinventorycore.reports.stock-movement"
+                        },
+                        {
+                            "url": "/inventory/reports/low-stock",
+                            "name": "Low Stock Alert",
+                            "slug": "wmsinventorycore.reports.low-stock"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

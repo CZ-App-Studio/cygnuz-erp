@@ -1,0 +1,41 @@
+{
+    "menu": [
+        {
+            "name": "Accounting Core",
+            "icon": "menu-icon bx bx-calculator",
+            "slug": [
+                "accountingcore.dashboard",
+                "accountingcore.transactions.index",
+                "accountingcore.categories.index",
+                "accountingcore.reports.index"
+            ],
+            "submenu": [
+                {
+                    "url": "accountingcore/dashboard",
+                    "name": "Accounting Dashboard",
+                    "slug": "accountingcore.dashboard"
+                },
+                {
+                    "url": "accountingcore/transactions",
+                    "name": "Transactions",
+                    "slug": "accountingcore.transactions.index"
+                },
+                {
+                    "url": "accountingcore/categories",
+                    "name": "Categories",
+                    "slug": "accountingcore.categories.index"
+                },
+                {
+                    "url": "accountingcore/tax-rates",
+                    "name": "Tax Rates",
+                    "slug": "accountingcore.tax-rates.index"
+                },
+                {
+                    "url": "accountingcore/reports",
+                    "name": "Reports",
+                    "slug": "accountingcore.reports.index"
+                }
+            ]
+        }
+    ]
+}

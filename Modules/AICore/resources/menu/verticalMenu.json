@@ -1,0 +1,47 @@
+{
+    "menu": [
+        {
+            "name": "Artificial Intelligence",
+            "icon": "menu-icon bx bx-brain",
+            "slug": [
+                "aicore.dashboard",
+                "aicore.providers.index",
+                "aicore.models.index",
+                "aicore.usage.index",
+                "aicore.configurations.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/aicore/dashboard",
+                    "name": "AI Dashboard",
+                    "slug": "aicore.dashboard"
+                },
+                {
+                    "url": "/aicore/providers",
+                    "name": "AI Providers",
+                    "slug": "aicore.providers.index"
+                },
+                {
+                    "url": "/aicore/models",
+                    "name": "AI Models",
+                    "slug": "aicore.models.index"
+                },
+                {
+                    "url": "/aicore/usage",
+                    "name": "Usage Analytics",
+                    "slug": "aicore.usage.index"
+                },
+                {
+                  "url": "/aicore/module-configuration",
+                  "name": "Module Configuration",
+                  "slug": "aicore.module-configuration.index"
+                },
+                {
+                  "url": "/aicore/logs",
+                  "name": "AI Request Logs",
+                  "slug": "aicore.logs.index"
+                }
+            ]
+        }
+    ]
+}

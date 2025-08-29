@@ -1,0 +1,18 @@
+{
+    "name": "Calendar",
+    "alias": "calendar",
+    "displayName": "Calendar",
+    "version": "1.0.0",
+    "description": "The Calendar module provides a comprehensive calendar system for managing events, appointments, and schedules within the application. It allows users to create, update, and delete events, set reminders, and view their schedules in various formats.",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Calendar\\app\\Providers\\CalendarServiceProvider"
+    ],
+    "files": [],
+    "category": "Communication & Collaboration",
+    "dependencies": []
+}

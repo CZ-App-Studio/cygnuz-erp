@@ -1,0 +1,11 @@
+{
+    "menu": [
+        {
+            "url": "/calendar",
+            "name": "Calendar",
+            "icon": "menu-icon bx bx-calendar",
+            "slug": "calendar.index",
+            "addon": "Calendar"
+        }
+    ]
+}

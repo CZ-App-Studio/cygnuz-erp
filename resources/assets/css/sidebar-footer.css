@@ -1,0 +1,46 @@
+/* Minimal Sidebar Footer Styles */
+.menu-footer {
+  background: rgba(var(--bs-body-color-rgb), 0.03);
+  font-size: 0.75rem;
+}
+
+.menu-footer a {
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.menu-footer a:hover {
+  color: var(--bs-primary) !important;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-left: 2px;
+  position: relative;
+  top: -1px;
+}
+
+.status-dot.bg-success {
+  background-color: var(--bs-success) !important;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .menu-footer {
+  background: rgba(255, 255, 255, 0.05);
+}

@@ -1,0 +1,188 @@
+{
+  "menu": [
+    {
+      "url": "/dashboard",
+      "name": "Dashboard",
+      "icon": "menu-icon bx bx-home",
+      "slug": "dashboard"
+    },
+    {
+      "url": "/hrcore/self-service/profile",
+      "name": "My Profile",
+      "icon": "menu-icon bx bx-user",
+      "slug": "hrcore.self-service.profile"
+    },
+    {
+      "icon": "menu-icon bx bx-time-five",
+      "name": "Time & Attendance",
+      "slug": [
+        "hrcore.attendance.web-attendance",
+        "hrcore.attendance.my-attendance",
+        "hrcore.attendance.regularization",
+        "hrcore.attendance.reports",
+        "hrcore.leaves.apply",
+        "hrcore.leaves.index",
+        "hrcore.leaves.balance",
+        "hrcore.holidays.my-holidays",
+        "hrcore.leaves.team"
+      ],
+      "submenu": [
+        {
+          "url": "/hrcore/attendance/web-attendance",
+          "name": "Web Check-in",
+          "icon": "menu-icon bx bx-time-five",
+          "slug": "hrcore.attendance.web-attendance"
+        },
+        {
+          "url": "/hrcore/attendance/my-attendance",
+          "name": "My Attendance",
+          "icon": "menu-icon bx bx-calendar-check",
+          "slug": "hrcore.attendance.my-attendance"
+        },
+        {
+          "url": "/hrcore/attendance/regularization",
+          "name": "Regularization",
+          "icon": "menu-icon bx bx-edit",
+          "slug": "hrcore.attendance.regularization"
+        },
+        {
+          "url": "/hrcore/leaves/apply",
+          "name": "Apply Leave",
+          "icon": "menu-icon bx bx-plus-circle",
+          "slug": "hrcore.leaves.apply"
+        },
+        {
+          "url": "/hrcore/leaves",
+          "name": "My Leaves",
+          "icon": "menu-icon bx bx-calendar-x",
+          "slug": "hrcore.leaves.index"
+        },
+        {
+          "url": "/hrcore/leaves/balance",
+          "name": "Leave Balance",
+          "icon": "menu-icon bx bx-pie-chart-alt",
+          "slug": "hrcore.leaves.balance"
+        },
+        {
+          "url": "/hrcore/holidays/my-holidays",
+          "name": "Holiday Calendar",
+          "icon": "menu-icon bx bx-calendar-event",
+          "slug": "hrcore.holidays.my-holidays"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-briefcase",
+      "name": "My Work",
+      "slug": [
+        "tasks.index",
+        "calendar.index",
+        "pmcore.my-projects",
+        "pmcore.timesheets.my",
+        "hrcore.leaves.team",
+        "hrcore.attendance.reports"
+      ],
+      "submenu": [
+        {
+          "url": "/tasks",
+          "name": "My Tasks",
+          "icon": "menu-icon bx bx-task",
+          "slug": "tasks.index"
+        },
+        {
+          "url": "/calendar",
+          "name": "My Calendar",
+          "icon": "menu-icon bx bx-calendar",
+          "slug": "calendar.index"
+        },
+        {
+          "url": "/pmcore/my-projects",
+          "name": "My Projects",
+          "icon": "menu-icon bx bx-folder",
+          "slug": "pmcore.my-projects",
+          "addon": "PMCore"
+        },
+        {
+          "url": "/pmcore/timesheets/my",
+          "name": "Timesheets",
+          "icon": "menu-icon bx bx-time",
+          "slug": "pmcore.timesheets.my",
+          "addon": "PMCore"
+        },
+        {
+          "url": "/hrcore/leaves/team",
+          "name": "Team Calendar",
+          "icon": "menu-icon bx bx-group",
+          "slug": "hrcore.leaves.team"
+        },
+        {
+          "url": "/hrcore/attendance/reports",
+          "name": "Reports",
+          "icon": "menu-icon bx bx-bar-chart",
+          "slug": "hrcore.attendance.reports"
+        }
+      ]
+    },
+    {
+      "url": "/payroll/my-payslips",
+      "name": "Payslips",
+      "icon": "menu-icon bx bx-receipt",
+      "slug": "payroll.my-payslips",
+      "addon": "Payroll"
+    },
+    {
+      "icon": "menu-icon bx bx-info-circle",
+      "name": "Information",
+      "slug": [
+        "documentmanagement.my-documents",
+        "hrpolicies.my-policies.index",
+        "announcements.my",
+        "noticeboard.index",
+        "notifications.my"
+      ],
+      "submenu": [
+        {
+          "url": "/announcements/my/list",
+          "name": "Announcements",
+          "icon": "menu-icon bx bx-megaphone",
+          "slug": "announcements.my",
+          "addon": "Announcement"
+        },
+        {
+          "url": "/hrpolicies/my-policies",
+          "name": "Company Policies",
+          "icon": "menu-icon bx bx-book-open",
+          "slug": "hrpolicies.my-policies.index",
+          "addon": "HRPolicies"
+        },
+        {
+          "url": "/documentmanagement/my-documents",
+          "name": "My Documents",
+          "icon": "menu-icon bx bx-file",
+          "slug": "documentmanagement.my-documents",
+          "addon": "DocumentManagement"
+        },
+        {
+          "url": "/disciplinary-actions/warnings/my-warnings",
+          "name": "My Warnings",
+          "icon": "menu-icon bx bx-error",
+          "slug": "disciplinaryactions.warnings.my-warnings",
+          "addon": "DisciplinaryActions"
+        },
+        {
+          "url": "/notifications/my",
+          "name": "Notifications",
+          "icon": "menu-icon bx bx-bell",
+          "slug": "notifications.my"
+        }
+      ]
+    },
+    {
+      "url": "/my-learning",
+      "name": "Learning",
+      "icon": "menu-icon bx bx-book",
+      "slug": "lms.my.courses",
+      "addon": "LMS"
+    }
+  ]
+}

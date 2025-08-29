@@ -1,0 +1,69 @@
+/* Menu Pin Styles */
+.menu-pin-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  padding: 5px;
+  z-index: 10;
+}
+
+.menu-pin-icon:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+}
+
+/* Only apply padding to menu items with pin icons, not the toggle button */
+.menu-inner .menu-item .menu-link {
+  position: relative;
+  padding-right: 40px !important;
+}
+
+/* Fix the menu toggle button */
+.layout-menu-toggle.menu-link {
+  padding-right: 0 !important;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layout-menu-toggle.menu-link i {
+  margin: 0;
+  transform: none;
+}
+
+.pinned-menu-items {
+  min-height: 10px;
+  position: relative;
+  z-index: 5;
+  background: inherit;
+  width: 100%;
+}
+
+/* Add proper backgrounds to pinned items to prevent text showing through */
+.pinned-menu-items .menu-item {
+  background: inherit;
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+.menu-item-ghost {
+  opacity: 0.4;
+  background: #c8ebfb;
+}
+
+.menu-item-chosen {
+  background-color: #f1f1f1;
+}
+
+.menu-item-drag {
+  background-color: #f8f8f8;
+}
+
+/* Prevent pin icon from overlapping with badges */
+.badge + .menu-pin-icon {
+  right: 30px;
+}

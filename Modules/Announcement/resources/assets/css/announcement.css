@@ -1,0 +1,103 @@
+/**
+ * Announcement Module Custom Styles
+ */
+
+/* DataTables Pagination Button Fixes */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0.25rem 0.5rem !important;
+  margin-left: 2px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  color: white !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  color: white !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next {
+  padding: 0.25rem 0.375rem !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+  background: transparent !important;
+  border-color: #dee2e6 !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+}
+
+/* Fix icon sizes in pagination */
+.dataTables_wrapper .dataTables_paginate .paginate_button i {
+  font-size: 14px !important;
+  vertical-align: middle;
+}
+
+/* DataTable Length and Filter styling */
+.dataTables_wrapper .dataTables_length select {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  min-width: 60px;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Responsive table adjustments */
+@media (max-width: 768px) {
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Announcement specific styles */
+.announcement-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.announcement-progress {
+  height: 6px;
+}
+
+.announcement-pin-icon {
+  font-size: 1rem;
+  color: var(--bs-primary);
+}
+
+/* Laravel Pagination Fixes */
+.card-footer .pagination {
+  margin-bottom: 0;
+}
+
+.card-footer .pagination .page-link {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.card-footer .pagination .page-item:first-child .page-link,
+.card-footer .pagination .page-item:last-child .page-link {
+  padding: 0.375rem 0.5rem;
+}
+
+/* Ensure pagination icons are properly sized */
+.pagination .page-link i,
+.pagination .page-link svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+}

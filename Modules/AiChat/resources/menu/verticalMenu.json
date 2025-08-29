@@ -1,0 +1,11 @@
+{
+    "menu": [
+        {
+            "url": "/aichat",
+            "name": "AI Assistant",
+            "slug": "aichat.index",
+            "icon": "menu-icon bx bx-bot",
+            "addon": "AiChat"
+        }
+    ]
+}

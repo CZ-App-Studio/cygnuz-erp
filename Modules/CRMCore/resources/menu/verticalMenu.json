@@ -1,0 +1,109 @@
+{
+    "menu": [
+        {
+            "name": "Customer Relationship",
+            "icon": "menu-icon bx bx-group",
+            "slug": [
+                "crm.dashboard.index",
+                "companies.index",
+                "contacts.index",
+                "customers.index",
+                "customer-groups.index",
+                "leads.index",
+                "deals.index",
+                "tasks.index",
+                "settings.leadStatuses.index",
+                "settings.leadSources.index",
+                "settings.dealPipelines.index",
+                "settings.dealStages.index",
+                "settings.taskStatuses.index",
+                "settings.taskPriorities.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/crm/dashboard",
+                    "name": "CRM Dashboard",
+                    "slug": "crm.dashboard.index"
+                },
+                {
+                    "url": "/companies",
+                    "name": "Companies",
+                    "slug": "companies.index"
+                },
+                {
+                    "url": "/contacts",
+                    "name": "Contacts",
+                    "slug": "contacts.index"
+                },
+                {
+                    "url": "/customers",
+                    "name": "Customers",
+                    "slug": "customers.index"
+                },
+                {
+                    "url": "/customer-groups",
+                    "name": "Customer Groups",
+                    "slug": "customer-groups.index"
+                },
+                {
+                    "url": "/leads",
+                    "name": "Leads",
+                    "slug": "leads.index"
+                },
+                {
+                    "url": "/deals",
+                    "name": "Deals",
+                    "slug": "deals.index"
+                },
+                {
+                    "url": "/tasks",
+                    "name": "Tasks",
+                    "slug": "tasks.index"
+                },
+                {
+                    "name": "CRM Settings",
+                    "slug": [
+                        "settings.leadStatuses.index",
+                        "settings.leadSources.index",
+                        "settings.dealPipelines.index",
+                        "settings.dealStages.index",
+                        "settings.taskStatuses.index",
+                        "settings.taskPriorities.index"
+                    ],
+                    "submenu": [
+                        {
+                            "url": "/settings/lead-statuses",
+                            "name": "Lead Statuses",
+                            "slug": "settings.leadStatuses.index"
+                        },
+                        {
+                            "url": "/settings/lead-sources",
+                            "name": "Lead Sources",
+                            "slug": "settings.leadSources.index"
+                        },
+                        {
+                            "url": "/settings/deal-pipelines",
+                            "name": "Deal Pipelines",
+                            "slug": "settings.dealPipelines.index"
+                        },
+                        {
+                            "url": "/settings/deal-stages",
+                            "name": "Deal Stages",
+                            "slug": "settings.dealStages.index"
+                        },
+                        {
+                            "url": "/settings/task-statuses",
+                            "name": "Task Statuses",
+                            "slug": "settings.taskStatuses.index"
+                        },
+                        {
+                            "url": "/settings/task-priorities",
+                            "name": "Task Priorities",
+                            "slug": "settings.taskPriorities.index"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

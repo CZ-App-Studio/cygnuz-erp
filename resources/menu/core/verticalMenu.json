@@ -1,0 +1,56 @@
+{
+    "menu": [
+        {
+            "url": "/",
+            "name": "Dashboard",
+            "icon": "menu-icon bx bx-home",
+            "slug": "dashboard"
+        },
+        {
+            "name": "User Management",
+            "icon": "menu-icon bx bx-group",
+            "slug": [
+                "roles.index",
+                "permissions.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/roles",
+                    "name": "Roles",
+                    "slug": "roles.index"
+                },
+                {
+                    "url": "/permissions",
+                    "name": "Permissions",
+                    "slug": "permissions.index"
+                }
+            ]
+        },
+        {
+            "name": "System Configuration",
+            "icon": "menu-icon bx bx-cog",
+            "slug": [
+                "settings.index",
+                "admin.system-status.index",
+                "master-data.index"
+            ],
+            "submenu": [
+                {
+                    "url": "/settings",
+                    "name": "General Settings",
+                    "slug": "settings.index"
+                },
+                {
+                    "url": "/admin/system-status",
+                    "name": "System Status",
+                    "slug": "admin.system-status.index"
+                },
+                {
+                    "url": "/master-data",
+                    "name": "Master Data",
+                    "slug": "master-data.index"
+                }
+            ]
+        }
+    ]
+}
