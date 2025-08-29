@@ -70,9 +70,9 @@ return new class extends Migration {
         $table->foreign('customer_id')->references('id')->on('customers')->onDelete('restrict');
         $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('restrict');
 
-        $table->unsignedBigInteger('created_by_id')->nullable()->after('total_profit');
-            $table->unsignedBigInteger('updated_by_id')->nullable()->after('created_by_id');
-            $table->softDeletes()->after('updated_at');
+        $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->softDeletes();
 
             $table->foreign('created_by_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by_id')->references('id')->on('users')->onDelete('set null');
@@ -113,9 +113,9 @@ return new class extends Migration {
         $table->foreign('product_id')->references('id')->on('products')->onDelete('restrict');
         $table->foreign('unit_id')->references('id')->on('units')->onDelete('restrict');
 
-         $table->unsignedBigInteger('created_by_id')->nullable()->after('return_reason');
-            $table->unsignedBigInteger('updated_by_id')->nullable()->after('created_by_id');
-            $table->softDeletes()->after('updated_at');
+         $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->softDeletes();
 
             $table->foreign('created_by_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by_id')->references('id')->on('users')->onDelete('set null');
@@ -130,9 +130,9 @@ return new class extends Migration {
 
         $table->foreign('sale_id')->references('id')->on('sales')->onDelete('cascade');
 
-          $table->unsignedBigInteger('created_by_id')->nullable()->after('file_path');
-            $table->unsignedBigInteger('updated_by_id')->nullable()->after('created_by_id');
-            $table->softDeletes()->after('updated_at');
+          $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->softDeletes();
 
             $table->foreign('created_by_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by_id')->references('id')->on('users')->onDelete('set null');
