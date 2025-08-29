@@ -21,7 +21,7 @@ class ProductionSetupCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'erp:production-setup 
+    protected $signature = 'erp:production-setup
                             {--email= : Email for super admin account}
                             {--password= : Password for super admin account (default: 123456)}
                             {--skip-permissions : Skip permission seeding}
@@ -55,16 +55,16 @@ class ProductionSetupCommand extends Command
         // Step 1: Seed permissions (base + module permissions)
         if (!$this->option('skip-permissions')) {
             $this->info('Step 1: Seeding permissions and roles...');
-            
+
             // Base permissions
             $this->call('db:seed', ['--class' => ERPPermissionSeeder::class]);
-            
+
             // Module permissions following the same order as migrate:erp
             $this->seedModulePermissions();
-            
+
             // Create roles after all permissions are available
             $this->call('db:seed', ['--class' => ERPRoleSeeder::class]);
-            
+
             $this->info('✓ Permissions and roles created');
         } else {
             $this->info('Step 1: Skipping permissions (--skip-permissions flag)');
@@ -88,12 +88,12 @@ class ProductionSetupCommand extends Command
 
         // Step 4: Create super admin account
         $this->info('Step 4: Creating super admin account...');
-        
+
         // Get email
         $email = $this->option('email');
         if (!$email) {
             $email = $this->ask('Enter email for super admin account');
-            
+
             // Validate email
             while (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->error('Invalid email format. Please try again.');
@@ -107,14 +107,14 @@ class ProductionSetupCommand extends Command
             if (!$this->confirm('Do you want to update the existing user to super admin?')) {
                 return 1;
             }
-            
+
             $user = User::where('email', $email)->first();
             $user->syncRoles(['super_admin']);
             $this->info('✓ Existing user updated to super admin');
         } else {
             // Get password
             $password = $this->option('password') ?: '123456';
-            
+
             // Get required data
             $shift = Shift::where('code', 'SH-001')->first();
             $team = Team::where('code', 'TM-001')->first();
@@ -156,7 +156,7 @@ class ProductionSetupCommand extends Command
 
         // Step 5: Seed essential module data
         $this->info('Step 5: Seeding essential module data...');
-        
+
         $essentialSeeders = [
             ['module' => 'HRCore', 'seeder' => 'LeaveTypeSeeder'],
             ['module' => 'HRCore', 'seeder' => 'ExpenseTypeSeeder'],
@@ -170,7 +170,7 @@ class ProductionSetupCommand extends Command
                 $this->warn("  ⏩ Skipping disabled module: {$item['module']}");
                 continue;
             }
-            
+
             $seederClass = "Modules\\{$item['module']}\\database\\seeders\\{$item['seeder']}";
             if (class_exists($seederClass)) {
                 $this->info("  - Running {$item['module']}::{$item['seeder']}...");
@@ -185,7 +185,7 @@ class ProductionSetupCommand extends Command
         $this->info('   Production Setup Complete!');
         $this->info('===========================================');
         $this->newLine();
-        
+
         $this->table(
             ['Setting', 'Value'],
             [
@@ -219,7 +219,6 @@ class ProductionSetupCommand extends Command
             '\Modules\PMCore\Database\Seeders\PMCorePermissionSeeder',
             '\Modules\WMSInventoryCore\Database\Seeders\WMSInventoryCorePermissionSeeder',
             '\Modules\FileManagerCore\Database\Seeders\FileManagerCorePermissionSeeder',
-            '\Modules\FormBuilder\Database\Seeders\FormBuilderPermissionSeeder',
             '\Modules\AICore\Database\Seeders\AICorePermissionSeeder',
             // Add other module permission seeders as needed
         ];
@@ -227,14 +226,14 @@ class ProductionSetupCommand extends Command
         foreach ($modulePermissionSeeders as $seederClass) {
             if (class_exists($seederClass)) {
                 $moduleName = $this->extractModuleName($seederClass);
-                
+
                 // Check if module is enabled
                 $module = Module::find($moduleName);
                 if ($module && !$module->isEnabled()) {
                     $this->warn("  ⏩ Skipping disabled module: {$moduleName}");
                     continue;
                 }
-                
+
                 $this->info("  - Seeding {$moduleName} permissions...");
                 try {
                     $this->call('db:seed', ['--class' => $seederClass]);
