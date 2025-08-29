@@ -10,9 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Modules\GoogleReCAPTCHA\app\Rules\ReCaptchaRule;
-use Modules\GoogleReCAPTCHA\app\Services\ReCaptchaService;
-use Modules\TwoFactorAuth\app\Services\TwoFactorAuthService;
+use App\Services\AddonService\AddonService;
+// Optional module imports - checked before use
+// use Modules\GoogleReCAPTCHA\app\Rules\ReCaptchaRule;
+// use Modules\GoogleReCAPTCHA\app\Services\ReCaptchaService;
+// use Modules\TwoFactorAuth\app\Services\TwoFactorAuthService;
 
 class AuthController extends Controller
 {
@@ -28,10 +30,16 @@ class AuthController extends Controller
                 'rememberMe' => 'boolean',
             ];
 
-            // Add reCAPTCHA validation if enabled
-            $recaptchaService = app(ReCaptchaService::class);
-            if ($recaptchaService->isEnabled()) {
-                $rules['g-recaptcha-response'] = ['required', new ReCaptchaRule];
+            // Add reCAPTCHA validation if module is enabled
+            $addonService = app(AddonService::class);
+            if ($addonService->isAddonEnabled('GoogleReCAPTCHA')) {
+                if (class_exists('\Modules\GoogleReCAPTCHA\app\Services\ReCaptchaService') && 
+                    class_exists('\Modules\GoogleReCAPTCHA\app\Rules\ReCaptchaRule')) {
+                    $recaptchaService = app('\Modules\GoogleReCAPTCHA\app\Services\ReCaptchaService');
+                    if ($recaptchaService->isEnabled()) {
+                        $rules['g-recaptcha-response'] = ['required', new \Modules\GoogleReCAPTCHA\app\Rules\ReCaptchaRule];
+                    }
+                }
             }
 
             $request->validate($rules);
