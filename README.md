@@ -5,10 +5,11 @@
   
   ### 🚀 Complete ERP Ecosystem with AI, Mobile Apps & 40+ Add-ons
   
+  [![Status](https://img.shields.io/badge/Status-Alpha-red?style=for-the-badge)](https://github.com/CZ-App-Studio/cygnuz-erp)
   [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
   [![PHP](https://img.shields.io/badge/PHP-8.4%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
   [![AI Powered](https://img.shields.io/badge/AI_Powered-OpenAI%20Free%20%2B%20Premium-4A90E2?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com)
-  [![Add-ons](https://img.shields.io/badge/40%2B_Premium_Addons-Available-FF6B6B?style=for-the-badge)](https://czappstudio.com/cygnuz-erp-addons/)
+  [![Add-ons](https://img.shields.io/badge/40%2B_Premium_Addons-Planned-FF6B6B?style=for-the-badge)](https://czappstudio.com/cygnuz-erp-addons/)
   
   **Built with ❤️ by [CZ App Studio](https://czappstudio.com)**
   
@@ -16,6 +17,18 @@
 </div>
 
 ---
+
+## ⚠️ Development Status
+
+> **🚧 This project is in Alpha stage - Under Heavy Development**
+> 
+> - Core architecture is established but features are still being built
+> - Many features are experimental or partially implemented
+> - NOT ready for production use - Development/Testing only
+> - Breaking changes may occur frequently
+> - We welcome contributors and testers!
+> 
+> **Current Phase**: Alpha Development | **Beta Target**: Q4 2025 | **Stable Release**: Q1 2026
 
 ## 🤖 AI Core: The Game Changer
 
@@ -52,11 +65,11 @@
 
 | Feature | Status | Type | Description |
 |---------|--------|------|-------------|
-| **AI Chat Assistant** | ✅ Live | Free | General AI chat interface with OpenAI |
-| **OpenAI Provider** | ✅ Live | Free | GPT-4o, GPT-4o Mini, DALL-E, Whisper |
-| **Gemini Provider** | ✅ Live | Premium | Google's Gemini 2.0 models |
-| **HR AI Assistant** | ✅ Live | Premium | Automated HR workflows & insights |
-| **AI Description** | ✅ Live | Premium | Intelligent content generation |
+| **AI Chat Assistant** | 🔧 Alpha | Free | General AI chat interface with OpenAI |
+| **OpenAI Provider** | 🔧 Alpha | Free | GPT-4o, GPT-4o Mini, DALL-E, Whisper |
+| **Gemini Provider** | 📋 Planned | Premium | Google's Gemini 2.0 models |
+| **HR AI Assistant** | 📋 Planned | Premium | Automated HR workflows & insights |
+| **AI Description** | 📋 Planned | Premium | Intelligent content generation |
 | **Claude Provider** | 🔄 Coming | Premium | Anthropic's Claude models |
 | **Smart Document Processing** | 🔄 Coming | Premium | AI-powered OCR & extraction |
 | **Predictive Analytics** | 🔄 Coming | Premium | Business forecasting |
@@ -87,18 +100,20 @@ Cygnuz ERP is a **complete business ecosystem** that combines traditional ERP fu
 
 ## ✨ Features
 
-### 📊 Core Modules
+### 📊 Core Modules (Development Status)
 
 | Module | Description | Status |
 |--------|-------------|--------|
-| **HRCore** | Complete HR management with attendance, leave, payroll | ✅ Active |
-| **AccountingCore** | Financial management, transactions, reporting | ✅ Active |
-| **CRMCore** | Customer relationship management | ✅ Active |
-| **PMCore** | Project management with tasks and timelines | ✅ Active |
-| **WMSInventoryCore** | Warehouse and inventory management | ✅ Active |
-| **AICore** | AI integration framework for smart features | ✅ Active |
-| **SystemCore** | System-wide settings and configurations | ✅ Active |
-| **AiChat** | AI Chat assistant | ✅ Active |
+| **HRCore** | Complete HR management with attendance, leave, payroll | 🟡 Alpha |
+| **AccountingCore** | Financial management, transactions, reporting | 🟡 Alpha |
+| **CRMCore** | Customer relationship management | 🟡 Alpha |
+| **PMCore** | Project management with tasks and timelines | 🟡 Alpha |
+| **WMSInventoryCore** | Warehouse and inventory management | 🟡 Alpha |
+| **AICore** | AI integration framework for smart features | 🔴 Early Alpha |
+| **SystemCore** | System-wide settings and configurations | 🟡 Alpha |
+| **AiChat** | AI Chat assistant | 🔴 Early Alpha |
+
+**Legend**: 🟢 Stable | 🟡 Alpha (Basic functionality) | 🔴 Early Alpha (Experimental)
 
 ### 🤖 AI Core Features Available Now
 
@@ -123,9 +138,9 @@ Cygnuz ERP is a **complete business ecosystem** that combines traditional ERP fu
 
 ### 🌍 Field Manager - Complete Field Force Automation
 
-Our flagship **Field Manager Android App** revolutionizes field operations:
+**Status: 🔴 In Development** - Our flagship **Field Manager Android App** for field operations:
 
-#### Core Features
+#### Planned Features
 - **📍 Real-Time GPS Tracking** - Live location of field employees
 - **📴 Offline Mode** - Work without internet, auto-sync when online
 - **🏢 Customer Management** - Complete CRM on mobile
@@ -135,19 +150,19 @@ Our flagship **Field Manager Android App** revolutionizes field operations:
 - **📸 Photo Capture** - Document visits with geotagged photos
 - **📈 Performance Analytics** - Field team productivity metrics
 
-#### Perfect For
+#### Target Users
 - Sales teams
 - Service technicians
 - Delivery personnel
 - Field inspectors
 - Marketing teams
 
-### 📱 Mobile & Desktop Applications (Ecosystem)
+### 📱 Mobile & Desktop Applications (Roadmap)
 
-#### Available Now
-- **🌍 Field Manager (Android)** - Complete field sales & service app
+#### In Development
+- **🌍 Field Manager (Android)** - Early development phase
 
-#### Coming Soon
+#### Future Applications
 - **📲 ESS App (Flutter)** - Employee self-service mobile app
 - **💬 Chat App** - Internal communication (no third-party SDK)
 - **📅 Calendar App** - Mobile event management
@@ -155,9 +170,11 @@ Our flagship **Field Manager Android App** revolutionizes field operations:
 - **💻 Desktop Tracker** - Employee productivity monitoring (Electron)
 - **💳 POS System** - Point of Sale application (React/TypeScript)
 
-### 💎 Premium Add-ons Marketplace
+### 💎 Premium Add-ons Marketplace (Under Development)
 
-Visit our [Add-ons Store](https://czappstudio.com/cygnuz-erp-addons/) for 40+ premium modules:
+**Note**: Premium add-ons are being developed and will be available at our [Add-ons Store](https://czappstudio.com/cygnuz-erp-addons/)
+
+**Planned Add-ons (40+ modules):**
 
 #### 🏢 HR & Payroll
 - **Payroll Management** - Complete salary processing
@@ -429,7 +446,7 @@ cygnuz_erp/
 
 ## 🔒 Security
 
-If you discover any security-related issues, please email security@czappstudio.com instead of using the issue tracker.
+If you discover any security-related issues, please email support@czappstudio.com instead of using the issue tracker.
 
 ## 📄 License
 
@@ -441,7 +458,7 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 - Website: [https://czappstudio.com](https://czappstudio.com)
 - Email: support@czappstudio.com
-- LinkedIn: [CZ App Studio](https://linkedin.com/company/czappstudio)
+- LinkedIn: [CZ App Studio](https://www.linkedin.com/company/103614654/)
 
 ## 🙏 Acknowledgments
 
@@ -475,7 +492,16 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 ## 📈 Project Status
 
-🟢 **Active Development** - Regular updates and new features
+🔴 **Alpha Phase** - Early development stage, core features being built
+
+### Development Progress
+- ✅ **Core Architecture** - Foundation laid
+- 🔧 **Basic Modules** - Alpha stage (basic functionality)
+- 🔴 **AI Integration** - Early experimental phase
+- 📋 **Mobile Apps** - Planning & early development
+- 📋 **Premium Add-ons** - Concept & planning stage
+- 🔴 **Documentation** - Minimal, being created
+- ⚠️ **Testing** - Limited testing, not production-ready
 
 ### Roadmap 2025
 
@@ -501,6 +527,19 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 - [ ] **AR Inventory** - Augmented reality warehouse
 - [ ] **Blockchain Integration** - Secure transactions
 - [ ] **IoT Integration** - Smart device connectivity
+
+---
+
+## 📝 Important Notice
+
+> **⚠️ Alpha Software Warning**: Cygnuz ERP is in ALPHA stage. This means:
+> - **NOT suitable for production use**
+> - **Features are incomplete and may not work as expected**
+> - **Data loss or corruption may occur**
+> - **Breaking changes will happen frequently**
+> - **Use only for development, testing, and evaluation purposes**
+>
+> **For Developers & Contributors**: We welcome developers who want to contribute to building this ambitious ERP ecosystem. Your feedback and contributions will help shape the future of Cygnuz ERP!
 
 ---
 
