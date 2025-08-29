@@ -13,7 +13,6 @@ if (!class_exists('ModuleConstants')) {
     public const ASSETS = 'Assets';
     public const AUDIT_LOG = 'AuditLog';
     public const BILLING = 'Billing';
-    public const BREAK_SYSTEM = 'BreakSystem';
     public const CALENDAR = 'Calendar';
     public const COMMUNICATION_CENTER = 'CommunicationCenter';
     public const CRM_CORE = 'CRMCore';
