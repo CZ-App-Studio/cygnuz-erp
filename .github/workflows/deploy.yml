@@ -1,6 +1,6 @@
 # .github/workflows/deploy.yml
 
-name: Deploy Laravel Application
+name: Dev Deploy Cygnuz ERP
 
 # This action runs on every push to the 'main' branch
 on:
