@@ -152,9 +152,6 @@
               <button class="btn btn-primary d-grid w-100" type="submit">@lang('Login')</button>
             </div>
           </form>
-
-          <h1>Hello workld CI TEST </h1>
-
           @php
             $addonService = app(\App\Services\AddonService\IAddonService::class);
             $isMultiTenancyEnabled = $addonService->isAddonEnabled('MultiTenancyCore');
