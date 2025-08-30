@@ -81,7 +81,7 @@
             <img src="{{asset('assets/img/login_bg.png')}}"
                  class="img-fluid" alt="Login image" width="700">
           </div>
-          
+
           {{-- Version Information --}}
           <div class="text-center mt-5 pt-4">
             <small class="text-muted">
@@ -152,6 +152,8 @@
               <button class="btn btn-primary d-grid w-100" type="submit">@lang('Login')</button>
             </div>
           </form>
+
+          <h1>Hello workld CI TEST </h1>
 
           @php
             $addonService = app(\App\Services\AddonService\IAddonService::class);
