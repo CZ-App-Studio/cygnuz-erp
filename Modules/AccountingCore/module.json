@@ -11,7 +11,7 @@
     "keywords": ["accounting", "income", "expense", "basic", "financial"],
     "priority": 0,
     "providers": [
-        "Modules\\AccountingCore\\Providers\\AccountingCoreServiceProvider"
+        "Modules\\AccountingCore\\app\\Providers\\AccountingCoreServiceProvider"
     ],
     "files": [],
     "category": "Finance & Accounting",

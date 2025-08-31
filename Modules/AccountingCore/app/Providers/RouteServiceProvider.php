@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AccountingCore\Providers;
+namespace Modules\AccountingCore\app\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;

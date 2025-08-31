@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AccountingCore\Providers;
+namespace Modules\AccountingCore\app\Providers;
 
 use App\Services\AddonService\AddonService;
 use App\Services\Settings\SettingsRegistry;
