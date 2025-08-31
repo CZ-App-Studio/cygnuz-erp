@@ -11,7 +11,7 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\SystemCore\\Providers\\SystemCoreServiceProvider"
+        "Modules\\SystemCore\\app\\Providers\\SystemCoreServiceProvider"
     ],
     "files": [],
     "category": "Core",

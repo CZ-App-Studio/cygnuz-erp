@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\FileManagerCore\Providers;
+namespace Modules\FileManagerCore\app\Providers;
 
 use App\Services\Settings\SettingsRegistry;
 use Illuminate\Support\Facades\Config;

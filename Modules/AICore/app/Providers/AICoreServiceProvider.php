@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AICore\Providers;
+namespace Modules\AICore\app\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;

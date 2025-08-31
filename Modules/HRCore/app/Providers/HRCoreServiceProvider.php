@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\HRCore\Providers;
+namespace Modules\HRCore\app\Providers;
 
 use App\Services\Settings\SettingsRegistry;
 use Illuminate\Support\Facades\Blade;

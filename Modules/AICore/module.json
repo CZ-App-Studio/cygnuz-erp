@@ -20,7 +20,7 @@
     ],
     "priority": 1,
     "providers": [
-        "Modules\\AICore\\Providers\\AICoreServiceProvider"
+        "Modules\\AICore\\app\\Providers\\AICoreServiceProvider"
     ],
     "files": [],
     "category": "Core",

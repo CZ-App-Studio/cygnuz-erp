@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CRMCore\Providers;
+namespace Modules\CRMCore\app\Providers;
 
 use App\Services\Settings\SettingsRegistry;
 use Illuminate\Support\Facades\Blade;
@@ -209,7 +209,7 @@ class CRMCoreServiceProvider extends ServiceProvider
     {
         if (class_exists(SettingsRegistry::class)) {
             $settingsRegistry = app(SettingsRegistry::class);
-            
+
             $settingsRegistry->registerModule('crmcore', [
                 'name' => __('CRM Settings'),
                 'icon' => 'bx bx-group',

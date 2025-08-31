@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\HRCore\Providers;
+namespace Modules\HRCore\app\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 

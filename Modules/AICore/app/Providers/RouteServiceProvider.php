@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AICore\Providers;
+namespace Modules\AICore\app\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;

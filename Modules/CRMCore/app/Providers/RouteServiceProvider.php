@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CRMCore\Providers;
+namespace Modules\CRMCore\app\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;

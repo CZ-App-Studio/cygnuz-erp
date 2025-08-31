@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AICore\Providers;
+namespace Modules\AICore\app\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 

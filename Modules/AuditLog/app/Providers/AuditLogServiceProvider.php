@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AuditLog\Providers;
+namespace Modules\AuditLog\app\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;

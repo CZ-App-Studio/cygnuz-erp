@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CRMCore\Providers;
+namespace Modules\CRMCore\app\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 

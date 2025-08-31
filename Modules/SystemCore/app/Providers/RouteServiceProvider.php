@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\SystemCore\Providers;
+namespace Modules\SystemCore\app\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -17,7 +17,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
-        
+
         // Load routes directly in boot method for Laravel 11
         $this->routes(function () {
             $this->mapApiRoutes();

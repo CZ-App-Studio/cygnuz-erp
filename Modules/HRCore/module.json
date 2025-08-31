@@ -11,7 +11,7 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\HRCore\\Providers\\HRCoreServiceProvider"
+        "Modules\\HRCore\\app\\Providers\\HRCoreServiceProvider"
     ],
     "files": [],
     "category": "Core",

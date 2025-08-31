@@ -11,7 +11,7 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\CRMCore\\Providers\\CRMCoreServiceProvider"
+        "Modules\\CRMCore\\app\\Providers\\CRMCoreServiceProvider"
     ],
     "files": [],
     "category": "Core",

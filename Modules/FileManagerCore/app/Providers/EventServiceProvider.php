@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\FileManagerCore\Providers;
+namespace Modules\FileManagerCore\app\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 

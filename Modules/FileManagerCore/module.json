@@ -11,7 +11,7 @@
     "keywords": ["file", "storage", "upload", "manager"],
     "priority": 5,
     "providers": [
-        "Modules\\FileManagerCore\\Providers\\FileManagerCoreServiceProvider"
+        "Modules\\FileManagerCore\\app\\Providers\\FileManagerCoreServiceProvider"
     ],
     "files": [],
     "category": "Core",
