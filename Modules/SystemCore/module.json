@@ -11,7 +11,9 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\SystemCore\\app\\Providers\\SystemCoreServiceProvider"
+        "Modules\\SystemCore\\app\\Providers\\SystemCoreServiceProvider",
+        "Modules\\SystemCore\\app\\Providers\\EventServiceProvider",
+        "Modules\\SystemCore\\app\\Providers\\RouteServiceProvider"
     ],
     "files": [],
     "category": "Core",
