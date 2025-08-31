@@ -139,7 +139,6 @@ Desktop.ini
 /public/vendor/
 package-lock.json
 yarn.lock
-composer.lock
 
 # Testing and Coverage
 /coverage/
