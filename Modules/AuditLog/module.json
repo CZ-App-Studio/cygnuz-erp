@@ -16,9 +16,9 @@
     "tutorialUrl": "https://czappstudio.com/",
     "priority": 100,
     "providers": [
-        "Modules\\AuditLog\\Providers\\app\\AuditLogServiceProvider",
-        "Modules\\AuditLog\\Providers\\app\\EventServiceProvider",
-        "Modules\\AuditLog\\Providers\\app\\RouteServiceProvider"
+        "Modules\\AuditLog\\app\\Providers\\AuditLogServiceProvider",
+        "Modules\\AuditLog\\app\\Providers\\EventServiceProvider",
+        "Modules\\AuditLog\\app\\Providers\\RouteServiceProvider"
     ],
     "files": [],
     "category": "System & Administration",
