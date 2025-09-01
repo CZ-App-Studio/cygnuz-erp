@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', [CompanyController::class, 'store'])->name('store');
 
         Route::get('/{company}', [CompanyController::class, 'show'])->name('show'); // Route model binding
+        Route::get('/{company}/deals-ajax', [CompanyController::class, 'getCompanyDealsAjax'])->name('dealsAjax'); // AJAX endpoint for deals refresh
         Route::get('/{company}/edit', [CompanyController::class, 'edit'])->name('edit'); // Route model binding
         Route::put('/{company}', [CompanyController::class, 'update'])->name('update'); // Route model binding
 
