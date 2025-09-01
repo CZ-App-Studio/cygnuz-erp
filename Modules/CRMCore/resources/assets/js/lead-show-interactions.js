@@ -32,8 +32,8 @@ $(function () {
   const taskIdInput = $(taskForm).find('#task_id');
   const taskFormMethodInput = $(taskForm).find('#formMethod');
   const taskOffcanvasLabel = $(taskOffcanvasElement).find('#offcanvasTaskFormLabel');
-  const taskTitleInput = $(taskForm).find('#title');
-  const taskDescriptionInput = $(taskForm).find('#description');
+  const taskTitleInput = $(taskForm).find('#task_title');
+  const taskDescriptionInput = $(taskForm).find('#task_description');
   const taskStatusSelect = $(taskForm).find('#task_status_id');
   const taskPrioritySelect = $(taskForm).find('#task_priority_id');
   const taskAssignedToUserSelect = $(taskForm).find('#task_assigned_to_user_id');
