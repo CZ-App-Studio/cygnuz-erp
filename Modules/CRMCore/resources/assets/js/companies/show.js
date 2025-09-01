@@ -320,6 +320,31 @@ $(function () {
     }
   });
 
+  // Handle edit deal button clicks (both from initial load and dynamically added)
+  $(document).on('click', '.edit-deal-from-related', function() {
+    const dealId = $(this).data('deal-id');
+    if (!dealId || !dealOffcanvas) return;
+    
+    // Fetch deal details via AJAX
+    const url = pageData.urls.getDealTemplate.replace('__DEAL_ID__', dealId);
+    $.ajax({
+      url: url,
+      type: 'GET',
+      success: function(response) {
+        // Handle both direct response and wrapped response formats
+        const dealData = response.data || response;
+        if (dealData && dealData.id) {
+          populateDealOffcanvasForEdit(dealData);
+        } else {
+          Swal.fire(pageData.labels.error, pageData.labels.couldNotFetch || 'Could not fetch deal details.', 'error');
+        }
+      },
+      error: function() {
+        Swal.fire(pageData.labels.error, pageData.labels.unexpectedError || 'An unexpected error occurred.', 'error');
+      }
+    });
+  });
+
   if (dealForm) {
     $(dealForm).on('submit', function(e) {
       e.preventDefault();
