@@ -271,7 +271,7 @@ class ExpenseController extends Controller
 
     public function create(Request $request)
     {
-        $expenseTypes = ExpenseType::active()->get();
+        $expenseTypes = ExpenseType::where('status', 'active')->get();
         $departments = Department::where('status', Status::ACTIVE->value)->get();
 
         // Store the return URL in session to redirect back after save
@@ -405,7 +405,7 @@ class ExpenseController extends Controller
             session(['expense_return_url' => $request->return_to]);
         }
 
-        $expenseTypes = ExpenseType::active()->get();
+        $expenseTypes = ExpenseType::where('status', 'active')->get();
         $departments = Department::where('status', Status::ACTIVE->value)->get();
 
         return view('hrcore::expenses.edit', compact('expense', 'expenseTypes', 'departments'));
@@ -654,7 +654,7 @@ class ExpenseController extends Controller
      */
     public function createMyExpense(Request $request)
     {
-        $expenseTypes = ExpenseType::active()->get();
+        $expenseTypes = ExpenseType::where('status', 'active')->get();
         $departments = Department::where('status', Status::ACTIVE->value)->get();
 
         // Store the return URL in session to redirect back after save
@@ -776,7 +776,7 @@ class ExpenseController extends Controller
             ->where('status', ExpenseRequestStatus::PENDING)
             ->findOrFail($id);
 
-        $expenseTypes = ExpenseType::active()->get();
+        $expenseTypes = ExpenseType::where('status', 'active')->get();
         $departments = Department::where('status', Status::ACTIVE->value)->get();
 
         return view('hrcore::expenses.my-edit', compact('expense', 'expenseTypes', 'departments'));

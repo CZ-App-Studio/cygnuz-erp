@@ -11,6 +11,7 @@
                 "hrcore.my.leaves.balance",
                 "hrcore.my.leaves.apply",
                 "hrcore.my.expenses",
+                "hrcore.my.expenses.create",
                 "hrcore.my.holidays",
                 "hrcore.my.reports"
             ],
@@ -49,6 +50,11 @@
                     "url": "/hrcore/my/expenses",
                     "name": "My Expenses",
                     "slug": "hrcore.my.expenses"
+                },
+                {
+                    "url": "/hrcore/my/expenses/create",
+                    "name": "Create Expense",
+                    "slug": "hrcore.my.expenses.create"
                 },
                 {
                     "url": "/hrcore/my/holidays",
