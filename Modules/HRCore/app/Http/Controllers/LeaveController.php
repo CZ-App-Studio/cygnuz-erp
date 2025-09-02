@@ -265,8 +265,9 @@ class LeaveController extends Controller
     {
         // Get settings for leave validation
         $settingsService = app(ModuleSettingsService::class);
-        $minAdvanceNoticeDays = (int) $settingsService->get('HRCore', 'min_advance_notice_days', '1');
-        $minDate = now()->addDays($minAdvanceNoticeDays)->toDateString();
+        $minAdvanceNoticeDays = (int) $settingsService->get('HRCore', 'min_advance_notice_days', '0');
+        // If minAdvanceNoticeDays is 0, allow today. Otherwise, add the days
+        $minDate = $minAdvanceNoticeDays > 0 ? now()->addDays($minAdvanceNoticeDays)->toDateString() : now()->toDateString();
         
         $validated = $request->validate([
             'user_id' => auth()->user()->can('hrcore.create-leave-for-others') ? 'required|exists:users,id' : 'nullable',
