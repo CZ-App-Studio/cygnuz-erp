@@ -179,6 +179,21 @@
   </div>
 </div>
 
+<!-- Offcanvas for Leave Details -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="leaveDetailsOffcanvas" aria-labelledby="leaveDetailsOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 id="leaveDetailsOffcanvasLabel" class="offcanvas-title">{{ __('Leave Request Details') }}</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body" id="leaveDetailsContent">
+    <div class="text-center">
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">{{ __('Loading...') }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @section('page-script')

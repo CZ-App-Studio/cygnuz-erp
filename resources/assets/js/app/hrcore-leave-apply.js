@@ -231,6 +231,23 @@
         if (result.isConfirmed) {
           // Submit form via AJAX
           const formData = new FormData(form);
+          
+          // Handle half_day_type field - remove it if half day is not selected
+          const isHalfDay = document.getElementById('is_half_day');
+          if (!isHalfDay.checked) {
+            formData.delete('half_day_type');
+          }
+          
+          // Handle checkbox values
+          formData.delete('is_half_day');
+          formData.append('is_half_day', isHalfDay.checked ? '1' : '0');
+          
+          const isAbroad = document.getElementById('is_abroad');
+          if (isAbroad) {
+            formData.delete('is_abroad');
+            formData.append('is_abroad', isAbroad.checked ? '1' : '0');
+          }
+          
           const submitBtn = form.querySelector('button[type="submit"]');
           
           // Disable submit button
@@ -245,25 +262,51 @@
               'Accept': 'application/json'
             }
           })
-          .then(response => response.json())
-          .then(data => {
-            if (data.status === 'success') {
+          .then(response => {
+            return response.json().then(data => {
+              return { status: response.status, data: data };
+            });
+          })
+          .then(result => {
+            const { status, data } = result;
+            
+            if (status === 200 && data.status === 'success') {
               Swal.fire({
                 icon: 'success',
                 title: 'Success!',
-                text: data.data || 'Leave request submitted successfully!',
+                text: data.data?.message || data.message || 'Leave request submitted successfully!',
                 customClass: {
                   confirmButton: 'btn btn-success'
                 },
                 buttonsStyling: false
               }).then(() => {
-                window.location.href = '/hrcore/leaves';
+                window.location.href = '/hrcore/my/leaves';
               });
             } else {
+              // Handle validation errors or other errors
+              let errorMessage = 'Failed to submit leave request. Please try again.';
+              
+              if (data.errors) {
+                // Format validation errors
+                const errorMessages = [];
+                for (const field in data.errors) {
+                  if (Array.isArray(data.errors[field])) {
+                    errorMessages.push(...data.errors[field]);
+                  } else {
+                    errorMessages.push(data.errors[field]);
+                  }
+                }
+                errorMessage = errorMessages.join('<br>');
+              } else if (data.message) {
+                errorMessage = data.message;
+              } else if (data.data) {
+                errorMessage = typeof data.data === 'string' ? data.data : data.data.message || errorMessage;
+              }
+              
               Swal.fire({
                 icon: 'error',
                 title: 'Submission Failed',
-                text: data.data || 'Failed to submit leave request. Please try again.',
+                html: errorMessage,
                 customClass: {
                   confirmButton: 'btn btn-primary'
                 },

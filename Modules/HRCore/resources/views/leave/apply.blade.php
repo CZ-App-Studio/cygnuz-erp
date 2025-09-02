@@ -32,7 +32,8 @@
     <x-breadcrumb
       :title="__('Apply for Leave')"
       :breadcrumbs="[
-        ['name' => __('Leave Management'), 'url' => ''],
+        ['name' => __('Self Service'), 'url' => ''],
+        ['name' => __('My Leaves'), 'url' => route('hrcore.my.leaves')],
         ['name' => __('Apply Leave'), 'url' => '']
       ]"
     />
@@ -43,7 +44,7 @@
           <div class="card-header">
             <h5 class="card-title mb-0">{{ __('Leave Application Form') }}</h5>
           </div>
-          <form id="leaveApplicationForm" method="POST" action="{{ route('hrcore.leaves.store') }}" enctype="multipart/form-data">
+          <form id="leaveApplicationForm" method="POST" action="{{ route('hrcore.my.leaves.store') }}" enctype="multipart/form-data">
             @csrf
             {{-- Hidden user_id field for self application --}}
             @unless(auth()->user()->can('hrcore.create-leave-for-others'))
@@ -57,7 +58,7 @@
                   <select id="leave_type_id" name="leave_type_id" class="form-select select2" required>
                     <option value="">{{ __('Select Leave Type') }}</option>
                     @foreach($leaveTypes as $type)
-                      <option value="{{ $type->id }}" 
+                      <option value="{{ $type->id }}"
                         data-days="{{ $type->user_available ?? $type->days_allowed ?? 0 }}"
                         data-color="{{ $type->color }}">
                         {{ $type->name }} ({{ $type->user_available ?? $type->days_allowed ?? 0 }} {{ __('days available') }})
@@ -169,7 +170,7 @@
               <button type="submit" class="btn btn-primary me-2">
                 <i class="bx bx-send me-1"></i> {{ __('Submit Application') }}
               </button>
-              <a href="{{ route('hrcore.leaves.index') }}" class="btn btn-label-secondary">
+              <a href="{{ route('hrcore.my.leaves') }}" class="btn btn-label-secondary">
                 <i class="bx bx-x me-1"></i> {{ __('Cancel') }}
               </a>
             </div>
@@ -188,8 +189,8 @@
               @foreach($leaveTypes as $index => $type)
                 <div class="accordion-item">
                   <h2 class="accordion-header" id="heading{{ $index }}">
-                    <button class="accordion-button {{ $index > 0 ? 'collapsed' : '' }}" type="button" 
-                      data-bs-toggle="collapse" data-bs-target="#collapse{{ $index }}" 
+                    <button class="accordion-button {{ $index > 0 ? 'collapsed' : '' }}" type="button"
+                      data-bs-toggle="collapse" data-bs-target="#collapse{{ $index }}"
                       aria-expanded="{{ $index === 0 ? 'true' : 'false' }}">
                       {{ $type->name }}
                       <span class="badge rounded-pill ms-auto" style="background-color: {{ $type->color }}">
@@ -197,7 +198,7 @@
                       </span>
                     </button>
                   </h2>
-                  <div id="collapse{{ $index }}" class="accordion-collapse collapse {{ $index === 0 ? 'show' : '' }}" 
+                  <div id="collapse{{ $index }}" class="accordion-collapse collapse {{ $index === 0 ? 'show' : '' }}"
                     data-bs-parent="#leavePoliciesAccordion">
                     <div class="accordion-body">
                       <small class="text-muted">{{ $type->description ?? __('No description available') }}</small>

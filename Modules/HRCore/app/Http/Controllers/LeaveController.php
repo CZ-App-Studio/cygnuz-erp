@@ -23,6 +23,7 @@ use Modules\FileManagerCore\Enums\FileType;
 use Modules\FileManagerCore\Enums\FileVisibility;
 use Modules\HRCore\app\Models\LeaveRequest;
 use Modules\HRCore\app\Models\LeaveType;
+use Modules\HRCore\app\Models\UserAvailableLeave;
 use Yajra\DataTables\Facades\DataTables;
 
 class LeaveController extends Controller
@@ -1040,7 +1041,9 @@ class LeaveController extends Controller
     public function createMyLeave()
     {
         $leaveTypes = LeaveType::where('status', 'active')->get();
-        $leaveBalances = auth()->user()->leaveBalances()
+        $currentYear = date('Y');
+        $leaveBalances = UserAvailableLeave::where('user_id', auth()->id())
+            ->where('year', $currentYear)
             ->with('leaveType')
             ->get()
             ->keyBy('leave_type_id');
@@ -1078,12 +1081,14 @@ class LeaveController extends Controller
             );
 
             // Check leave balance
-            $leaveBalance = auth()->user()->leaveBalances()
+            $currentYear = date('Y');
+            $leaveBalance = UserAvailableLeave::where('user_id', auth()->id())
                 ->where('leave_type_id', $request->leave_type_id)
+                ->where('year', $currentYear)
                 ->first();
 
-            if ($leaveBalance && $leaveBalance->available_balance < $totalDays) {
-                return Error::response(__('Insufficient leave balance'));
+            if ($leaveBalance && $leaveBalance->available_leaves < $totalDays) {
+                return Error::response(__('Insufficient leave balance. You have ' . $leaveBalance->available_leaves . ' days available.'));
             }
 
             // Handle file upload
@@ -1191,7 +1196,9 @@ class LeaveController extends Controller
      */
     public function myLeaveBalance()
     {
-        $leaveBalances = auth()->user()->leaveBalances()
+        $currentYear = date('Y');
+        $leaveBalances = UserAvailableLeave::where('user_id', auth()->id())
+            ->where('year', $currentYear)
             ->with('leaveType')
             ->get();
 
