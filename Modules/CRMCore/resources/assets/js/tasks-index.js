@@ -444,7 +444,17 @@ $(function () {
   const updateTaskableIdSelect2 = (type) => {
     taskableIdSelector.val(null).trigger('change').empty();
 
-    if (!type || !pageData.urls.relatedTo[type.toLowerCase() + 's']) {
+    // Map singular types to their plural URL keys
+    const typeToUrlKey = {
+      'contact': 'contacts',
+      'company': 'companies',
+      'lead': 'leads',
+      'deal': 'deals'
+    };
+
+    const urlKey = typeToUrlKey[type.toLowerCase()];
+    
+    if (!type || !urlKey || !pageData.urls.relatedTo[urlKey]) {
       taskableIdSelector.select2({
         dropdownParent: offcanvasElement,
         placeholder: pageData.labels.selectTypeFirst,
@@ -454,7 +464,7 @@ $(function () {
       return;
     }
 
-    const searchUrl = pageData.urls.relatedTo[type.toLowerCase() + 's'];
+    const searchUrl = pageData.urls.relatedTo[urlKey];
     taskableIdSelector.select2({
       placeholder: pageData.labels.searchAndSelect + ' ' + type,
       dropdownParent: offcanvasElement,
