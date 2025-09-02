@@ -30,10 +30,10 @@ $(function () {
                     search: params.term
                 };
             },
-            processResults: function (data) {
-                console.log('User search results (modal):', data);
+            processResults: function (response) {
+                console.log('User search results (modal):', response);
                 return {
-                    results: data
+                    results: response.data || response
                 };
             },
             cache: true
@@ -82,10 +82,10 @@ $(function () {
                         search: params.term
                     };
                 },
-                processResults: function (data) {
-                    console.log('Project manager search results:', data);
+                processResults: function (response) {
+                    console.log('Project manager search results:', response);
                     return {
-                        results: data
+                        results: response.data || response
                     };
                 },
                 cache: true
@@ -226,6 +226,12 @@ $(function () {
                     if (errors && typeof errors === 'object') {
                         message = Object.values(errors)[0];
                     }
+                } else if (xhr.status === 400 && xhr.responseJSON) {
+                    // Handle 400 errors with custom message
+                    message = xhr.responseJSON.data || xhr.responseJSON.message || message;
+                } else if (xhr.responseJSON?.data) {
+                    // Handle other error responses with data field
+                    message = xhr.responseJSON.data;
                 }
                 Swal.fire({
                     icon: 'error',
@@ -479,10 +485,10 @@ $(function () {
                         search: params.term
                     };
                 },
-                processResults: function (data) {
-                    console.log('User search results:', data);
+                processResults: function (response) {
+                    console.log('User search results:', response);
                     return {
-                        results: data
+                        results: response.data || response
                     };
                 },
                 cache: true
