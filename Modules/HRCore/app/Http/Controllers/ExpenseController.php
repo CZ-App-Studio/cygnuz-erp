@@ -643,4 +643,249 @@ class ExpenseController extends Controller
             return Error::response(__('Failed to process expense request'));
         }
     }
+
+    // ===================================================================
+    // SELF-SERVICE METHODS - Always use auth()->id()
+    // These methods are called from /my/* routes with self_service middleware
+    // ===================================================================
+
+    /**
+     * Create a new expense for the authenticated user (self-service)
+     */
+    public function createMyExpense(Request $request)
+    {
+        $expenseTypes = ExpenseType::active()->get();
+        $departments = Department::where('status', Status::ACTIVE->value)->get();
+
+        // Store the return URL in session to redirect back after save
+        if ($request->has('return_to')) {
+            session(['expense_return_url' => $request->return_to]);
+        }
+
+        return view('hrcore::expenses.my-create', compact('expenseTypes', 'departments'));
+    }
+
+    /**
+     * Store a new expense for the authenticated user (self-service)
+     * Always uses auth()->id() for user_id
+     */
+    public function storeMyExpense(Request $request)
+    {
+        $request->validate([
+            'expense_type_id' => 'required|exists:expense_types,id',
+            'expense_date' => 'required|date',
+            'amount' => 'required|numeric|min:0.01',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'department_id' => 'nullable|exists:departments,id',
+            'project_code' => 'nullable|string|max:100',
+            'cost_center' => 'nullable|string|max:100',
+            'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,pdf,doc,docx',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Always use authenticated user's ID for self-service
+            $expense = ExpenseRequest::create([
+                'user_id' => auth()->id(), // Always use auth()->id() for self-service
+                'expense_type_id' => $request->expense_type_id,
+                'expense_date' => $request->expense_date,
+                'amount' => $request->amount,
+                'title' => $request->title,
+                'description' => $request->description,
+                'department_id' => $request->department_id,
+                'project_code' => $request->project_code,
+                'cost_center' => $request->cost_center,
+                'status' => ExpenseRequestStatus::PENDING,
+            ]);
+
+            // Handle attachments using FileManagerCore
+            if ($request->hasFile('attachments')) {
+                $fileManager = app(FileManagerInterface::class);
+
+                foreach ($request->file('attachments') as $index => $file) {
+                    try {
+                        $uploadRequest = FileUploadRequest::fromRequest(
+                            $file,
+                            FileType::EXPENSE_RECEIPT,
+                            ExpenseRequest::class,
+                            $expense->id
+                        )->withName('expense_'.$expense->expense_number.'_'.($index + 1))
+                            ->withVisibility(FileVisibility::PRIVATE)
+                            ->withDescription('Expense receipt for '.$expense->title)
+                            ->withMetadata([
+                                'expense_number' => $expense->expense_number,
+                                'expense_type' => $expense->expenseType->name ?? 'N/A',
+                                'user_id' => auth()->id(),
+                                'uploaded_at' => now()->toISOString(),
+                            ]);
+
+                        $fileManager->uploadFile($uploadRequest);
+                    } catch (\Exception $e) {
+                        Log::error('File upload failed for expense: '.$e->getMessage());
+                        // Continue with next file
+                    }
+                }
+            }
+
+            DB::commit();
+
+            // Send notification
+            try {
+                $notificationService = app(HRNotificationService::class);
+                $notificationService->sendNewExpenseRequestNotification($expense);
+            } catch (\Exception $e) {
+                Log::error('Failed to send expense request notification: '.$e->getMessage());
+            }
+
+            // Check for return URL
+            $returnUrl = session()->pull('expense_return_url', route('hrcore.my.expenses'));
+
+            return Success::response([
+                'message' => __('Expense request submitted successfully'),
+                'redirect' => $returnUrl,
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+
+            return Error::response(__('Failed to submit expense request'));
+        }
+    }
+
+    /**
+     * Show expense details for authenticated user (self-service)
+     */
+    public function showMyExpense($id)
+    {
+        $expense = ExpenseRequest::where('user_id', auth()->id())
+            ->with(['expenseType', 'department', 'approvedBy', 'rejectedBy', 'processedBy'])
+            ->findOrFail($id);
+
+        return view('hrcore::expenses.my-show', compact('expense'));
+    }
+
+    /**
+     * Edit expense for authenticated user (self-service)
+     */
+    public function editMyExpense($id)
+    {
+        $expense = ExpenseRequest::where('user_id', auth()->id())
+            ->where('status', ExpenseRequestStatus::PENDING)
+            ->findOrFail($id);
+
+        $expenseTypes = ExpenseType::active()->get();
+        $departments = Department::where('status', Status::ACTIVE->value)->get();
+
+        return view('hrcore::expenses.my-edit', compact('expense', 'expenseTypes', 'departments'));
+    }
+
+    /**
+     * Update expense for authenticated user (self-service)
+     */
+    public function updateMyExpense(Request $request, $id)
+    {
+        $expense = ExpenseRequest::where('user_id', auth()->id())
+            ->where('status', ExpenseRequestStatus::PENDING)
+            ->findOrFail($id);
+
+        $request->validate([
+            'expense_type_id' => 'required|exists:expense_types,id',
+            'expense_date' => 'required|date',
+            'amount' => 'required|numeric|min:0.01',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'department_id' => 'nullable|exists:departments,id',
+            'project_code' => 'nullable|string|max:100',
+            'cost_center' => 'nullable|string|max:100',
+            'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,pdf,doc,docx',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $expense->update([
+                'expense_type_id' => $request->expense_type_id,
+                'expense_date' => $request->expense_date,
+                'amount' => $request->amount,
+                'title' => $request->title,
+                'description' => $request->description,
+                'department_id' => $request->department_id,
+                'project_code' => $request->project_code,
+                'cost_center' => $request->cost_center,
+            ]);
+
+            // Handle new attachments
+            if ($request->hasFile('attachments')) {
+                $fileManager = app(FileManagerInterface::class);
+
+                foreach ($request->file('attachments') as $index => $file) {
+                    try {
+                        $uploadRequest = FileUploadRequest::fromRequest(
+                            $file,
+                            FileType::EXPENSE_RECEIPT,
+                            ExpenseRequest::class,
+                            $expense->id
+                        )->withName('expense_'.$expense->expense_number.'_updated_'.($index + 1))
+                            ->withVisibility(FileVisibility::PRIVATE)
+                            ->withDescription('Updated expense receipt for '.$expense->title)
+                            ->withMetadata([
+                                'expense_number' => $expense->expense_number,
+                                'expense_type' => $expense->expenseType->name ?? 'N/A',
+                                'user_id' => auth()->id(),
+                                'updated_at' => now()->toISOString(),
+                            ]);
+
+                        $fileManager->uploadFile($uploadRequest);
+                    } catch (\Exception $e) {
+                        Log::error('File upload failed for expense update: '.$e->getMessage());
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return Success::response([
+                'message' => __('Expense request updated successfully'),
+                'redirect' => route('hrcore.my.expenses'),
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+
+            return Error::response(__('Failed to update expense request'));
+        }
+    }
+
+    /**
+     * Delete expense for authenticated user (self-service)
+     */
+    public function deleteMyExpense($id)
+    {
+        try {
+            $expense = ExpenseRequest::where('user_id', auth()->id())
+                ->where('status', ExpenseRequestStatus::PENDING)
+                ->findOrFail($id);
+
+            $expense->delete();
+
+            return Success::response(__('Expense request deleted successfully'));
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+
+            return Error::response(__('Failed to delete expense request'));
+        }
+    }
+
+    /**
+     * Get my leaves list (self-service)
+     */
+    public function myLeaves()
+    {
+        // This method might be called from routes, redirect to myExpenses
+        return redirect()->route('hrcore.my.expenses');
+    }
 }

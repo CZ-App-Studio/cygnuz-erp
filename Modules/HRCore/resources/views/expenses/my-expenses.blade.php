@@ -209,7 +209,7 @@
 <script>
 window.pageData = {
   urls: {
-    datatable: @json(route('hrcore.expenses.my-expenses.datatable')),
+    datatable: @json(route('hrcore.my.expenses.datatable')),
     create: @json(route('hrcore.expenses.create')),
     store: @json(route('hrcore.expenses.store')),
     edit: @json(route('hrcore.expenses.edit', ['id' => '__ID__'])),

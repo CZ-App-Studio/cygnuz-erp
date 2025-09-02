@@ -153,7 +153,7 @@
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">{{ __('Leave Balance by Type') }}</h5>
-            <a href="{{ route('hrcore.leaves.apply') }}" class="btn btn-primary btn-sm">
+            <a href="{{ route('hrcore.my.leaves.apply') }}" class="btn btn-primary btn-sm">
               <i class="bx bx-plus me-1"></i> {{ __('Apply Leave') }}
             </a>
           </div>
