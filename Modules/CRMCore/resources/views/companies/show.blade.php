@@ -71,6 +71,7 @@ use Illuminate\Support\Str;
       $contactSearchUrl = route('contacts.selectSearch');
       $leadSearchUrl = route('leads.selectSearch');
       $dealSearchForTaskUrl = route('deals.selectSearch'); // For task "related to deal"
+      $companyDealsAjaxUrl = route('companies.dealsAjax', ['company' => $companyIdForRoute]);
 
       // Data for static dropdowns
       $taskStatusesData = Modules\CRMCore\App\Models\TaskStatus::orderBy('position')->pluck('name', 'id')->all();
@@ -91,7 +92,7 @@ use Illuminate\Support\Str;
               })
           ]];
       })->all();
-      $initialPipelineIdData = (Modules\CRMCore\App\Models\DealPipeline::where('is_default', true)->first() ?? \App\Models\DealPipeline::orderBy('position')->first())->id ?? null;
+      $initialPipelineIdData = (Modules\CRMCore\App\Models\DealPipeline::where('is_default', true)->first() ?? Modules\CRMCore\App\Models\DealPipeline::orderBy('position')->first())->id ?? null;
 
     @endphp
 
@@ -131,7 +132,8 @@ use Illuminate\Support\Str;
         companySearch: @json($companySearchUrl),
         contactSearch: @json($contactSearchUrl),
         leadSearch: @json($leadSearchUrl),
-        dealSearch: @json($dealSearchForTaskUrl) // Specifically for task's "related to deal"
+        dealSearch: @json($dealSearchForTaskUrl), // Specifically for task's "related to deal"
+        companyDealsAjax: @json($companyDealsAjaxUrl) // AJAX endpoint to refresh deals after creation
       },
       taskStatuses: @json($taskStatusesData),
       taskPriorities: @json($taskPrioritiesData),

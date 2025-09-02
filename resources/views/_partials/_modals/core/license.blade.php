@@ -33,7 +33,6 @@
             <div class="d-flex justify-content-center">
               <a href="javascript:" class="btn btn-primary me-1_5">
                 Activate with
-                <img class="ms-2" src="{{asset('assets/img/envato.svg')}}" alt="Activate with envato" width="100">
               </a>
             </div>
 

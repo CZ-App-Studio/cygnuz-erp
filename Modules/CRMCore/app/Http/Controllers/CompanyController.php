@@ -305,6 +305,28 @@ class CompanyController extends Controller
     }
 
     /**
+     * Get updated company data for AJAX refresh after deal creation.
+     */
+    public function getCompanyDealsAjax(Company $company)
+    {
+        try {
+            $company->load([
+                'deals' => function ($query) {
+                    $query->with(['dealStage:id,name,color', 'assignedToUser:id,first_name,last_name', 'contact:id,first_name,last_name'])
+                        ->orderBy('expected_close_date', 'desc');
+                },
+            ]);
+
+            return Success::response([
+                'deals' => $company->deals,
+            ]);
+        } catch (Exception $e) {
+            Log::error("Company Get Deals Ajax Error for ID {$company->id}: " . $e->getMessage());
+            return Error::response(__('Failed to fetch updated deals data'));
+        }
+    }
+
+    /**
      * Search for companies for Select2 AJAX.
      */
     public function selectSearch(Request $request)
