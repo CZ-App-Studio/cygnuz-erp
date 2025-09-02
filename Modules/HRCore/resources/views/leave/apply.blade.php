@@ -45,6 +45,10 @@
           </div>
           <form id="leaveApplicationForm" method="POST" action="{{ route('hrcore.leaves.store') }}" enctype="multipart/form-data">
             @csrf
+            {{-- Hidden user_id field for self application --}}
+            @unless(auth()->user()->can('hrcore.create-leave-for-others'))
+              <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+            @endunless
             <div class="card-body">
               {{-- Leave Type --}}
               <div class="row mb-3">
