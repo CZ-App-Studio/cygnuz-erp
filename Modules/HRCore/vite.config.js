@@ -25,7 +25,8 @@ export default defineConfig({
                 __dirname + '/resources/assets/js/expense-create.js',
                 __dirname + '/resources/assets/js/expense-edit.js',
                 __dirname + '/resources/assets/js/compensatory-off.js',
-                __dirname + '/resources/assets/js/my-regularization.js'
+                __dirname + '/resources/assets/js/my-regularization.js',
+                __dirname + '/resources/assets/js/my-leaves.js'
             ],
             refresh: true,
         }),

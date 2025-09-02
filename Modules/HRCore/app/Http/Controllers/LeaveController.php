@@ -939,9 +939,17 @@ class LeaveController extends Controller
      */
     public function myLeaves()
     {
-        $leaveTypes = LeaveType::active()->get();
+        $leaveTypes = LeaveType::where('status', 'active')->get();
+        
+        // Calculate statistics for the current user
+        $statistics = [
+            'total' => LeaveRequest::where('user_id', auth()->id())->count(),
+            'pending' => LeaveRequest::where('user_id', auth()->id())->where('status', 'pending')->count(),
+            'approved' => LeaveRequest::where('user_id', auth()->id())->where('status', 'approved')->count(),
+            'rejected' => LeaveRequest::where('user_id', auth()->id())->where('status', 'rejected')->count(),
+        ];
 
-        return view('hrcore::leave.my-leaves', compact('leaveTypes'));
+        return view('hrcore::leave.my-leaves', compact('leaveTypes', 'statistics'));
     }
 
     /**
@@ -971,6 +979,9 @@ class LeaveController extends Controller
         }
 
         return DataTables::of($query)
+            ->editColumn('created_at', function ($leave) {
+                return $leave->created_at->format('M d, Y');
+            })
             ->addColumn('leave_type', function ($leave) {
                 return $leave->leaveType->name;
             })
@@ -984,7 +995,14 @@ class LeaveController extends Controller
                 return $leave->total_days;
             })
             ->addColumn('status', function ($leave) {
-                return '<span class="badge '.$leave->getStatusBadgeClass().'">'.$leave->status->label().'</span>';
+                $badgeClass = match($leave->status->value) {
+                    'pending' => 'bg-label-warning',
+                    'approved' => 'bg-label-success',
+                    'rejected' => 'bg-label-danger',
+                    'cancelled' => 'bg-label-secondary',
+                    default => 'bg-label-primary'
+                };
+                return '<span class="badge '.$badgeClass.'">'.ucfirst($leave->status->value).'</span>';
             })
             ->addColumn('approved_by', function ($leave) {
                 return $leave->approvedBy ? $leave->approvedBy->getFullName() : '-';
@@ -1021,7 +1039,7 @@ class LeaveController extends Controller
      */
     public function createMyLeave()
     {
-        $leaveTypes = LeaveType::active()->get();
+        $leaveTypes = LeaveType::where('status', 'active')->get();
         $leaveBalances = auth()->user()->leaveBalances()
             ->with('leaveType')
             ->get()
@@ -1177,7 +1195,7 @@ class LeaveController extends Controller
             ->with('leaveType')
             ->get();
 
-        $leaveTypes = LeaveType::active()->get();
+        $leaveTypes = LeaveType::where('status', 'active')->get();
 
         return view('hrcore::leave.my-balance', compact('leaveBalances', 'leaveTypes'));
     }

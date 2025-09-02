@@ -79,6 +79,7 @@ Route::prefix('hrcore')->name('hrcore.')->middleware(['auth', 'web'])->group(fun
 
         // My Leave Management
         Route::get('/leaves', [LeaveController::class, 'myLeaves'])->name('leaves');
+        Route::get('/leaves/datatable', [LeaveController::class, 'myLeavesAjax'])->name('leaves.datatable');
         Route::get('/leaves/balance', [LeaveController::class, 'myBalance'])->name('leaves.balance');
         Route::get('/leaves/apply', [LeaveController::class, 'applyLeave'])->name('leaves.apply');
         Route::post('/leaves/apply', [LeaveController::class, 'storeMyLeave'])->name('leaves.store');
