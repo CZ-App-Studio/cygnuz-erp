@@ -50,37 +50,37 @@ class LeaveController extends Controller
         $settingsService = app(ModuleSettingsService::class);
         $includeWeekends = $settingsService->get('HRCore', 'weekend_included_in_leave', false);
         $includeHolidays = $settingsService->get('HRCore', 'holidays_included_in_leave', false);
-        
+
         $startDate = \Carbon\Carbon::parse($fromDate);
         $endDate = \Carbon\Carbon::parse($toDate);
-        
+
         if ($isHalfDay) {
             return 0.5;
         }
-        
+
         $days = 0;
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate <= $endDate) {
             $isWeekend = $currentDate->isWeekend();
             $isHoliday = \Modules\HRCore\app\Models\Holiday::whereDate('date', $currentDate)->exists();
-            
+
             // Skip weekends if not included
             if (!$includeWeekends && $isWeekend) {
                 $currentDate->addDay();
                 continue;
             }
-            
+
             // Skip holidays if not included
             if (!$includeHolidays && $isHoliday) {
                 $currentDate->addDay();
                 continue;
             }
-            
+
             $days++;
             $currentDate->addDay();
         }
-        
+
         return $days;
     }
 
@@ -268,9 +268,8 @@ class LeaveController extends Controller
         $minAdvanceNoticeDays = (int) $settingsService->get('HRCore', 'min_advance_notice_days', '0');
         // If minAdvanceNoticeDays is 0, allow today. Otherwise, add the days
         $minDate = $minAdvanceNoticeDays > 0 ? now()->addDays($minAdvanceNoticeDays)->toDateString() : now()->toDateString();
-        
+
         $validated = $request->validate([
-            'user_id' => auth()->user()->can('hrcore.create-leave-for-others') ? 'required|exists:users,id' : 'nullable',
             'leave_type_id' => 'required|exists:leave_types,id',
             'from_date' => 'required|date|after_or_equal:' . $minDate,
             'to_date' => 'required|date|after_or_equal:from_date',
@@ -289,9 +288,7 @@ class LeaveController extends Controller
             \Illuminate\Support\Facades\DB::beginTransaction();
 
             // Set user_id if not provided (for self leave request)
-            if (! isset($validated['user_id'])) {
-                $validated['user_id'] = auth()->id();
-            }
+             $validated['user_id'] = auth()->id();
 
             // Calculate total days based on settings
             $totalDays = $this->calculateLeaveDays(
