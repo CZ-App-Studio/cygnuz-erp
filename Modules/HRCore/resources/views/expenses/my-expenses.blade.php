@@ -203,6 +203,17 @@
 <!-- Form Offcanvas -->
 @include('hrcore::expenses._modals')
 
+<!-- Expense Details Offcanvas -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="expenseDetailsOffcanvas" aria-labelledby="expenseDetailsOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 id="expenseDetailsOffcanvasLabel" class="offcanvas-title">{{ __('Expense Request Details') }}</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body" id="expenseDetailsContent">
+    <!-- Dynamic content will be loaded here -->
+  </div>
+</div>
+
 @endsection
 
 @section('page-script')
@@ -210,12 +221,12 @@
 window.pageData = {
   urls: {
     datatable: @json(route('hrcore.my.expenses.datatable')),
-    create: @json(route('hrcore.expenses.create')),
-    store: @json(route('hrcore.expenses.store')),
-    edit: @json(route('hrcore.expenses.edit', ['id' => '__ID__'])),
-    update: @json(route('hrcore.expenses.update', ['id' => '__ID__'])),
-    destroy: @json(route('hrcore.expenses.destroy', ['id' => '__ID__'])),
-    show: @json(route('hrcore.expenses.show', ['id' => '__ID__']))
+    create: @json(route('hrcore.my.expenses.create')),
+    store: @json(route('hrcore.my.expenses.store')),
+    edit: @json(route('hrcore.my.expenses.edit', ['id' => '__ID__'])),
+    update: @json(route('hrcore.my.expenses.update', ['id' => '__ID__'])),
+    destroy: @json(route('hrcore.my.expenses.delete', ['id' => '__ID__'])),
+    show: @json(route('hrcore.my.expenses.show', ['id' => '__ID__']))
   },
   labels: {
     confirmDelete: @json(__('Are you sure you want to delete this expense request?')),

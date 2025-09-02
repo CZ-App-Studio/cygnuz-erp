@@ -72,18 +72,152 @@ function setupEventHandlers() {
 
 // Create new expense
 window.createExpense = function() {
-    // Add return_to parameter to redirect back to my-expenses
-    const url = new URL(pageData.urls.create, window.location.origin);
-    url.searchParams.append('return_to', 'my-expenses');
-    window.location.href = url.toString();
+    window.location.href = pageData.urls.create;
 };
 
 // Edit expense
 window.editExpense = function(id) {
-    // Add return_to parameter to redirect back to my-expenses
-    const url = new URL(pageData.urls.edit.replace('__ID__', id), window.location.origin);
-    url.searchParams.append('return_to', 'my-expenses');
-    window.location.href = url.toString();
+    window.location.href = pageData.urls.edit.replace('__ID__', id);
+};
+
+// View expense details
+window.viewExpense = function(id) {
+    // Show offcanvas first
+    const offcanvasElement = document.getElementById('expenseDetailsOffcanvas');
+    const offcanvas = new bootstrap.Offcanvas(offcanvasElement);
+    offcanvas.show();
+    
+    // Show loading state
+    $('#expenseDetailsContent').html(`
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `);
+    
+    // Fetch expense details
+    $.ajax({
+        url: pageData.urls.show.replace('__ID__', id),
+        type: 'GET',
+        success: function(response) {
+            if (response.status === 'success') {
+                const expense = response.data.expense;
+                
+                // Build HTML content
+                let html = `
+                    <div class="expense-details">
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.expenseNumber || 'Expense Number'}</h6>
+                            <p class="fw-semibold">${expense.expense_number || '-'}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.date || 'Date'}</h6>
+                            <p>${expense.expense_date}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.type || 'Type'}</h6>
+                            <p>${expense.expense_type?.name || '-'}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.title || 'Title'}</h6>
+                            <p>${expense.title || '-'}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.description || 'Description'}</h6>
+                            <p>${expense.description || '-'}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.amount || 'Amount'}</h6>
+                            <p class="fs-5 fw-semibold">${expense.formatted_amount || expense.amount}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.status || 'Status'}</h6>
+                            <p>${expense.status_badge || expense.status}</p>
+                        </div>
+                `;
+                
+                // Add approval info if approved
+                if (expense.status === 'approved' && expense.approved_by) {
+                    html += `
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.approvedBy || 'Approved By'}</h6>
+                            <p>${expense.approved_by.name} on ${expense.approved_at}</p>
+                            ${expense.approval_remarks ? `<p class="text-muted small">${expense.approval_remarks}</p>` : ''}
+                        </div>
+                    `;
+                }
+                
+                // Add rejection info if rejected
+                if (expense.status === 'rejected' && expense.rejected_by) {
+                    html += `
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.rejectedBy || 'Rejected By'}</h6>
+                            <p>${expense.rejected_by.name} on ${expense.rejected_at}</p>
+                            ${expense.rejection_reason ? `<p class="text-danger small">${expense.rejection_reason}</p>` : ''}
+                        </div>
+                    `;
+                }
+                
+                // Add processing info if processed
+                if (expense.status === 'processed' && expense.processed_by) {
+                    html += `
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.processedBy || 'Processed By'}</h6>
+                            <p>${expense.processed_by.name} on ${expense.processed_at}</p>
+                            ${expense.payment_reference ? `<p class="small">Reference: ${expense.payment_reference}</p>` : ''}
+                            ${expense.processing_notes ? `<p class="text-muted small">${expense.processing_notes}</p>` : ''}
+                        </div>
+                    `;
+                }
+                
+                // Add attachments if available
+                if (expense.attachments && expense.attachments.length > 0) {
+                    html += `
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">${pageData.labels.attachments || 'Attachments'}</h6>
+                            <div class="list-group">
+                    `;
+                    expense.attachments.forEach(function(attachment) {
+                        html += `
+                            <a href="${attachment.url}" target="_blank" class="list-group-item list-group-item-action">
+                                <i class="bx bx-file me-2"></i> ${attachment.name}
+                            </a>
+                        `;
+                    });
+                    html += `</div></div>`;
+                }
+                
+                html += `</div>`;
+                
+                // Update offcanvas content
+                $('#expenseDetailsContent').html(html);
+            } else {
+                $('#expenseDetailsContent').html(`
+                    <div class="alert alert-danger">
+                        ${response.data || 'Failed to load expense details'}
+                    </div>
+                `);
+            }
+        },
+        error: function(xhr) {
+            let errorMessage = 'Failed to load expense details';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            }
+            $('#expenseDetailsContent').html(`
+                <div class="alert alert-danger">
+                    ${errorMessage}
+                </div>
+            `);
+        }
+    });
 };
 
 // Delete expense

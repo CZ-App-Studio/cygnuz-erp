@@ -132,26 +132,35 @@ class ExpenseController extends Controller
                     $actions[] = [
                         'label' => __('View'),
                         'icon' => 'bx bx-show',
-                        'url' => route('hrcore.expenses.show', $model->id),
+                        'onclick' => "viewExpense({$model->id})",
                         'class' => 'dropdown-item',
                     ];
 
+                    // Get the actual status value
+                    $statusValue = $model->status instanceof ExpenseRequestStatus 
+                        ? $model->status->value 
+                        : $model->status;
+                    
                     // Edit action only for pending expenses
-                    if ($model->status === ExpenseRequestStatus::PENDING->value) {
-                        $actions[] = [
-                            'label' => __('Edit'),
-                            'icon' => 'bx bx-edit',
-                            'onclick' => "editExpense({$model->id})",
-                            'class' => 'dropdown-item',
-                        ];
+                    if ($statusValue === 'pending' || $statusValue === ExpenseRequestStatus::PENDING->value) {
+                        if (auth()->user()->can('hrcore.edit-expense')) {
+                            $actions[] = [
+                                'label' => __('Edit'),
+                                'icon' => 'bx bx-edit',
+                                'onclick' => "editExpense({$model->id})",
+                                'class' => 'dropdown-item',
+                            ];
+                        }
 
                         // Delete action only for own pending expenses
-                        $actions[] = [
-                            'label' => __('Delete'),
-                            'icon' => 'bx bx-trash',
-                            'onclick' => "deleteExpense({$model->id})",
-                            'class' => 'dropdown-item text-danger',
-                        ];
+                        if (auth()->user()->can('hrcore.delete-expense')) {
+                            $actions[] = [
+                                'label' => __('Delete'),
+                                'icon' => 'bx bx-trash',
+                                'onclick' => "deleteExpense({$model->id})",
+                                'class' => 'dropdown-item text-danger',
+                            ];
+                        }
                     }
 
                     return view('components.datatable-actions', [
@@ -760,11 +769,70 @@ class ExpenseController extends Controller
      */
     public function showMyExpense($id)
     {
-        $expense = ExpenseRequest::where('user_id', auth()->id())
-            ->with(['expenseType', 'department', 'approvedBy', 'rejectedBy', 'processedBy'])
-            ->findOrFail($id);
+        try {
+            $expense = ExpenseRequest::where('user_id', auth()->id())
+                ->with(['expenseType', 'department', 'approvedBy', 'rejectedBy', 'processedBy', 'files'])
+                ->findOrFail($id);
 
-        return view('hrcore::expenses.my-show', compact('expense'));
+            // Check if request is AJAX
+            if (request()->ajax()) {
+                // Format the expense data for JSON response
+                $expenseData = [
+                    'id' => $expense->id,
+                    'expense_number' => $expense->expense_number,
+                    'expense_date' => $expense->expense_date->format('d M Y'),
+                    'title' => $expense->title,
+                    'description' => $expense->description,
+                    'amount' => $expense->amount,
+                    'formatted_amount' => \App\Helpers\FormattingHelper::formatCurrency($expense->amount),
+                    'status' => $expense->status,
+                    'status_badge' => $this->getStatusBadge($expense->status),
+                    'expense_type' => $expense->expenseType,
+                    'department' => $expense->department,
+                    'approved_by' => $expense->approvedBy,
+                    'approved_at' => $expense->approved_at ? $expense->approved_at->format('d M Y H:i') : null,
+                    'approval_remarks' => $expense->approval_remarks,
+                    'rejected_by' => $expense->rejectedBy,
+                    'rejected_at' => $expense->rejected_at ? $expense->rejected_at->format('d M Y H:i') : null,
+                    'rejection_reason' => $expense->rejection_reason,
+                    'processed_by' => $expense->processedBy,
+                    'processed_at' => $expense->processed_at ? $expense->processed_at->format('d M Y H:i') : null,
+                    'payment_reference' => $expense->payment_reference,
+                    'processing_notes' => $expense->processing_notes,
+                    'attachments' => $expense->files->map(function ($file) {
+                        return [
+                            'name' => $file->original_name,
+                            'url' => route('file.download', $file->id)
+                        ];
+                    })
+                ];
+
+                return Success::response([
+                    'expense' => $expenseData
+                ]);
+            }
+
+            return view('hrcore::expenses.my-show', compact('expense'));
+        } catch (\Exception $e) {
+            if (request()->ajax()) {
+                return Error::response('Failed to load expense details: ' . $e->getMessage());
+            }
+            throw $e;
+        }
+    }
+
+    private function getStatusBadge($status)
+    {
+        $statusValue = $status instanceof ExpenseRequestStatus ? $status->value : $status;
+        $statusColors = [
+            ExpenseRequestStatus::PENDING->value => 'bg-label-warning',
+            ExpenseRequestStatus::APPROVED->value => 'bg-label-success',
+            ExpenseRequestStatus::REJECTED->value => 'bg-label-danger',
+            ExpenseRequestStatus::PROCESSED->value => 'bg-label-info',
+        ];
+        $statusClass = $statusColors[$statusValue] ?? 'bg-label-secondary';
+        
+        return '<span class="badge '.$statusClass.'">'.ucfirst($statusValue).'</span>';
     }
 
     /**
