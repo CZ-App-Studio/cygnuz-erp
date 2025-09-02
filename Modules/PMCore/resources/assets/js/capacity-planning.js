@@ -131,7 +131,8 @@ $(function () {
                 height: 400,
                 stacked: true,
                 toolbar: {
-                    show: true
+                    show: true,
+                    offsetY: -10
                 }
             },
             plotOptions: {
@@ -160,7 +161,13 @@ $(function () {
             colors: ['#435971', '#71dd37'],
             legend: {
                 position: 'top',
-                horizontalAlign: 'right'
+                horizontalAlign: 'left',
+                offsetX: 0,
+                offsetY: 0,
+                markers: {
+                    width: 12,
+                    height: 12
+                }
             },
             fill: {
                 opacity: 1
