@@ -484,8 +484,10 @@
         showCancelButton: true,
         confirmButtonText: pageData.labels.approve,
         cancelButtonText: pageData.labels.no,
-        confirmButtonClass: 'btn btn-success me-3',
-        cancelButtonClass: 'btn btn-label-secondary',
+        customClass: {
+          confirmButton: 'btn btn-success me-3',
+          cancelButton: 'btn btn-label-secondary'
+        },
         buttonsStyling: false
       }).then((result) => {
         if (result.isConfirmed) {
@@ -508,8 +510,10 @@
         showCancelButton: true,
         confirmButtonText: pageData.labels.reject,
         cancelButtonText: pageData.labels.no,
-        confirmButtonClass: 'btn btn-danger me-3',
-        cancelButtonClass: 'btn btn-label-secondary',
+        customClass: {
+          confirmButton: 'btn btn-danger me-3',
+          cancelButton: 'btn btn-label-secondary'
+        },
         buttonsStyling: false
       }).then((result) => {
         if (result.isConfirmed) {
@@ -527,8 +531,10 @@
         showCancelButton: true,
         confirmButtonText: pageData.labels.yes,
         cancelButtonText: pageData.labels.no,
-        confirmButtonClass: 'btn btn-warning me-3',
-        cancelButtonClass: 'btn btn-label-secondary',
+        customClass: {
+          confirmButton: 'btn btn-warning me-3',
+          cancelButton: 'btn btn-label-secondary'
+        },
         buttonsStyling: false
       }).then((result) => {
         if (result.isConfirmed) {
@@ -544,8 +550,10 @@
         showCancelButton: true,
         confirmButtonText: pageData.labels.delete,
         cancelButtonText: pageData.labels.no,
-        confirmButtonClass: 'btn btn-danger me-3',
-        cancelButtonClass: 'btn btn-label-secondary',
+        customClass: {
+          confirmButton: 'btn btn-danger me-3',
+          cancelButton: 'btn btn-label-secondary'
+        },
         buttonsStyling: false
       }).then((result) => {
         if (result.isConfirmed) {
@@ -575,7 +583,9 @@
             icon: 'success',
             title: pageData.labels.success,
             text: data.message || data.data?.message || 'Action completed successfully',
-            confirmButtonClass: 'btn btn-success',
+            customClass: {
+              confirmButton: 'btn btn-success'
+            },
             buttonsStyling: false
           }).then(() => {
             if (action === 'destroy') {
@@ -589,7 +599,9 @@
             icon: 'error',
             title: pageData.labels.error,
             text: data.message || data.data || 'Action failed',
-            confirmButtonClass: 'btn btn-danger',
+            customClass: {
+              confirmButton: 'btn btn-danger'
+            },
             buttonsStyling: false
           });
         }
@@ -600,7 +612,9 @@
           icon: 'error',
           title: pageData.labels.error,
           text: 'Something went wrong. Please try again.',
-          confirmButtonClass: 'btn btn-danger',
+          customClass: {
+            confirmButton: 'btn btn-danger'
+          },
           buttonsStyling: false
         });
       });

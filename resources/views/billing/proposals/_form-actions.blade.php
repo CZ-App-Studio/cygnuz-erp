@@ -190,7 +190,10 @@ function deleteProposal(proposalId) {
             showCancelButton: true,
             confirmButtonText: '{{ __('Yes, delete it!') }}',
             cancelButtonText: '{{ __('Cancel') }}',
-            confirmButtonClass: 'btn btn-danger'
+            customClass: {
+                confirmButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');

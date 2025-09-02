@@ -276,7 +276,10 @@ function resetToDefaults() {
             showCancelButton: true,
             confirmButtonText: '{{ __('Yes, reset!') }}',
             cancelButtonText: '{{ __('Cancel') }}',
-            confirmButtonClass: 'btn btn-danger'
+            customClass: {
+                confirmButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch('{{ route('billing.settings.reset') }}', {

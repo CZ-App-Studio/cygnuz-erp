@@ -474,8 +474,10 @@ function approveLeave(id) {
     showCancelButton: true,
     confirmButtonText: pageData.labels?.approve || 'Approve',
     cancelButtonText: pageData.labels?.no || 'Cancel',
-    confirmButtonClass: 'btn btn-success me-3',
-    cancelButtonClass: 'btn btn-label-secondary',
+    customClass: {
+      confirmButton: 'btn btn-success me-3',
+      cancelButton: 'btn btn-label-secondary'
+    },
     buttonsStyling: false
   }).then((result) => {
     if (result.isConfirmed) {
@@ -498,8 +500,10 @@ function rejectLeave(id) {
     showCancelButton: true,
     confirmButtonText: pageData.labels?.reject || 'Reject',
     cancelButtonText: pageData.labels?.no || 'Cancel',
-    confirmButtonClass: 'btn btn-danger me-3',
-    cancelButtonClass: 'btn btn-label-secondary',
+    customClass: {
+      confirmButton: 'btn btn-danger me-3',
+      cancelButton: 'btn btn-label-secondary'
+    },
     buttonsStyling: false
   }).then((result) => {
     if (result.isConfirmed) {
@@ -517,8 +521,10 @@ function cancelLeave(id) {
     showCancelButton: true,
     confirmButtonText: pageData.labels?.yes || 'Yes, Cancel',
     cancelButtonText: pageData.labels?.no || 'No',
-    confirmButtonClass: 'btn btn-warning me-3',
-    cancelButtonClass: 'btn btn-label-secondary',
+    customClass: {
+      confirmButton: 'btn btn-warning me-3',
+      cancelButton: 'btn btn-label-secondary'
+    },
     buttonsStyling: false
   }).then((result) => {
     if (result.isConfirmed) {
@@ -542,8 +548,10 @@ function deleteLeave(id) {
     showCancelButton: true,
     confirmButtonText: pageData.labels?.delete || 'Delete',
     cancelButtonText: pageData.labels?.no || 'Cancel',
-    confirmButtonClass: 'btn btn-danger me-3',
-    cancelButtonClass: 'btn btn-label-secondary',
+    customClass: {
+      confirmButton: 'btn btn-danger me-3',
+      cancelButton: 'btn btn-label-secondary'
+    },
     buttonsStyling: false
   }).then((result) => {
     if (result.isConfirmed) {
@@ -574,7 +582,9 @@ function performAction(action, id, data = {}, method = 'POST') {
         icon: 'success',
         title: pageData.labels?.success || 'Success',
         text: data.message || data.data?.message || 'Action completed successfully',
-        confirmButtonClass: 'btn btn-success',
+        customClass: {
+          confirmButton: 'btn btn-success'
+        },
         buttonsStyling: false
       }).then(() => {
         // Reload the details
@@ -595,7 +605,9 @@ function performAction(action, id, data = {}, method = 'POST') {
         icon: 'error',
         title: pageData.labels?.error || 'Error',
         text: data.message || data.data || 'Action failed',
-        confirmButtonClass: 'btn btn-danger',
+        customClass: {
+          confirmButton: 'btn btn-danger'
+        },
         buttonsStyling: false
       });
     }
@@ -606,7 +618,9 @@ function performAction(action, id, data = {}, method = 'POST') {
       icon: 'error',
       title: pageData.labels?.error || 'Error',
       text: pageData.labels?.somethingWentWrong || 'Something went wrong. Please try again.',
-      confirmButtonClass: 'btn btn-danger',
+      customClass: {
+        confirmButton: 'btn btn-danger'
+      },
       buttonsStyling: false
     });
   });
