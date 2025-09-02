@@ -10,6 +10,7 @@ use Modules\PMCore\app\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -131,6 +132,25 @@ class ResourceController extends Controller
                         ]
                     ]
                 ])->render();
+            })
+            ->filterColumn('user', function ($query, $keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('users.name', 'like', "%{$keyword}%")
+                      ->orWhere('users.email', 'like', "%{$keyword}%");
+                    
+                    // Check if user has first_name and last_name fields for full name search
+                    if (Schema::hasColumn('users', 'first_name')) {
+                        $q->orWhere('users.first_name', 'like', "%{$keyword}%");
+                    }
+                    if (Schema::hasColumn('users', 'last_name')) {
+                        $q->orWhere('users.last_name', 'like', "%{$keyword}%");
+                    }
+                });
+            })
+            ->filterColumn('role', function ($query, $keyword) {
+                $query->whereHas('roles', function ($q) use ($keyword) {
+                    $q->where('name', 'like', "%{$keyword}%");
+                });
             })
             ->rawColumns(['user', 'current_allocation', 'availability', 'actions'])
             ->make(true);
