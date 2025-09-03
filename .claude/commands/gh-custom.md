@@ -34,7 +34,10 @@ Complete workflow for GitHub issue $ARGUMENTS:
 - Push to GitHub with `git push -u origin fix/issue-$ARGUMENTS`
 
 **Step 8: Create pull request using gh CLI**
-- Use `gh pr create` to create pull request referencing issue #$ARGUMENTS
+- First, get the issue details to extract the creator's username
+- Use `gh pr create` to create pull request with the issue creator as reviewer:
+  - `gh pr create --title "fix: Issue title (issue #$ARGUMENTS)" --body "PR description" --reviewer <issue_creator_username>`
+- **IMPORTANT**: Automatically add the issue creator as a reviewer using `--reviewer` flag
 - Include comprehensive description with:
   - Summary linking to the issue
   - Technical details of the fix
