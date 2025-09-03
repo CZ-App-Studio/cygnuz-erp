@@ -31,8 +31,15 @@ Complete workflow for GitHub issue $ARGUMENTS:
 **Step 7: Format and commit**
 - Run `./vendor/bin/pint` to format code
 - Commit changes with proper message
-- Push to GitHub 
-- Create pull request referencing issue #$ARGUMENTS
+- Push to GitHub with `git push -u origin fix/issue-$ARGUMENTS`
+
+**Step 8: Create pull request using gh CLI**
+- Use `gh pr create` to create pull request referencing issue #$ARGUMENTS
+- Include comprehensive description with:
+  - Summary linking to the issue
+  - Technical details of the fix
+  - Test plan verification
+  - Impact assessment
 
 **Testing Guidelines:**
 - Tests must validate the fix without touching the database
