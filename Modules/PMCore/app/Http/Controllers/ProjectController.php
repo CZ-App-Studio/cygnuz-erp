@@ -375,6 +375,9 @@ class ProjectController extends Controller
 
     try {
       DB::transaction(function () use ($request, $project) {
+        // Store old project manager ID before updating
+        $oldProjectManagerId = $project->project_manager_id;
+        
         $updateData = [
           'name' => $request->name,
           'code' => $request->code,
@@ -401,8 +404,22 @@ class ProjectController extends Controller
 
         // Update project manager membership
         if ($request->project_manager_id) {
+          // Remove old project manager from members if changed
+          if ($oldProjectManagerId && $oldProjectManagerId != $request->project_manager_id) {
+            $oldManager = $project->members()
+              ->where('user_id', $oldProjectManagerId)
+              ->whereNull('left_at')
+              ->first();
+            
+            if ($oldManager) {
+              $oldManager->update(['left_at' => now()]);
+            }
+          }
+
+          // Add or update new project manager in members
           $existingManager = $project->members()
             ->where('user_id', $request->project_manager_id)
+            ->whereNull('left_at')
             ->first();
 
           if ($existingManager) {
@@ -423,7 +440,7 @@ class ProjectController extends Controller
         ]);
       }
 
-      return redirect()->route('pmcore.projects.show', $project)
+      return redirect()->route('pmcore.projects.edit', $project)
         ->with('success', 'Project updated successfully.');
 
     } catch (\Exception $e) {
