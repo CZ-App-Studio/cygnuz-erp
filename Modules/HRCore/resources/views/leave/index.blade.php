@@ -45,13 +45,7 @@
         ['name' => __('Leave Requests'), 'url' => '']
       ]"
       :home-url="url('/')"
-    >
-      @can('hrcore.create-leave')
-        <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddLeave">
-          <i class="bx bx-plus me-1"></i>{{ __('Add Leave Request') }}
-        </button>
-      @endcan
-    </x-breadcrumb>
+    />
 
   {{-- Filters Card --}}
   <div class="card mb-4">
@@ -102,6 +96,14 @@
 
   {{-- Leave Requests Table --}}
   <div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h5 class="card-title mb-0">{{ __('Leave Requests List') }}</h5>
+      @can('hrcore.create-leave')
+        <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddLeave">
+          <i class="bx bx-plus me-1"></i>{{ __('Add Leave Request') }}
+        </button>
+      @endcan
+    </div>
     <div class="card-datatable table-responsive">
       <table id="leaveRequestsTable" class="table">
         <thead>
