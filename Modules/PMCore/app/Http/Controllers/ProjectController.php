@@ -343,41 +343,6 @@ class ProjectController extends Controller
     }
 
     /**
-     * Remove the specified project.
-     */
-    public function destroy(Project $project)
-    {
-        try {
-            DB::transaction(function () use ($project) {
-                // Remove all project members
-                $project->members()->delete();
-
-                // If TaskSystem is available, handle task cleanup
-                // Tasks would be soft deleted or reassigned
-                // This depends on the TaskSystem implementation
-
-                // Soft delete the project
-                $project->delete();
-            });
-
-            if (request()->ajax()) {
-                return \App\ApiClasses\Success::response('Project deleted successfully');
-            }
-
-            return redirect()->route('pmcore.projects.index')
-                ->with('success', 'Project deleted successfully.');
-
-        } catch (\Exception $e) {
-            if (request()->ajax()) {
-                return \App\ApiClasses\Error::response('Failed to delete project');
-            }
-
-            return redirect()->back()
-                ->with('error', 'Failed to delete project.');
-        }
-    }
-
-    /**
      * Update the specified project.
      */
     public function update(Request $request, Project $project)
@@ -478,6 +443,41 @@ class ProjectController extends Controller
             return redirect()->back()
                 ->with('error', 'Failed to update project.')
                 ->withInput();
+        }
+    }
+
+    /**
+     * Remove the specified project.
+     */
+    public function destroy(Project $project)
+    {
+        try {
+            DB::transaction(function () use ($project) {
+                // Remove all project members
+                $project->members()->delete();
+
+                // If TaskSystem is available, handle task cleanup
+                // Tasks would be soft deleted or reassigned
+                // This depends on the TaskSystem implementation
+
+                // Soft delete the project
+                $project->delete();
+            });
+
+            if (request()->ajax()) {
+                return \App\ApiClasses\Success::response('Project deleted successfully');
+            }
+
+            return redirect()->route('pmcore.projects.index')
+                ->with('success', 'Project deleted successfully.');
+
+        } catch (\Exception $e) {
+            if (request()->ajax()) {
+                return \App\ApiClasses\Error::response('Failed to delete project');
+            }
+
+            return redirect()->back()
+                ->with('error', 'Failed to delete project.');
         }
     }
 
@@ -680,14 +680,64 @@ class ProjectController extends Controller
     }
 
     /**
+     * Update project financial values from timesheets.
+     */
+    protected function updateProjectFinancials($project): void
+    {
+        try {
+            // Calculate actual cost from timesheets
+            $actualCost = $project->timesheets()
+                ->whereIn('status', ['approved', 'submitted'])
+                ->sum(DB::raw('hours * COALESCE(cost_rate, hourly_rate, 0)'));
+
+            // Calculate actual revenue from billable timesheets
+            $actualRevenue = $project->timesheets()
+                ->whereIn('status', ['approved', 'submitted'])
+                ->where('is_billable', true)
+                ->sum(DB::raw('hours * COALESCE(billing_rate, hourly_rate, 0)'));
+
+            // Update the project's financial fields
+            $project->update([
+                'actual_cost' => $actualCost,
+                'actual_revenue' => $actualRevenue,
+            ]);
+        } catch (\Exception $e) {
+            Log::debug('Failed to update project financials: '.$e->getMessage());
+        }
+    }
+
+    /**
      * Get project statistics.
      */
     protected function getProjectStats(): array
     {
         $activeProjects = Project::notArchived();
 
+        // Calculate task counts across all projects
+        $totalCompletedTasks = 0;
+        $totalOverdueTasks = 0;
+        $totalSpent = 0;
+        $totalRevenue = 0;
+
+        // Get all active projects for calculation
+        $projects = $activeProjects->get();
+
+        foreach ($projects as $project) {
+            // Update actual cost and revenue from timesheets
+            $this->updateProjectFinancials($project);
+
+            // Calculate task counts
+            $totalCompletedTasks += $this->getProjectCompletedTaskCount($project);
+            $totalOverdueTasks += $this->getProjectOverdueTaskCount($project);
+
+            // Get updated financial values
+            $project->refresh();
+            $totalSpent += $project->actual_cost ?? 0;
+            $totalRevenue += $project->actual_revenue ?? 0;
+        }
+
         return [
-            'total_projects' => $activeProjects->count(),
+            'total_projects' => $projects->count(),
             'active_projects' => $activeProjects->ongoing()->count(),
             'completed_projects' => $activeProjects->completed()->count(),
             'overdue_projects' => $activeProjects->ongoing()
@@ -695,9 +745,11 @@ class ProjectController extends Controller
                 ->where('end_date', '<', now())
                 ->count(),
             'total_budget' => $activeProjects->sum('budget'),
-            'total_spent' => $activeProjects->sum('actual_cost'),
-            'total_revenue' => $activeProjects->sum('actual_revenue'),
-            'projects_over_budget' => $activeProjects->get()->filter->isOverBudget()->count(),
+            'total_spent' => $totalSpent,
+            'total_revenue' => $totalRevenue,
+            'projects_over_budget' => $projects->filter->isOverBudget()->count(),
+            'completed_tasks' => $totalCompletedTasks,
+            'overdue_tasks' => $totalOverdueTasks,
         ];
     }
 
@@ -788,7 +840,9 @@ class ProjectController extends Controller
     {
         try {
             if (class_exists('\\Modules\\CRMCore\\app\\Models\\Task')) {
-                return $project->tasks()->count();
+                return \Modules\CRMCore\app\Models\Task::where('taskable_type', 'Modules\PMCore\app\Models\Project')
+                    ->where('taskable_id', $project->id)
+                    ->count();
             }
         } catch (\Exception $e) {
             Log::debug('Failed to get project task count: '.$e->getMessage());
@@ -804,7 +858,10 @@ class ProjectController extends Controller
     {
         try {
             if (class_exists('\\Modules\\CRMCore\\app\\Models\\Task')) {
-                return $project->tasks()->whereNotNull('completed_at')->count();
+                return \Modules\CRMCore\app\Models\Task::where('taskable_type', 'Modules\PMCore\app\Models\Project')
+                    ->where('taskable_id', $project->id)
+                    ->whereNotNull('completed_at')
+                    ->count();
             }
         } catch (\Exception $e) {
             Log::debug('Failed to get project completed task count: '.$e->getMessage());
@@ -855,7 +912,8 @@ class ProjectController extends Controller
     {
         try {
             if (class_exists('\\Modules\\CRMCore\\app\\Models\\Task')) {
-                return $project->tasks()
+                return \Modules\CRMCore\app\Models\Task::where('taskable_type', 'Modules\PMCore\app\Models\Project')
+                    ->where('taskable_id', $project->id)
                     ->where('due_date', '<', now())
                     ->whereNull('completed_at')
                     ->count();

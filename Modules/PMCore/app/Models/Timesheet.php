@@ -62,6 +62,25 @@ class Timesheet extends Model implements Auditable
         static::updating(function ($timesheet) {
             $timesheet->calculateAmounts();
         });
+
+        // Update project financials after timesheet is saved
+        static::created(function ($timesheet) {
+            if ($timesheet->project_id) {
+                $timesheet->updateProjectFinancials();
+            }
+        });
+
+        static::updated(function ($timesheet) {
+            if ($timesheet->project_id) {
+                $timesheet->updateProjectFinancials();
+            }
+        });
+
+        static::deleted(function ($timesheet) {
+            if ($timesheet->project_id) {
+                $timesheet->updateProjectFinancials();
+            }
+        });
     }
 
     /**
@@ -77,6 +96,48 @@ class Timesheet extends Model implements Auditable
             $this->billable_amount = $this->hours * ($this->billing_rate ?: 0);
         } else {
             $this->billable_amount = 0;
+        }
+    }
+
+    /**
+     * Update project financial values based on timesheets
+     */
+    protected function updateProjectFinancials(): void
+    {
+        try {
+            if (! $this->project_id) {
+                return;
+            }
+
+            $project = $this->project()->first();
+            if (! $project) {
+                return;
+            }
+
+            // Calculate total cost from approved/submitted timesheets
+            $totalCost = $project->timesheets()
+                ->whereIn('status', ['approved', 'submitted'])
+                ->sum(\Illuminate\Support\Facades\DB::raw('hours * COALESCE(cost_rate, 0)'));
+
+            // Calculate total revenue from approved/submitted billable timesheets
+            $totalRevenue = $project->timesheets()
+                ->whereIn('status', ['approved', 'submitted'])
+                ->where('is_billable', true)
+                ->sum(\Illuminate\Support\Facades\DB::raw('hours * COALESCE(billing_rate, 0)'));
+
+            // Update project without triggering events to avoid infinite loops
+            $project->timestamps = false;
+            $project->update([
+                'actual_cost' => $totalCost,
+                'actual_revenue' => $totalRevenue,
+            ]);
+            $project->timestamps = true;
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to update project financials: '.$e->getMessage(), [
+                'timesheet_id' => $this->id,
+                'project_id' => $this->project_id,
+            ]);
         }
     }
 

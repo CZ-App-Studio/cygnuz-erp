@@ -70,7 +70,81 @@
         </div>
     </div>
     
-    <!-- Second Row: Budget Stats -->
+    <!-- Second Row: Task Stats -->
+    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar">
+                        <div class="avatar-initial bg-label-success rounded">
+                            <i class="bx bx-task text-success"></i>
+                        </div>
+                    </div>
+                    <div class="ms-3">
+                        <div class="small mb-1">{{ __('Completed Tasks') }}</div>
+                        <h5 class="mb-0">{{ $stats['completed_tasks'] ?? 0 }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar">
+                        <div class="avatar-initial bg-label-warning rounded">
+                            <i class="bx bx-time-five text-warning"></i>
+                        </div>
+                    </div>
+                    <div class="ms-3">
+                        <div class="small mb-1">{{ __('Overdue Tasks') }}</div>
+                        <h5 class="mb-0">{{ $stats['overdue_tasks'] ?? 0 }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar">
+                        <div class="avatar-initial bg-label-info rounded">
+                            <i class="bx bx-dollar-circle text-info"></i>
+                        </div>
+                    </div>
+                    <div class="ms-3">
+                        <div class="small mb-1">{{ __('Budget Variance') }}</div>
+                        <h5 class="mb-0 {{ ($stats['total_budget'] - $stats['total_spent']) >= 0 ? 'text-success' : 'text-danger' }}">
+                            {{ \App\Helpers\FormattingHelper::formatCurrency(($stats['total_budget'] ?? 0) - ($stats['total_spent'] ?? 0)) }}
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar">
+                        <div class="avatar-initial bg-label-primary rounded">
+                            <i class="bx bx-trending-up text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="ms-3">
+                        <div class="small mb-1">{{ __('Profit Margin') }}</div>
+                        <h5 class="mb-0 {{ ($stats['total_revenue'] - $stats['total_spent']) >= 0 ? 'text-success' : 'text-danger' }}">
+                            {{ \App\Helpers\FormattingHelper::formatCurrency(($stats['total_revenue'] ?? 0) - ($stats['total_spent'] ?? 0)) }}
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Third Row: Budget Stats -->
     <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
         <div class="card">
             <div class="card-body">
