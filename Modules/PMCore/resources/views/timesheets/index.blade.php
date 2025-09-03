@@ -30,7 +30,9 @@
                 rejectUrl: @json(route('pmcore.timesheets.reject', ['timesheet' => '__ID__'])),
                 submitUrl: @json(route('pmcore.timesheets.submit', ['timesheet' => '__ID__'])),
                 statisticsUrl: @json(route('pmcore.timesheets.statistics')),
-                projectTasksUrl: @json(route('pmcore.timesheets.project-tasks', ['project' => '__PROJECT_ID__']))
+                projectTasksUrl: @json(route('pmcore.timesheets.project-tasks', ['project' => '__PROJECT_ID__'])),
+                usersSearchUrl: @json(route('pmcore.users.search')),
+                projectsSearchUrl: @json(route('pmcore.projects.search'))
             },
             labels: {
                 confirmDelete: @json(__('Are you sure you want to delete this timesheet?')),

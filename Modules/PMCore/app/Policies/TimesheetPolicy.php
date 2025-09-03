@@ -47,20 +47,8 @@ class TimesheetPolicy
      */
     public function update(User $user, Timesheet $timesheet): bool
     {
-        // Can't edit approved or rejected timesheets
-        if (in_array($timesheet->status, ['approved', 'rejected'])) {
-            return false;
-        }
-
-        if ($user->can('pmcore.edit-timesheet')) {
-            return true;
-        }
-
-        if ($user->can('pmcore.edit-own-timesheet')) {
-            return $timesheet->user_id === $user->id;
-        }
-
-        return false;
+        // Use the canBeEditedBy method from the model which has proper logic
+        return $timesheet->canBeEditedBy($user);
     }
 
     /**
@@ -68,12 +56,9 @@ class TimesheetPolicy
      */
     public function delete(User $user, Timesheet $timesheet): bool
     {
-        // Can't delete approved timesheets
-        if ($timesheet->status === 'approved') {
-            return false;
-        }
-
-        return $user->can('pmcore.delete-timesheet');
+        // Use the canBeEditedBy method from the model which has proper logic for deletions
+        // Only draft timesheets can be deleted by the owner or admins
+        return $timesheet->canBeEditedBy($user);
     }
 
     /**
@@ -83,7 +68,7 @@ class TimesheetPolicy
     {
         return $user->can('pmcore.submit-timesheet') && 
                $timesheet->user_id === $user->id &&
-               $timesheet->status === 'draft';
+               $timesheet->status === \Modules\PMCore\app\Enums\TimesheetStatus::DRAFT;
     }
 
     /**
@@ -92,7 +77,7 @@ class TimesheetPolicy
     public function approve(User $user, Timesheet $timesheet): bool
     {
         return $user->can('pmcore.approve-timesheet') &&
-               $timesheet->status === 'submitted' &&
+               $timesheet->status === \Modules\PMCore\app\Enums\TimesheetStatus::SUBMITTED &&
                $timesheet->user_id !== $user->id; // Can't approve own timesheets
     }
 
@@ -102,7 +87,7 @@ class TimesheetPolicy
     public function reject(User $user, Timesheet $timesheet): bool
     {
         return $user->can('pmcore.reject-timesheet') &&
-               $timesheet->status === 'submitted' &&
+               $timesheet->status === \Modules\PMCore\app\Enums\TimesheetStatus::SUBMITTED &&
                $timesheet->user_id !== $user->id; // Can't reject own timesheets
     }
 
