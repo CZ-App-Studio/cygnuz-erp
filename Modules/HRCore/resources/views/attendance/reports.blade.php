@@ -59,11 +59,8 @@
               placeholder="{{ __('Select Date Range') }}" />
           </div>
           <div class="col-md-4 d-flex align-items-end">
-            <button class="btn btn-primary me-2" id="generateReport">
+            <button class="btn btn-primary" id="generateReport">
               <i class="bx bx-refresh me-1"></i> {{ __('Generate Report') }}
-            </button>
-            <button class="btn btn-label-success" id="exportReport">
-              <i class="bx bx-download me-1"></i> {{ __('Export') }}
             </button>
           </div>
         </div>

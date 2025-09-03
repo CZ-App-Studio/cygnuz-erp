@@ -276,7 +276,7 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title mb-4">{{ __('Personal Information') }}</h5>
-              <form method="POST" action="{{ route('hrcore.self-service.profile.update') }}">
+              <form method="POST" action="{{ route('hrcore.my.profile.update') }}">
                 @csrf
                 <div class="row g-3">
                   <div class="col-md-6">
@@ -361,7 +361,7 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title mb-4">{{ __('Emergency Contact Information') }}</h5>
-              <form method="POST" action="{{ route('hrcore.self-service.profile.update') }}">
+              <form method="POST" action="{{ route('hrcore.my.profile.update') }}">
                 @csrf
                 <div class="row g-3">
                   <div class="col-md-6">
@@ -393,7 +393,7 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title mb-4">{{ __('Change Password') }}</h5>
-              <form method="POST" action="{{ route('hrcore.self-service.profile.password') }}">
+              <form method="POST" action="{{ route('hrcore.my.profile.password') }}">
                 @csrf
                 <div class="row g-3">
                   <div class="col-md-6">
@@ -430,7 +430,7 @@
           <h5 class="modal-title">{{ __('Upload Profile Photo') }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form id="uploadPhotoForm" action="{{ route('hrcore.self-service.profile.photo') }}" method="POST" enctype="multipart/form-data">
+        <form id="uploadPhotoForm" action="{{ route('hrcore.my.profile.photo') }}" method="POST" enctype="multipart/form-data">
           @csrf
           <div class="modal-body">
             <div class="mb-3">
