@@ -252,10 +252,11 @@ function updateCharts(chartData) {
  * Format currency helper
  */
 function formatCurrency(value) {
-    // Use the format from pageData if available
-    if (window.pageData?.currencyFormat) {
+    // Use the format from pageData if available and contains {value} placeholder
+    if (window.pageData?.currencyFormat && window.pageData.currencyFormat.includes('{value}')) {
         return window.pageData.currencyFormat.replace('{value}', value.toLocaleString());
     }
+    // Fallback to default formatting if no proper template is provided
     return '$' + value.toLocaleString();
 }
 
