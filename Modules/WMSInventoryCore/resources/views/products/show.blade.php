@@ -116,8 +116,20 @@
     </div>
   </div>
   
-  <!-- Inventory Summary Card -->
+  <!-- Product Image Card -->
   <div class="col-xl-4 col-lg-5 col-md-5">
+    @if($product->hasProductImage())
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">{{ __('Product Image') }}</h5>
+      </div>
+      <div class="card-body text-center">
+        <img src="{{ $product->getProductImageUrl() }}" alt="{{ $product->name }}" class="img-fluid rounded" style="max-height: 300px; object-fit: cover;">
+      </div>
+    </div>
+    @endif
+    
+    <!-- Inventory Summary Card -->
     <div class="card mb-4">
       <div class="card-header">
         <h5 class="mb-0">{{ __('Inventory Summary') }}</h5>
