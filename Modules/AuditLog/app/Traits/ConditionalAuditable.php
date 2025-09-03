@@ -34,8 +34,8 @@ trait ConditionalAuditable
     protected function checkAuditEnabled()
     {
         $addonService = app(AddonService::class);
-        
-        if (!$addonService->isAddonEnabled('AuditLog')) {
+
+        if (! $addonService->isAddonEnabled('AuditLog')) {
             $this->disableAuditing();
         }
     }
@@ -46,8 +46,8 @@ trait ConditionalAuditable
     public function shouldAudit(): bool
     {
         $addonService = app(AddonService::class);
-        
-        if (!$addonService->isAddonEnabled('AuditLog')) {
+
+        if (! $addonService->isAddonEnabled('AuditLog')) {
             return false;
         }
 

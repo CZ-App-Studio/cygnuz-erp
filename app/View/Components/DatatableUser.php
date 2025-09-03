@@ -7,17 +7,20 @@ use Illuminate\View\Component;
 class DatatableUser extends Component
 {
     public $user;
+
     public $showCode;
+
     public $linkRoute;
+
     public $avatarSize;
 
     /**
      * Create a new component instance.
      *
-     * @param mixed $user
-     * @param bool $showCode
-     * @param string $linkRoute
-     * @param string $avatarSize
+     * @param  mixed  $user
+     * @param  bool  $showCode
+     * @param  string  $linkRoute
+     * @param  string  $avatarSize
      * @return void
      */
     public function __construct($user, $showCode = true, $linkRoute = 'employees.show', $avatarSize = 'sm')

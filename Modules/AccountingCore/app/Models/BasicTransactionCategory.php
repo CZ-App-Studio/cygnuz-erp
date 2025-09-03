@@ -13,7 +13,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class BasicTransactionCategory extends Model implements AuditableContract
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'basic_transaction_categories';
 
@@ -137,7 +137,8 @@ class BasicTransactionCategory extends Model implements AuditableContract
     public function getDisplayWithIconAttribute(): string
     {
         $icon = $this->icon ? "<i class='{$this->icon}'></i> " : '';
-        return $icon . $this->name;
+
+        return $icon.$this->name;
     }
 
     /**
@@ -146,6 +147,7 @@ class BasicTransactionCategory extends Model implements AuditableContract
     public function getBadgeHtmlAttribute(): string
     {
         $typeClass = $this->type === 'income' ? 'bg-label-success' : 'bg-label-danger';
+
         return sprintf(
             '<span class="badge %s">%s</span>',
             $typeClass,
@@ -164,7 +166,7 @@ class BasicTransactionCategory extends Model implements AuditableContract
             ['name' => 'Services', 'type' => 'income', 'icon' => 'bx bx-briefcase', 'color' => '#17a2b8'],
             ['name' => 'Investments', 'type' => 'income', 'icon' => 'bx bx-trending-up', 'color' => '#20c997'],
             ['name' => 'Other Income', 'type' => 'income', 'icon' => 'bx bx-receipt', 'color' => '#6c757d'],
-            
+
             // Expense categories
             ['name' => 'Salaries', 'type' => 'expense', 'icon' => 'bx bx-user', 'color' => '#dc3545'],
             ['name' => 'Rent', 'type' => 'expense', 'icon' => 'bx bx-home', 'color' => '#e83e8c'],

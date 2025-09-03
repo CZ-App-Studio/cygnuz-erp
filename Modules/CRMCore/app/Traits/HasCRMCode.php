@@ -24,7 +24,7 @@ trait HasCRMCode
         if (empty($this->code)) {
             $entityType = $this->getCRMEntityType();
             $codeGenerator = app(CRMCodeGeneratorService::class);
-            
+
             if ($codeGenerator->isAutoGenerationEnabled($entityType)) {
                 $tenantId = $this->tenant_id ?? null;
                 $this->code = $codeGenerator->generateCode($entityType, $tenantId);
@@ -40,9 +40,9 @@ trait HasCRMCode
         $entityType = $this->getCRMEntityType();
         $codeGenerator = app(CRMCodeGeneratorService::class);
         $tenantId = $this->tenant_id ?? null;
-        
+
         $this->code = $codeGenerator->generateCode($entityType, $tenantId);
-        
+
         return $this->code;
     }
 
@@ -63,7 +63,7 @@ trait HasCRMCode
         ];
 
         $tableName = $this->getTable();
-        
+
         return $tableToEntity[$tableName] ?? rtrim($tableName, 's');
     }
 
@@ -78,7 +78,7 @@ trait HasCRMCode
 
         $entityType = $this->getCRMEntityType();
         $codeGenerator = app(CRMCodeGeneratorService::class);
-        
+
         return $codeGenerator->validateCodeFormat($this->code, $entityType);
     }
 
@@ -90,7 +90,7 @@ trait HasCRMCode
         $entityType = $this->getCRMEntityType();
         $codeGenerator = app(CRMCodeGeneratorService::class);
         $tenantId = $this->tenant_id ?? null;
-        
+
         return $codeGenerator->getNextNumber($entityType, $tenantId);
     }
 
@@ -109,7 +109,7 @@ trait HasCRMCode
     {
         $entityType = $this->getCRMEntityType();
         $codeGenerator = app(CRMCodeGeneratorService::class);
-        
+
         return $codeGenerator->isAutoGenerationEnabled($entityType);
     }
 }

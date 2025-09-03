@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\WMSInventoryCore\app\Services\WMSInventoryCoreSettingsService;
 use Modules\WMSInventoryCore\Models\Category;
 use Modules\WMSInventoryCore\Models\Inventory;
 use Modules\WMSInventoryCore\Models\Option;
@@ -17,7 +18,6 @@ use Modules\WMSInventoryCore\Models\Product;
 use Modules\WMSInventoryCore\Models\Unit;
 use Modules\WMSInventoryCore\Models\Variant;
 use Modules\WMSInventoryCore\Models\Warehouse;
-use Modules\WMSInventoryCore\app\Services\WMSInventoryCoreSettingsService;
 
 class ProductController extends Controller
 {

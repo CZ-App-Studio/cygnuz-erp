@@ -13,45 +13,44 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class Designation extends Model implements AuditableContract
 {
-  use HasFactory, Auditable, UserActionsTrait, SoftDeletes;
+    use Auditable, HasFactory, SoftDeletes, UserActionsTrait;
 
-  protected $table = 'designations';
+    protected $table = 'designations';
 
-  protected $fillable = [
-    'name',
-    'code',
-    'notes',
-    'status',
-    'department_id',
-    'parent_id',
-    'tenant_id',
-    'level',
-    'created_by_id',
-    'updated_by_id',
-  ];
+    protected $fillable = [
+        'name',
+        'code',
+        'notes',
+        'status',
+        'department_id',
+        'parent_id',
+        'tenant_id',
+        'level',
+        'created_by_id',
+        'updated_by_id',
+    ];
 
-  protected $casts = [
-    'status' => Status::class,
-  ];
+    protected $casts = [
+        'status' => Status::class,
+    ];
 
-  public function department()
-  {
-    return $this->belongsTo(Department::class, 'department_id');
-  }
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
 
-  public function parent()
-  {
-    return $this->belongsTo(Designation::class, 'parent_id');
-  }
+    public function parent()
+    {
+        return $this->belongsTo(Designation::class, 'parent_id');
+    }
 
-  public function children()
-  {
-    return $this->hasMany(Designation::class, 'parent_id');
-  }
+    public function children()
+    {
+        return $this->hasMany(Designation::class, 'parent_id');
+    }
 
-  public function users()
-  {
-    return $this->hasMany(User::class, 'designation_id');
-  }
-
+    public function users()
+    {
+        return $this->hasMany(User::class, 'designation_id');
+    }
 }

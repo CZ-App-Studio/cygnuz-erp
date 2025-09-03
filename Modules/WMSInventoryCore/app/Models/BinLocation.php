@@ -21,12 +21,12 @@ class BinLocation extends Model
         'max_volume',
         'status',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
         'max_weight' => 'decimal:2',
-        'max_volume' => 'decimal:2'
+        'max_volume' => 'decimal:2',
     ];
 
     /**
@@ -84,10 +84,18 @@ class BinLocation extends Model
     {
         $parts = [];
 
-        if ($this->aisle) $parts[] = "A:{$this->aisle}";
-        if ($this->rack) $parts[] = "R:{$this->rack}";
-        if ($this->shelf) $parts[] = "S:{$this->shelf}";
-        if ($this->bin) $parts[] = "B:{$this->bin}";
+        if ($this->aisle) {
+            $parts[] = "A:{$this->aisle}";
+        }
+        if ($this->rack) {
+            $parts[] = "R:{$this->rack}";
+        }
+        if ($this->shelf) {
+            $parts[] = "S:{$this->shelf}";
+        }
+        if ($this->bin) {
+            $parts[] = "B:{$this->bin}";
+        }
 
         return implode('-', $parts);
     }

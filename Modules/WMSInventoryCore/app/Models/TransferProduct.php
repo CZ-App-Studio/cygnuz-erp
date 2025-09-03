@@ -12,7 +12,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class TransferProduct extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'transfer_products';
 
@@ -31,7 +31,7 @@ class TransferProduct extends Model implements Auditable
         'is_received',
         'notes',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -43,7 +43,7 @@ class TransferProduct extends Model implements Auditable
         'is_received' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -115,7 +115,9 @@ class TransferProduct extends Model implements Auditable
      */
     public function getShippingProgressAttribute()
     {
-        if ($this->quantity === 0) return 100;
+        if ($this->quantity === 0) {
+            return 100;
+        }
 
         return ($this->shipped_quantity / $this->quantity) * 100;
     }
@@ -125,7 +127,9 @@ class TransferProduct extends Model implements Auditable
      */
     public function getReceivingProgressAttribute()
     {
-        if ($this->shipped_quantity === 0) return 0;
+        if ($this->shipped_quantity === 0) {
+            return 0;
+        }
 
         return ($this->received_quantity / $this->shipped_quantity) * 100;
     }

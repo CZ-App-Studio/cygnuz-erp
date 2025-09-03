@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Employee Lifecycle States table
-        if (!Schema::hasTable('employee_lifecycle_states')) {
+        if (! Schema::hasTable('employee_lifecycle_states')) {
             Schema::create('employee_lifecycle_states', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -25,14 +25,14 @@ return new class extends Migration
                 $table->timestamp('approved_at')->nullable();
                 $table->foreignId('created_by')->constrained('users');
                 $table->timestamps();
-                
+
                 $table->index(['user_id', 'state']);
                 $table->index('effective_date');
             });
         }
 
         // Employee History table for tracking all changes
-        if (!Schema::hasTable('employee_histories')) {
+        if (! Schema::hasTable('employee_histories')) {
             Schema::create('employee_histories', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -44,14 +44,14 @@ return new class extends Migration
                 $table->foreignId('changed_by')->constrained('users');
                 $table->timestamp('effective_date')->nullable();
                 $table->timestamps();
-                
+
                 $table->index(['user_id', 'event_type']);
                 $table->index('created_at');
             });
         }
 
         // Employee Onboarding Checklist
-        if (!Schema::hasTable('employee_onboarding_checklists')) {
+        if (! Schema::hasTable('employee_onboarding_checklists')) {
             Schema::create('employee_onboarding_checklists', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -65,13 +65,13 @@ return new class extends Migration
                 $table->text('notes')->nullable();
                 $table->integer('sort_order')->default(0);
                 $table->timestamps();
-                
+
                 $table->index(['user_id', 'is_completed']);
             });
         }
 
         // Employee Offboarding Checklist
-        if (!Schema::hasTable('employee_offboarding_checklists')) {
+        if (! Schema::hasTable('employee_offboarding_checklists')) {
             Schema::create('employee_offboarding_checklists', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -85,13 +85,13 @@ return new class extends Migration
                 $table->text('notes')->nullable();
                 $table->integer('sort_order')->default(0);
                 $table->timestamps();
-                
+
                 $table->index(['user_id', 'is_completed']);
             });
         }
 
         // Employee Promotions
-        if (!Schema::hasTable('employee_promotions')) {
+        if (! Schema::hasTable('employee_promotions')) {
             Schema::create('employee_promotions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -108,13 +108,13 @@ return new class extends Migration
                 $table->timestamp('approved_at')->nullable();
                 $table->foreignId('created_by')->constrained('users');
                 $table->timestamps();
-                
+
                 $table->index(['user_id', 'effective_date']);
             });
         }
 
         // Employee Transfers
-        if (!Schema::hasTable('employee_transfers')) {
+        if (! Schema::hasTable('employee_transfers')) {
             Schema::create('employee_transfers', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -132,13 +132,13 @@ return new class extends Migration
                 $table->timestamp('approved_at')->nullable();
                 $table->foreignId('created_by')->constrained('users');
                 $table->timestamps();
-                
+
                 $table->index(['user_id', 'effective_date']);
             });
         }
 
         // Employee Probation Details
-        if (!Schema::hasTable('employee_probations')) {
+        if (! Schema::hasTable('employee_probations')) {
             Schema::create('employee_probations', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -152,34 +152,34 @@ return new class extends Migration
                 $table->foreignId('evaluated_by')->nullable()->constrained('users');
                 $table->timestamp('evaluated_at')->nullable();
                 $table->timestamps();
-                
+
                 $table->index(['user_id', 'status']);
             });
         }
 
         // Add lifecycle columns to users table if they don't exist
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'employee_status')) {
+            if (! Schema::hasColumn('users', 'employee_status')) {
                 $table->string('employee_status')->default('active')->after('status');
             }
-            if (!Schema::hasColumn('users', 'probation_end_date')) {
+            if (! Schema::hasColumn('users', 'probation_end_date')) {
                 $table->date('probation_end_date')->nullable()->after('date_of_joining');
             }
-            if (!Schema::hasColumn('users', 'resignation_date')) {
+            if (! Schema::hasColumn('users', 'resignation_date')) {
                 $table->date('resignation_date')->nullable()->after('probation_end_date');
             }
-            if (!Schema::hasColumn('users', 'last_working_date')) {
+            if (! Schema::hasColumn('users', 'last_working_date')) {
                 $table->date('last_working_date')->nullable()->after('resignation_date');
             }
-            if (!Schema::hasColumn('users', 'exit_reason')) {
+            if (! Schema::hasColumn('users', 'exit_reason')) {
                 $table->text('exit_reason')->nullable()->after('last_working_date');
             }
-            if (!Schema::hasColumn('users', 'exit_remarks')) {
+            if (! Schema::hasColumn('users', 'exit_remarks')) {
                 $table->text('exit_remarks')->nullable()->after('exit_reason');
             }
-            
+
             // Add index if not exists
-            if (!Schema::hasIndex('users', 'users_employee_status_index')) {
+            if (! Schema::hasIndex('users', 'users_employee_status_index')) {
                 $table->index('employee_status');
             }
         });
@@ -194,14 +194,14 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn([
                 'employee_status',
-                'probation_end_date', 
+                'probation_end_date',
                 'resignation_date',
                 'last_working_date',
                 'exit_reason',
-                'exit_remarks'
+                'exit_remarks',
             ]);
         });
-        
+
         // Drop tables
         Schema::dropIfExists('employee_probations');
         Schema::dropIfExists('employee_transfers');

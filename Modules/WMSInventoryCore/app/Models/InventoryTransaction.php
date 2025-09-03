@@ -19,7 +19,7 @@ class InventoryTransaction extends Model
         'reference_id',
         'reference_type',
         'notes',
-        'created_by_id'
+        'created_by_id',
     ];
 
     /**

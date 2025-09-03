@@ -33,7 +33,7 @@ return new class extends Migration
             $table->timestamp('edited_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('chat_id');
             $table->index('user_id');
@@ -41,7 +41,7 @@ return new class extends Migration
             $table->index('status');
             $table->index('created_at');
             $table->index(['chat_id', 'created_at']);
-            
+
             // Foreign keys
             $table->foreign('chat_id')->references('id')->on('ai_chats')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');

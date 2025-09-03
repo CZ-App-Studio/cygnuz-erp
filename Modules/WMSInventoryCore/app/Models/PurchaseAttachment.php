@@ -9,7 +9,7 @@ class PurchaseAttachment extends Model
 {
     protected $fillable = [
         'purchase_id',
-        'file_path'
+        'file_path',
     ];
 
     /**

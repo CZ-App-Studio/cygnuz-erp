@@ -11,27 +11,27 @@ use Illuminate\Queue\SerializesModels;
 
 class DeviceStatusUpdated implements ShouldBroadcastNow
 {
-  use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
-  public UserDevice $device;
+    public UserDevice $device;
 
-  /**
-   * Create a new event instance.
-   */
-  public function __construct(UserDevice $device)
-  {
-    $this->device = $device;
-  }
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(UserDevice $device)
+    {
+        $this->device = $device;
+    }
 
-  /**
-   * Get the channels the event should broadcast on.
-   *
-   * @return array<int, Channel>
-   */
-  public function broadcastOn(): array
-  {
-    return [
-      new Channel('device-updates'),
-    ];
-  }
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, Channel>
+     */
+    public function broadcastOn(): array
+    {
+        return [
+            new Channel('device-updates'),
+        ];
+    }
 }

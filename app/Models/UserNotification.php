@@ -10,30 +10,30 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class UserNotification extends Model implements AuditableContract
 {
-  use Auditable, UserActionsTrait, SoftDeletes;
+    use Auditable, SoftDeletes, UserActionsTrait;
 
-  protected $fillable = [
-    'user_id',
-    'notification_id',
-    'is_read',
-    'is_deleted',
-    'read_at',
-    'deleted_at',
-    'created_by_id',
-    'updated_by_id',
-  ];
-  protected $casts = [
-    'is_read' => 'boolean'
-  ];
+    protected $fillable = [
+        'user_id',
+        'notification_id',
+        'is_read',
+        'is_deleted',
+        'read_at',
+        'deleted_at',
+        'created_by_id',
+        'updated_by_id',
+    ];
 
-  public function user()
-  {
-    return $this->belongsTo(User::class);
-  }
+    protected $casts = [
+        'is_read' => 'boolean',
+    ];
 
-  public function notification()
-  {
-    return $this->belongsTo(Notification::class);
-  }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
+    public function notification()
+    {
+        return $this->belongsTo(Notification::class);
+    }
 }

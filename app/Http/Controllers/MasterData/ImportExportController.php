@@ -4,8 +4,8 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
 use App\Services\AddonService\AddonService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ImportExportController extends Controller
@@ -23,7 +23,7 @@ class ImportExportController extends Controller
     public function index(Request $request): View
     {
         // Check if DataImportExport addon is available
-        if (!$this->addonService->isAddonEnabled('DataImportExport')) {
+        if (! $this->addonService->isAddonEnabled('DataImportExport')) {
             abort(404, 'Import/Export functionality is not available');
         }
 
@@ -33,7 +33,7 @@ class ImportExportController extends Controller
 
         return view('master-data.import-export.index', compact(
             'masterDataTypes',
-            'selectedType', 
+            'selectedType',
             'action'
         ));
     }
@@ -48,8 +48,8 @@ class ImportExportController extends Controller
                 'label' => __('All Master Data'),
                 'description' => __('Import/Export all master data types'),
                 'icon' => 'bx bx-data',
-                'tables' => []
-            ]
+                'tables' => [],
+            ],
         ];
 
         // Core master data types (always available)
@@ -58,38 +58,38 @@ class ImportExportController extends Controller
                 'label' => __('Lead Statuses'),
                 'description' => __('CRM lead status options'),
                 'icon' => 'bx bx-check-shield',
-                'module' => 'core'
+                'module' => 'core',
             ],
             'lead_sources' => [
                 'label' => __('Lead Sources'),
                 'description' => __('CRM lead source options'),
                 'icon' => 'bx bx-link-alt',
-                'module' => 'core'
+                'module' => 'core',
             ],
             'deal_pipelines' => [
                 'label' => __('Deal Pipelines'),
                 'description' => __('Sales pipeline stages'),
                 'icon' => 'bx bx-pie-chart-alt-2',
-                'module' => 'core'
+                'module' => 'core',
             ],
             'task_statuses' => [
                 'label' => __('Task Statuses'),
                 'description' => __('Task status options'),
                 'icon' => 'bx bx-check-circle',
-                'module' => 'core'
+                'module' => 'core',
             ],
             'task_priorities' => [
                 'label' => __('Task Priorities'),
                 'description' => __('Task priority levels'),
                 'icon' => 'bx bx-flag',
-                'module' => 'core'
+                'module' => 'core',
             ],
             'expense_types' => [
                 'label' => __('Expense Types'),
                 'description' => __('Expense category options'),
                 'icon' => 'bx bx-category',
-                'module' => 'core'
-            ]
+                'module' => 'core',
+            ],
         ];
 
         $types = array_merge($types, $coreTypes);
@@ -100,13 +100,13 @@ class ImportExportController extends Controller
                 'label' => __('Shifts'),
                 'description' => __('Work shift schedules'),
                 'icon' => 'bx bx-time-five',
-                'module' => 'HRCore'
+                'module' => 'HRCore',
             ];
             $types['holidays'] = [
                 'label' => __('Holidays'),
                 'description' => __('Company holidays'),
                 'icon' => 'bx bx-calendar-x',
-                'module' => 'HRCore'
+                'module' => 'HRCore',
             ];
         }
 
@@ -115,19 +115,19 @@ class ImportExportController extends Controller
                 'label' => __('Product Categories'),
                 'description' => __('Inventory product categories'),
                 'icon' => 'bx bx-category',
-                'module' => 'WMSInventoryCore'
+                'module' => 'WMSInventoryCore',
             ];
             $types['units'] = [
                 'label' => __('Units of Measure'),
                 'description' => __('Measurement units'),
                 'icon' => 'bx bx-ruler',
-                'module' => 'WMSInventoryCore'
+                'module' => 'WMSInventoryCore',
             ];
             $types['adjustment_types'] = [
                 'label' => __('Adjustment Types'),
                 'description' => __('Inventory adjustment types'),
                 'icon' => 'bx bx-list-check',
-                'module' => 'WMSInventoryCore'
+                'module' => 'WMSInventoryCore',
             ];
         }
 
@@ -136,13 +136,13 @@ class ImportExportController extends Controller
                 'label' => __('Chart of Accounts'),
                 'description' => __('Accounting chart of accounts'),
                 'icon' => 'bx bx-list-ul',
-                'module' => 'AccountingCore'
+                'module' => 'AccountingCore',
             ];
             $types['tax_rates'] = [
                 'label' => __('Tax Rates'),
                 'description' => __('Tax rate configurations'),
                 'icon' => 'bx bx-percent',
-                'module' => 'AccountingCore'
+                'module' => 'AccountingCore',
             ];
         }
 
@@ -151,7 +151,7 @@ class ImportExportController extends Controller
                 'label' => __('Document Types'),
                 'description' => __('Document type categories'),
                 'icon' => 'bx bx-file',
-                'module' => 'DocumentManagement'
+                'module' => 'DocumentManagement',
             ];
         }
 
@@ -160,7 +160,7 @@ class ImportExportController extends Controller
                 'label' => __('Warning Types'),
                 'description' => __('Warning type categories'),
                 'icon' => 'bx bx-list-ul',
-                'module' => 'DisciplinaryActions'
+                'module' => 'DisciplinaryActions',
             ];
         }
 
@@ -170,7 +170,7 @@ class ImportExportController extends Controller
                 'label' => __('IP Groups'),
                 'description' => __('IP address groups for attendance'),
                 'icon' => 'bx bx-network-chart',
-                'module' => 'IpAddressAttendance'
+                'module' => 'IpAddressAttendance',
             ];
         }
 
@@ -179,7 +179,7 @@ class ImportExportController extends Controller
                 'label' => __('Geofence Groups'),
                 'description' => __('Geofence location groups'),
                 'icon' => 'bx bx-map',
-                'module' => 'GeofenceSystem'
+                'module' => 'GeofenceSystem',
             ];
         }
 
@@ -188,7 +188,7 @@ class ImportExportController extends Controller
                 'label' => __('QR Code Groups'),
                 'description' => __('QR codes for attendance'),
                 'icon' => 'bx bx-qr',
-                'module' => 'QRAttendance'
+                'module' => 'QRAttendance',
             ];
         }
 
@@ -197,7 +197,7 @@ class ImportExportController extends Controller
                 'label' => __('Sites'),
                 'description' => __('Site locations'),
                 'icon' => 'bx bx-buildings',
-                'module' => 'SiteAttendance'
+                'module' => 'SiteAttendance',
             ];
         }
 
@@ -206,7 +206,7 @@ class ImportExportController extends Controller
                 'label' => __('Currencies'),
                 'description' => __('Currency configurations'),
                 'icon' => 'bx bx-dollar-circle',
-                'module' => 'MultiCurrency'
+                'module' => 'MultiCurrency',
             ];
         }
 
@@ -218,20 +218,21 @@ class ImportExportController extends Controller
      */
     public function getTemplate(Request $request): JsonResponse
     {
-        if (!$this->addonService->isAddonEnabled('DataImportExport')) {
+        if (! $this->addonService->isAddonEnabled('DataImportExport')) {
             return response()->json(['error' => 'Import/Export functionality is not available'], 404);
         }
 
         $type = $request->get('type');
         $masterDataTypes = $this->getMasterDataTypes();
 
-        if (!isset($masterDataTypes[$type])) {
+        if (! isset($masterDataTypes[$type])) {
             return response()->json(['error' => 'Invalid master data type'], 400);
         }
 
         // Delegate to DataImportExport addon for actual template generation
         if (class_exists('\Modules\DataImportExport\Http\Controllers\TemplateController')) {
             $templateController = app('\Modules\DataImportExport\Http\Controllers\TemplateController');
+
             return $templateController->getMasterDataTemplate($type);
         }
 
@@ -243,19 +244,20 @@ class ImportExportController extends Controller
      */
     public function import(Request $request): JsonResponse
     {
-        if (!$this->addonService->isAddonEnabled('DataImportExport')) {
+        if (! $this->addonService->isAddonEnabled('DataImportExport')) {
             return response()->json(['error' => 'Import/Export functionality is not available'], 404);
         }
 
         $request->validate([
             'type' => 'required|string',
             'file' => 'required|file|mimes:csv,xlsx,xls',
-            'options' => 'nullable|array'
+            'options' => 'nullable|array',
         ]);
 
         // Delegate to DataImportExport addon for actual import processing
         if (class_exists('\Modules\DataImportExport\Http\Controllers\ImportController')) {
             $importController = app('\Modules\DataImportExport\Http\Controllers\ImportController');
+
             return $importController->processMasterDataImport($request);
         }
 
@@ -267,19 +269,20 @@ class ImportExportController extends Controller
      */
     public function export(Request $request): JsonResponse
     {
-        if (!$this->addonService->isAddonEnabled('DataImportExport')) {
+        if (! $this->addonService->isAddonEnabled('DataImportExport')) {
             return response()->json(['error' => 'Import/Export functionality is not available'], 404);
         }
 
         $request->validate([
             'type' => 'required|string',
             'format' => 'required|in:csv,xlsx,pdf',
-            'filters' => 'nullable|array'
+            'filters' => 'nullable|array',
         ]);
 
         // Delegate to DataImportExport addon for actual export processing
         if (class_exists('\Modules\DataImportExport\Http\Controllers\ExportController')) {
             $exportController = app('\Modules\DataImportExport\Http\Controllers\ExportController');
+
             return $exportController->processMasterDataExport($request);
         }
 
@@ -291,7 +294,7 @@ class ImportExportController extends Controller
      */
     public function status(Request $request): JsonResponse
     {
-        if (!$this->addonService->isAddonEnabled('DataImportExport')) {
+        if (! $this->addonService->isAddonEnabled('DataImportExport')) {
             return response()->json(['error' => 'Import/Export functionality is not available'], 404);
         }
 
@@ -300,6 +303,7 @@ class ImportExportController extends Controller
         // Delegate to DataImportExport addon for status checking
         if (class_exists('\Modules\DataImportExport\Http\Controllers\StatusController')) {
             $statusController = app('\Modules\DataImportExport\Http\Controllers\StatusController');
+
             return $statusController->getJobStatus($jobId);
         }
 

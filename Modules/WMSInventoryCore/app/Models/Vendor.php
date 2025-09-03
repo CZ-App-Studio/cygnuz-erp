@@ -13,9 +13,10 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Vendor extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'vendors';
+
     protected $fillable = [
         'name',
         'company_name',
@@ -34,14 +35,14 @@ class Vendor extends Model implements Auditable
         'lead_time_days',
         'minimum_order_value',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
         'lead_time_days' => 'integer',
         'minimum_order_value' => 'decimal:2',
         'status' => 'string',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
     /**
@@ -75,10 +76,18 @@ class Vendor extends Model implements Auditable
     {
         $parts = [$this->address];
 
-        if ($this->city) $parts[] = $this->city;
-        if ($this->state) $parts[] = $this->state;
-        if ($this->postal_code) $parts[] = $this->postal_code;
-        if ($this->country) $parts[] = $this->country;
+        if ($this->city) {
+            $parts[] = $this->city;
+        }
+        if ($this->state) {
+            $parts[] = $this->state;
+        }
+        if ($this->postal_code) {
+            $parts[] = $this->postal_code;
+        }
+        if ($this->country) {
+            $parts[] = $this->country;
+        }
 
         return implode(', ', $parts);
     }
@@ -104,7 +113,7 @@ class Vendor extends Model implements Auditable
      */
     public function getOutstandingBalanceAttribute()
     {
-        return $this->purchases->sum(function($purchase) {
+        return $this->purchases->sum(function ($purchase) {
             return $purchase->total_amount - $purchase->paid_amount;
         });
     }

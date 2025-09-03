@@ -15,7 +15,7 @@ class BaseApiController extends Controller
         // Check if data is a resource collection with pagination
         if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
             $response = $data->response()->getData(true);
-            
+
             // If it's a paginated response, restructure it
             if (isset($response['data']) && isset($response['links']) && isset($response['meta'])) {
                 return response()->json([
@@ -23,15 +23,15 @@ class BaseApiController extends Controller
                     'message' => $message,
                     'data' => $response['data'],
                     'links' => $response['links'],
-                    'meta' => $response['meta']
+                    'meta' => $response['meta'],
                 ], $code);
             }
         }
-        
+
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
         ], $code);
     }
 
@@ -43,7 +43,7 @@ class BaseApiController extends Controller
         return response()->json([
             'success' => false,
             'message' => $message,
-            'errors' => $errors
+            'errors' => $errors,
         ], $code);
     }
 
@@ -55,7 +55,7 @@ class BaseApiController extends Controller
         return response()->json([
             'success' => false,
             'message' => 'Validation failed',
-            'errors' => $validator->errors()
+            'errors' => $validator->errors(),
         ], 422);
     }
 

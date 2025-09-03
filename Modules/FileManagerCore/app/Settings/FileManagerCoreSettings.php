@@ -45,32 +45,32 @@ class FileManagerCoreSettings extends BaseModuleSettings
                     'help' => __('Default storage disk for file uploads'),
                     'options' => [
                         'local' => __('Private Local Storage'),
-                        'public' => __('Public Local Storage')
+                        'public' => __('Public Local Storage'),
                     ],
                     'default' => 'local',
-                    'validation' => 'required|in:local,public'
+                    'validation' => 'required|in:local,public',
                 ],
                 'filemanager_max_file_size' => [
                     'type' => 'number',
                     'label' => __('Maximum File Size (KB)'),
                     'help' => __('Maximum file size allowed for uploads in kilobytes'),
                     'default' => '10240',
-                    'validation' => 'required|numeric|min:100|max:102400'
+                    'validation' => 'required|numeric|min:100|max:102400',
                 ],
                 'filemanager_user_quota' => [
                     'type' => 'number',
                     'label' => __('User Storage Quota (MB)'),
                     'help' => __('Storage quota per user in megabytes (0 for unlimited)'),
                     'default' => '1024',
-                    'validation' => 'required|numeric|min:0|max:10240'
+                    'validation' => 'required|numeric|min:0|max:10240',
                 ],
                 'filemanager_dept_quota' => [
                     'type' => 'number',
                     'label' => __('Department Storage Quota (GB)'),
                     'help' => __('Storage quota per department in gigabytes (0 for unlimited)'),
                     'default' => '10',
-                    'validation' => 'required|numeric|min:0|max:100'
-                ]
+                    'validation' => 'required|numeric|min:0|max:100',
+                ],
             ],
 
             'file_types_security' => [
@@ -84,10 +84,10 @@ class FileManagerCoreSettings extends BaseModuleSettings
                         'image/png' => 'PNG',
                         'image/gif' => 'GIF',
                         'image/webp' => 'WebP',
-                        'image/svg+xml' => 'SVG'
+                        'image/svg+xml' => 'SVG',
                     ],
                     'default' => ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-                    'validation' => 'array'
+                    'validation' => 'array',
                 ],
                 'filemanager_allowed_document_types' => [
                     'type' => 'multiselect',
@@ -100,7 +100,7 @@ class FileManagerCoreSettings extends BaseModuleSettings
                         'application/vnd.ms-excel' => 'XLS',
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'XLSX',
                         'text/plain' => 'TXT',
-                        'text/csv' => 'CSV'
+                        'text/csv' => 'CSV',
                     ],
                     'default' => [
                         'application/pdf',
@@ -109,10 +109,10 @@ class FileManagerCoreSettings extends BaseModuleSettings
                         'application/vnd.ms-excel',
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                         'text/plain',
-                        'text/csv'
+                        'text/csv',
                     ],
-                    'validation' => 'array'
-                ]
+                    'validation' => 'array',
+                ],
             ],
 
             'thumbnails_processing' => [
@@ -121,28 +121,28 @@ class FileManagerCoreSettings extends BaseModuleSettings
                     'label' => __('Enable Thumbnail Generation'),
                     'help' => __('Automatically generate thumbnails for images'),
                     'default' => true,
-                    'validation' => 'boolean'
+                    'validation' => 'boolean',
                 ],
                 'filemanager_thumbnail_max_width' => [
                     'type' => 'number',
                     'label' => __('Thumbnail Max Width (px)'),
                     'help' => __('Maximum width for generated thumbnails'),
                     'default' => '300',
-                    'validation' => 'required|numeric|min:50|max:1000'
+                    'validation' => 'required|numeric|min:50|max:1000',
                 ],
                 'filemanager_thumbnail_max_height' => [
                     'type' => 'number',
                     'label' => __('Thumbnail Max Height (px)'),
                     'help' => __('Maximum height for generated thumbnails'),
                     'default' => '300',
-                    'validation' => 'required|numeric|min:50|max:1000'
+                    'validation' => 'required|numeric|min:50|max:1000',
                 ],
                 'filemanager_thumbnail_quality' => [
                     'type' => 'number',
                     'label' => __('Thumbnail Quality (%)'),
                     'help' => __('JPEG quality for thumbnails (1-100)'),
                     'default' => '80',
-                    'validation' => 'required|numeric|min:1|max:100'
+                    'validation' => 'required|numeric|min:1|max:100',
                 ],
                 'filemanager_thumbnail_disk' => [
                     'type' => 'select',
@@ -150,12 +150,12 @@ class FileManagerCoreSettings extends BaseModuleSettings
                     'help' => __('Storage disk for thumbnail files'),
                     'options' => [
                         'local' => __('Private Local Storage'),
-                        'public' => __('Public Local Storage')
+                        'public' => __('Public Local Storage'),
                     ],
                     'default' => 'public',
-                    'validation' => 'required|in:local,public'
-                ]
-            ]
+                    'validation' => 'required|in:local,public',
+                ],
+            ],
         ];
     }
 

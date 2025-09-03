@@ -15,11 +15,11 @@ class SetEmployeeLayoutMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {   
+    {
         // Check if a user is authenticated
         if (auth()->check()) {
             // Check if the user has the employee, field_employee, or tenant role
-            if (!auth()->user()->hasRole(['super_admin', 'admin'])) {
+            if (! auth()->user()->hasRole(['super_admin', 'admin'])) {
                 // Define the pageConfigs for Employee Self Service and Tenant users
                 $pageConfigs = ['myLayout' => 'horizontal'];
 

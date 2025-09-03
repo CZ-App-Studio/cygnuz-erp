@@ -2,15 +2,14 @@
 
 namespace Modules\WMSInventoryCore\app\Http\Controllers\Api\V1;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Modules\WMSInventoryCore\app\Http\Controllers\Api\BaseApiController;
-use Modules\WMSInventoryCore\Models\Category;
 use Modules\WMSInventoryCore\app\Http\Requests\StoreCategoryRequest;
 use Modules\WMSInventoryCore\app\Http\Requests\UpdateCategoryRequest;
+use Modules\WMSInventoryCore\Models\Category;
 
 class CategoryController extends BaseApiController
 {
@@ -35,8 +34,8 @@ class CategoryController extends BaseApiController
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('code', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 
@@ -46,7 +45,7 @@ class CategoryController extends BaseApiController
                     ->with('children')
                     ->orderBy('name')
                     ->get();
-                
+
                 return $this->successResponse($categories);
             } else {
                 // Sorting
@@ -57,11 +56,12 @@ class CategoryController extends BaseApiController
                 // Pagination
                 $perPage = $request->get('per_page', 15);
                 $categories = $query->paginate($perPage);
-                
+
                 return $this->paginatedResponse($categories, 'Categories retrieved successfully');
             }
         } catch (\Exception $e) {
             Log::error('Error fetching categories', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch categories', 500);
         }
     }
@@ -75,7 +75,7 @@ class CategoryController extends BaseApiController
             DB::beginTransaction();
 
             // Generate code if not provided
-            if (!$request->has('code')) {
+            if (! $request->has('code')) {
                 $code = $this->generateCategoryCode($request->parent_id);
             } else {
                 $code = $request->code;
@@ -88,7 +88,7 @@ class CategoryController extends BaseApiController
                 'parent_id' => $request->parent_id,
                 'status' => $request->status ?? 'active',
                 'created_by_id' => auth()->id(),
-                'updated_by_id' => auth()->id()
+                'updated_by_id' => auth()->id(),
             ]);
 
             // Parent categories don't need special handling since we don't have has_children column
@@ -101,6 +101,7 @@ class CategoryController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating category', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -114,7 +115,7 @@ class CategoryController extends BaseApiController
             $category = Category::with(['parent', 'children', 'products'])
                 ->find($id);
 
-            if (!$category) {
+            if (! $category) {
                 return $this->errorResponse('Category not found', 404);
             }
 
@@ -128,6 +129,7 @@ class CategoryController extends BaseApiController
             return $this->successResponse($category);
         } catch (\Exception $e) {
             Log::error('Error fetching category', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch category', 500);
         }
     }
@@ -139,7 +141,7 @@ class CategoryController extends BaseApiController
     {
         try {
             $category = Category::find($id);
-            if (!$category) {
+            if (! $category) {
                 return $this->errorResponse('Category not found', 404);
             }
 
@@ -161,9 +163,9 @@ class CategoryController extends BaseApiController
                 'code',
                 'description',
                 'parent_id',
-                'status'
+                'status',
             ]);
-            
+
             $updateData['updated_by_id'] = auth()->id();
 
             $category->update($updateData);
@@ -176,6 +178,7 @@ class CategoryController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error updating category', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -187,7 +190,7 @@ class CategoryController extends BaseApiController
     {
         try {
             $category = Category::find($id);
-            if (!$category) {
+            if (! $category) {
                 return $this->errorResponse('Category not found', 404);
             }
 
@@ -208,6 +211,7 @@ class CategoryController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error deleting category', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to delete category', 500);
         }
     }
@@ -221,7 +225,7 @@ class CategoryController extends BaseApiController
             $query = Category::whereNull('parent_id')
                 ->with('children');
 
-            if (!$request->boolean('include_inactive')) {
+            if (! $request->boolean('include_inactive')) {
                 $query->where('status', 'active');
             }
 
@@ -231,6 +235,7 @@ class CategoryController extends BaseApiController
             return $this->successResponse($tree);
         } catch (\Exception $e) {
             Log::error('Error fetching category tree', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch category tree', 500);
         }
     }
@@ -242,7 +247,7 @@ class CategoryController extends BaseApiController
     {
         try {
             $category = Category::find($id);
-            if (!$category) {
+            if (! $category) {
                 return $this->errorResponse('Category not found', 404);
             }
 
@@ -256,8 +261,8 @@ class CategoryController extends BaseApiController
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('sku', 'like', "%{$search}%")
-                      ->orWhere('barcode', 'like', "%{$search}%");
+                        ->orWhere('sku', 'like', "%{$search}%")
+                        ->orWhere('barcode', 'like', "%{$search}%");
                 });
             }
 
@@ -267,6 +272,7 @@ class CategoryController extends BaseApiController
             return $this->successResponse($products);
         } catch (\Exception $e) {
             Log::error('Error fetching category products', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch products', 500);
         }
     }
@@ -278,11 +284,11 @@ class CategoryController extends BaseApiController
     {
         try {
             $request->validate([
-                'parent_id' => 'nullable|exists:categories,id'
+                'parent_id' => 'nullable|exists:categories,id',
             ]);
 
             $category = Category::find($id);
-            if (!$category) {
+            if (! $category) {
                 return $this->errorResponse('Category not found', 404);
             }
 
@@ -299,7 +305,7 @@ class CategoryController extends BaseApiController
 
             $category->update([
                 'parent_id' => $request->parent_id,
-                'updated_by_id' => auth()->id()
+                'updated_by_id' => auth()->id(),
             ]);
 
             $category->load('parent', 'children');
@@ -308,6 +314,7 @@ class CategoryController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error moving category', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -332,11 +339,11 @@ class CategoryController extends BaseApiController
                 $search = $request->q;
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%");
+                        ->orWhere('code', 'like', "%{$search}%");
                 });
             }
 
-            if (!$request->boolean('include_inactive')) {
+            if (! $request->boolean('include_inactive')) {
                 $query->where('status', 'active');
             }
 
@@ -345,6 +352,7 @@ class CategoryController extends BaseApiController
             return $this->successResponse($categories);
         } catch (\Exception $e) {
             Log::error('Error searching categories', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to search categories', 500);
         }
     }
@@ -356,7 +364,7 @@ class CategoryController extends BaseApiController
     {
         try {
             $category = Category::find($id);
-            if (!$category) {
+            if (! $category) {
                 return $this->errorResponse('Category not found', 404);
             }
 
@@ -367,12 +375,13 @@ class CategoryController extends BaseApiController
                 'subcategories' => $category->children()->count(),
                 'total_inventory_value' => $this->calculateCategoryInventoryValue($category),
                 'low_stock_products' => $this->getLowStockProductsCount($category),
-                'out_of_stock_products' => $this->getOutOfStockProductsCount($category)
+                'out_of_stock_products' => $this->getOutOfStockProductsCount($category),
             ];
 
             return $this->successResponse($stats);
         } catch (\Exception $e) {
             Log::error('Error fetching category statistics', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch statistics', 500);
         }
     }
@@ -383,7 +392,7 @@ class CategoryController extends BaseApiController
     private function generateCategoryCode($parentId = null): string
     {
         $prefix = 'CAT';
-        
+
         if ($parentId) {
             $parent = Category::find($parentId);
             if ($parent) {
@@ -391,7 +400,7 @@ class CategoryController extends BaseApiController
             }
         }
 
-        $lastCategory = Category::where('code', 'like', $prefix . '%')
+        $lastCategory = Category::where('code', 'like', $prefix.'%')
             ->orderBy('id', 'desc')
             ->first();
 
@@ -411,6 +420,7 @@ class CategoryController extends BaseApiController
     private function isDescendant($category, $potentialParentId): bool
     {
         $descendants = $this->getAllDescendants($category);
+
         return in_array($potentialParentId, $descendants);
     }
 
@@ -442,7 +452,7 @@ class CategoryController extends BaseApiController
             array_unshift($breadcrumb, [
                 'id' => $current->id,
                 'name' => $current->name,
-                'code' => $current->code
+                'code' => $current->code,
             ]);
             $current = $current->parent;
         }

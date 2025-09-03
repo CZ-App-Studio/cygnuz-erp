@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('type', ['string', 'integer', 'boolean', 'json', 'array'])->default('string');
             $table->text('description')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['module', 'key']);
             $table->index('module');
         });

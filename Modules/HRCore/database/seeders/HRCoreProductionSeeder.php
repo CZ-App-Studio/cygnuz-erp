@@ -64,9 +64,9 @@ class HRCoreProductionSeeder extends Seeder
         );
 
         $this->command->info('HRCore production data seeded successfully!');
-        $this->command->info('Default Team: ' . $team->name);
-        $this->command->info('Default Shift: ' . $shift->name);
-        $this->command->info('Default Department: ' . $department->name);
-        $this->command->info('Default Designation: ' . $designation->name);
+        $this->command->info('Default Team: '.$team->name);
+        $this->command->info('Default Shift: '.$shift->name);
+        $this->command->info('Default Department: '.$department->name);
+        $this->command->info('Default Designation: '.$designation->name);
     }
 }

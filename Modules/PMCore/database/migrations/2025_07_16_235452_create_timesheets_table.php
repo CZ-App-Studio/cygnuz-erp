@@ -29,14 +29,14 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index(['user_id', 'date']);
             $table->index(['project_id', 'date']);
             $table->index(['status']);
             $table->index(['is_billable']);
             $table->index(['approved_by_id']);
-            
+
             // Foreign key constraints
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('project_id')->references('id')->on('projects');

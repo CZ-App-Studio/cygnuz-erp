@@ -4,25 +4,36 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
 use App\Services\AddonService\AddonService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
 abstract class BaseMasterDataController extends Controller
 {
     protected AddonService $addonService;
+
     protected string $viewPrefix = '';
+
     protected string $routePrefix = '';
+
     protected string $pageTitle = '';
+
     protected string $pageDescription = '';
+
     protected string $pageIcon = '';
+
     protected string $modelClass = '';
+
     protected array $searchableFields = [];
+
     protected array $fillableFields = [];
+
     protected array $validationRules = [];
+
     protected bool $hasImportExport = false;
+
     protected string $exportType = 'master-data';
 
     public function __construct(AddonService $addonService)
@@ -50,7 +61,7 @@ abstract class BaseMasterDataController extends Controller
             'exportType' => $this->exportType,
             'urls' => $this->getUrls(),
             'breadcrumbs' => $this->getBreadcrumbs(),
-            'permissions' => $this->getPermissions()
+            'permissions' => $this->getPermissions(),
         ];
 
         return view($this->getViewName('index'), $data);
@@ -95,8 +106,8 @@ abstract class BaseMasterDataController extends Controller
             'urls' => $this->getUrls(),
             'breadcrumbs' => $this->getBreadcrumbs('create'),
             'record' => new $this->modelClass,
-            'formAction' => route($this->routePrefix . '.store'),
-            'formMethod' => 'POST'
+            'formAction' => route($this->routePrefix.'.store'),
+            'formMethod' => 'POST',
         ];
 
         return view($this->getViewName('form'), $data);
@@ -119,11 +130,11 @@ abstract class BaseMasterDataController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => $message,
-                'data' => $record
+                'data' => $record,
             ]);
         }
 
-        return redirect()->route($this->routePrefix . '.index')
+        return redirect()->route($this->routePrefix.'.index')
             ->with('success', $message);
     }
 
@@ -142,7 +153,7 @@ abstract class BaseMasterDataController extends Controller
             'exportType' => $this->exportType,
             'urls' => $this->getUrls(),
             'breadcrumbs' => $this->getBreadcrumbs('show'),
-            'record' => $record
+            'record' => $record,
         ];
 
         return view($this->getViewName('show'), $data);
@@ -164,8 +175,8 @@ abstract class BaseMasterDataController extends Controller
             'urls' => $this->getUrls(),
             'breadcrumbs' => $this->getBreadcrumbs('edit'),
             'record' => $record,
-            'formAction' => route($this->routePrefix . '.update', $record->id),
-            'formMethod' => 'PUT'
+            'formAction' => route($this->routePrefix.'.update', $record->id),
+            'formMethod' => 'PUT',
         ];
 
         return view($this->getViewName('form'), $data);
@@ -188,11 +199,11 @@ abstract class BaseMasterDataController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => $message,
-                'data' => $record
+                'data' => $record,
             ]);
         }
 
-        return redirect()->route($this->routePrefix . '.index')
+        return redirect()->route($this->routePrefix.'.index')
             ->with('success', $message);
     }
 
@@ -209,11 +220,11 @@ abstract class BaseMasterDataController extends Controller
         if (request()->expectsJson()) {
             return response()->json([
                 'status' => 'success',
-                'message' => $message
+                'message' => $message,
             ]);
         }
 
-        return redirect()->route($this->routePrefix . '.index')
+        return redirect()->route($this->routePrefix.'.index')
             ->with('success', $message);
     }
 
@@ -228,8 +239,8 @@ abstract class BaseMasterDataController extends Controller
             $actions[] = [
                 'label' => __('View'),
                 'icon' => 'bx bx-show',
-                'url' => route($this->routePrefix . '.show', $record->id),
-                'class' => 'btn-outline-info'
+                'url' => route($this->routePrefix.'.show', $record->id),
+                'class' => 'btn-outline-info',
             ];
         }
 
@@ -237,8 +248,8 @@ abstract class BaseMasterDataController extends Controller
             $actions[] = [
                 'label' => __('Edit'),
                 'icon' => 'bx bx-edit',
-                'url' => route($this->routePrefix . '.edit', $record->id),
-                'class' => 'btn-outline-primary'
+                'url' => route($this->routePrefix.'.edit', $record->id),
+                'class' => 'btn-outline-primary',
             ];
         }
 
@@ -246,14 +257,14 @@ abstract class BaseMasterDataController extends Controller
             $actions[] = [
                 'label' => __('Delete'),
                 'icon' => 'bx bx-trash',
-                'url' => route($this->routePrefix . '.destroy', $record->id),
-                'class' => 'btn-outline-danger delete-record'
+                'url' => route($this->routePrefix.'.destroy', $record->id),
+                'class' => 'btn-outline-danger delete-record',
             ];
         }
 
         return view('components.datatable-actions', [
             'id' => $record->id,
-            'actions' => $actions
+            'actions' => $actions,
         ])->render();
     }
 
@@ -263,7 +274,7 @@ abstract class BaseMasterDataController extends Controller
     protected function customizeQuery($query, Request $request)
     {
         // Apply search if searchable fields are defined
-        if (!empty($this->searchableFields) && $request->has('search') && $request->search['value']) {
+        if (! empty($this->searchableFields) && $request->has('search') && $request->search['value']) {
             $searchTerm = $request->search['value'];
             $query->where(function ($q) use ($searchTerm) {
                 foreach ($this->searchableFields as $field) {
@@ -298,6 +309,7 @@ abstract class BaseMasterDataController extends Controller
     protected function findRecord($id)
     {
         $model = new $this->modelClass;
+
         return $model->findOrFail($id);
     }
 
@@ -306,7 +318,7 @@ abstract class BaseMasterDataController extends Controller
      */
     protected function getViewName(string $view): string
     {
-        return $this->viewPrefix . '.' . $view;
+        return $this->viewPrefix.'.'.$view;
     }
 
     /**
@@ -315,10 +327,10 @@ abstract class BaseMasterDataController extends Controller
     protected function getUrls(): array
     {
         return [
-            'index' => route($this->routePrefix . '.index'),
-            'create' => route($this->routePrefix . '.create'),
-            'datatable' => route($this->routePrefix . '.datatable'),
-            'store' => route($this->routePrefix . '.store'),
+            'index' => route($this->routePrefix.'.index'),
+            'create' => route($this->routePrefix.'.create'),
+            'datatable' => route($this->routePrefix.'.datatable'),
+            'store' => route($this->routePrefix.'.store'),
         ];
     }
 
@@ -328,7 +340,7 @@ abstract class BaseMasterDataController extends Controller
     protected function getBreadcrumbs(string $action = 'index'): array
     {
         $breadcrumbs = [
-            ['title' => $this->pageTitle, 'url' => route($this->routePrefix . '.index')]
+            ['title' => $this->pageTitle, 'url' => route($this->routePrefix.'.index')],
         ];
 
         switch ($action) {
@@ -362,10 +374,25 @@ abstract class BaseMasterDataController extends Controller
     /**
      * Permission checks (override in child classes)
      */
-    protected function canView(): bool { return true; }
-    protected function canCreate(): bool { return true; }
-    protected function canEdit(): bool { return true; }
-    protected function canDelete(): bool { return true; }
+    protected function canView(): bool
+    {
+        return true;
+    }
+
+    protected function canCreate(): bool
+    {
+        return true;
+    }
+
+    protected function canEdit(): bool
+    {
+        return true;
+    }
+
+    protected function canDelete(): bool
+    {
+        return true;
+    }
 
     /**
      * Get singular title for messages

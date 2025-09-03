@@ -4,8 +4,7 @@ namespace App\Enums;
 
 enum DiscountType: string
 {
+    case FIXED = 'fixed';
 
-  case FIXED = 'fixed';
-
-  case PERCENTAGE = 'percentage';
+    case PERCENTAGE = 'percentage';
 }

@@ -2,20 +2,18 @@
 
 namespace Modules\WMSInventoryCore\app\DataTables;
 
+use App\Helpers\FormattingHelper;
 use Modules\WMSInventoryCore\app\Models\Adjustment;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
-use App\Helpers\FormattingHelper;
 
 class AdjustmentsDataTable extends DataTable
 {
     /**
      * Build DataTable class.
      *
-     * @param mixed $query Results from query() method.
+     * @param  mixed  $query  Results from query() method.
      * @return \Yajra\DataTables\DataTableAbstract
      */
     public function dataTable($query)
@@ -27,23 +25,24 @@ class AdjustmentsDataTable extends DataTable
                 $editUrl = route('wmsinventorycore.adjustments.edit', $adjustment->id);
 
                 $actions = '<div class="d-inline-block">';
-                $actions .= '<a href="' . $showUrl . '" class="btn btn-sm btn-icon" title="' . __('View Details') . '">';
+                $actions .= '<a href="'.$showUrl.'" class="btn btn-sm btn-icon" title="'.__('View Details').'">';
                 $actions .= '<i class="ti ti-eye"></i>';
                 $actions .= '</a>';
 
                 if ($adjustment->status === 'pending') {
-                    $actions .= '<a href="' . $editUrl . '" class="btn btn-sm btn-icon" title="' . __('Edit') . '">';
+                    $actions .= '<a href="'.$editUrl.'" class="btn btn-sm btn-icon" title="'.__('Edit').'">';
                     $actions .= '<i class="ti ti-pencil"></i>';
                     $actions .= '</a>';
-                    $actions .= '<button class="btn btn-sm btn-icon approve-record" data-id="' . $adjustment->id . '" title="' . __('Approve') . '">';
+                    $actions .= '<button class="btn btn-sm btn-icon approve-record" data-id="'.$adjustment->id.'" title="'.__('Approve').'">';
                     $actions .= '<i class="ti ti-check"></i>';
                     $actions .= '</button>';
-                    $actions .= '<button class="btn btn-sm btn-icon delete-record" data-id="' . $adjustment->id . '" title="' . __('Delete') . '">';
+                    $actions .= '<button class="btn btn-sm btn-icon delete-record" data-id="'.$adjustment->id.'" title="'.__('Delete').'">';
                     $actions .= '<i class="ti ti-trash"></i>';
                     $actions .= '</button>';
                 }
 
                 $actions .= '</div>';
+
                 return $actions;
             })
             ->addColumn('warehouse', function ($adjustment) {
@@ -62,11 +61,11 @@ class AdjustmentsDataTable extends DataTable
                 $statusColors = [
                     'pending' => 'warning',
                     'approved' => 'success',
-                    'cancelled' => 'danger'
+                    'cancelled' => 'danger',
                 ];
                 $statusColor = $statusColors[$adjustment->status] ?? 'secondary';
 
-                return '<span class="badge bg-label-' . $statusColor . '">' . strtoupper($adjustment->status) . '</span>';
+                return '<span class="badge bg-label-'.$statusColor.'">'.strtoupper($adjustment->status).'</span>';
             })
             ->rawColumns(['actions', 'status'])
             ->filter(function ($query) {
@@ -95,7 +94,6 @@ class AdjustmentsDataTable extends DataTable
     /**
      * Get query source of dataTable.
      *
-     * @param \Modules\WMSInventoryCore\app\Models\Adjustment $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function query(Adjustment $model)
@@ -125,7 +123,7 @@ class AdjustmentsDataTable extends DataTable
             )
             ->parameters([
                 'responsive' => true,
-                'autoWidth' => false
+                'autoWidth' => false,
             ]);
     }
 
@@ -155,11 +153,9 @@ class AdjustmentsDataTable extends DataTable
 
     /**
      * Get filename for export.
-     *
-     * @return string
      */
     protected function filename(): string
     {
-        return 'Adjustments_' . date('YmdHis');
+        return 'Adjustments_'.date('YmdHis');
     }
 }

@@ -3,10 +3,9 @@
 namespace Modules\PMCore\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Modules\PMCore\app\Enums\ProjectStatus;
 use Modules\PMCore\app\Models\Project;
 use Modules\PMCore\app\Services\PMIntegrationService;
-use Modules\PMCore\app\Enums\ProjectStatus;
 
 class ProjectDashboardController extends Controller
 {
@@ -29,7 +28,7 @@ class ProjectDashboardController extends Controller
 
         return view('pmcore::dashboard.index', compact(
             'stats',
-            'chartData', 
+            'chartData',
             'recentProjects',
             'overdueProjects'
         ));
@@ -69,7 +68,7 @@ class ProjectDashboardController extends Controller
         $statusData = [
             'labels' => [],
             'data' => [],
-            'colors' => []
+            'colors' => [],
         ];
 
         foreach (ProjectStatus::cases() as $status) {

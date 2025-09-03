@@ -3,7 +3,6 @@
 namespace Modules\FileManagerCore\Services;
 
 use Illuminate\Http\UploadedFile;
-use Modules\FileManagerCore\Services\FileManagerSettingsService;
 
 class FileValidationService
 {
@@ -22,25 +21,25 @@ class FileValidationService
         $errors = [];
 
         // Check file size
-        if (!$this->validateFileSize($file)) {
+        if (! $this->validateFileSize($file)) {
             $maxSizeMB = round($this->settingsService->getMaxFileSize() / 1024 / 1024, 2);
             $errors[] = "File size exceeds the maximum allowed size of {$maxSizeMB}MB";
         }
 
         // Check MIME type
-        if (!$this->validateMimeType($file)) {
+        if (! $this->validateMimeType($file)) {
             $allowedTypes = implode(', ', $this->settingsService->getAllowedMimeTypes());
             $errors[] = "File type '{$file->getMimeType()}' is not allowed. Allowed types: {$allowedTypes}";
         }
 
         // Additional security checks
-        if (!$this->validateFileName($file)) {
-            $errors[] = "File name contains invalid characters";
+        if (! $this->validateFileName($file)) {
+            $errors[] = 'File name contains invalid characters';
         }
 
         return [
             'valid' => empty($errors),
-            'errors' => $errors
+            'errors' => $errors,
         ];
     }
 
@@ -50,6 +49,7 @@ class FileValidationService
     public function validateFileSize(UploadedFile $file): bool
     {
         $maxSize = $this->settingsService->getMaxFileSize();
+
         return $file->getSize() <= $maxSize;
     }
 
@@ -59,6 +59,7 @@ class FileValidationService
     public function validateMimeType(UploadedFile $file): bool
     {
         $mimeType = $file->getMimeType();
+
         return $this->settingsService->isMimeTypeAllowed($mimeType);
     }
 
@@ -68,19 +69,19 @@ class FileValidationService
     public function validateFileName(UploadedFile $file): bool
     {
         $fileName = $file->getClientOriginalName();
-        
+
         // Check for dangerous file names
         $dangerousPatterns = [
-            '/\.\./','/__/','/\\\\/' ,'/<\?php/','/\x00/',
-            '/\.(bat|cmd|com|cpl|dll|exe|scr|pif)$/i'
+            '/\.\./', '/__/', '/\\\\/', '/<\?php/', '/\x00/',
+            '/\.(bat|cmd|com|cpl|dll|exe|scr|pif)$/i',
         ];
-        
+
         foreach ($dangerousPatterns as $pattern) {
             if (preg_match($pattern, $fileName)) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -90,6 +91,7 @@ class FileValidationService
     public function isImage(UploadedFile $file): bool
     {
         $mimeType = $file->getMimeType();
+
         return in_array($mimeType, $this->settingsService->getAllowedImageTypes());
     }
 
@@ -99,6 +101,7 @@ class FileValidationService
     public function isDocument(UploadedFile $file): bool
     {
         $mimeType = $file->getMimeType();
+
         return in_array($mimeType, $this->settingsService->getAllowedDocumentTypes());
     }
 
@@ -110,11 +113,11 @@ class FileValidationService
         if ($this->isImage($file)) {
             return 'image';
         }
-        
+
         if ($this->isDocument($file)) {
             return 'document';
         }
-        
+
         return 'other';
     }
 
@@ -124,18 +127,18 @@ class FileValidationService
     public function validateFiles(array $files): array
     {
         $results = [];
-        
+
         foreach ($files as $index => $file) {
             if ($file instanceof UploadedFile) {
                 $results[$index] = $this->validateFile($file);
             } else {
                 $results[$index] = [
                     'valid' => false,
-                    'errors' => ['Invalid file upload']
+                    'errors' => ['Invalid file upload'],
                 ];
             }
         }
-        
+
         return $results;
     }
 
@@ -147,11 +150,11 @@ class FileValidationService
         // Get current usage
         $currentUsage = $this->getCurrentUserUsage($userId);
         $maxQuota = $this->settingsService->getUserQuota();
-        
+
         if ($maxQuota === 0) {
             return true; // Unlimited quota
         }
-        
+
         return ($currentUsage + $fileSize) <= $maxQuota;
     }
 
@@ -163,11 +166,11 @@ class FileValidationService
         // Get current usage
         $currentUsage = $this->getCurrentDepartmentUsage($departmentId);
         $maxQuota = $this->settingsService->getDepartmentQuota();
-        
+
         if ($maxQuota === 0) {
             return true; // Unlimited quota
         }
-        
+
         return ($currentUsage + $fileSize) <= $maxQuota;
     }
 
@@ -198,12 +201,12 @@ class FileValidationService
     {
         $maxSizeKB = $this->settingsService->getMaxFileSize() / 1024;
         $allowedMimes = implode(',', $this->settingsService->getAllowedMimeTypes());
-        
+
         return [
             'required',
             'file',
             "max:{$maxSizeKB}",
-            "mimes:{$allowedMimes}"
+            "mimes:{$allowedMimes}",
         ];
     }
 
@@ -213,7 +216,7 @@ class FileValidationService
     public function getValidationMessages(): array
     {
         $maxSizeMB = round($this->settingsService->getMaxFileSize() / 1024 / 1024, 2);
-        
+
         return [
             'file.required' => 'Please select a file to upload.',
             'file.file' => 'The uploaded file is invalid.',

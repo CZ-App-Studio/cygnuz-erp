@@ -20,7 +20,7 @@ class SettingsServiceProvider extends ServiceProvider
         $this->app->singleton(ModuleSettingsService::class);
         $this->app->singleton(SettingsRegistry::class);
         $this->app->singleton(SettingsCacheManager::class);
-        
+
         // Register aliases for easier access
         $this->app->alias(SettingsService::class, 'settings');
         $this->app->alias(ModuleSettingsService::class, 'module.settings');
@@ -43,7 +43,7 @@ class SettingsServiceProvider extends ServiceProvider
     protected function registerSettingsMetadata(): void
     {
         $registry = $this->app->make(SettingsRegistry::class);
-        
+
         // Register general settings metadata
         $registry->registerMultiple([
             'app_name' => [

@@ -18,8 +18,8 @@ use Modules\FileManagerCore\Traits\TracksStorage;
 // use Modules\LocationManagement\app\Traits\HasLocation; // Module not available
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use Spatie\Permission\Traits\HasRoles;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements AuditableContract, JWTSubject
 {

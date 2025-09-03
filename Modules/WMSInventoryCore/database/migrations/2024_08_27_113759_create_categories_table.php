@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-      Schema::create('categories', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->string('code', 255);
-        $table->enum('status', ['active', 'inactive'])->default('active');
-        $table->unsignedBigInteger('parent_id')->constrained('categories')->nullable();
-        $table->unsignedBigInteger('created_by_id')->nullable();
-        $table->unsignedBigInteger('updated_by_id')->nullable();
-        $table->timestamps();
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('code', 255);
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->unsignedBigInteger('parent_id')->constrained('categories')->nullable();
+            $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->timestamps();
 
-        // Add unique constraint with key length for 'code' column
-        $table->unique(['code']);
-      });
+            // Add unique constraint with key length for 'code' column
+            $table->unique(['code']);
+        });
     }
 
     /**
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-      Schema::dropIfExists('categories');
+        Schema::dropIfExists('categories');
     }
 };

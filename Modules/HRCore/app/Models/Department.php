@@ -12,47 +12,48 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class Department extends Model implements AuditableContract
 {
-  use Auditable, UserActionsTrait, SoftDeletes;
+    use Auditable, SoftDeletes, UserActionsTrait;
 
-  protected $table = 'departments';
+    protected $table = 'departments';
 
-  protected $fillable = [
-    'name',
-    'code',
-    'notes',
-    'parent_id',
-    'status',
-    'tenant_id',
-    'created_by_id',
-    'updated_by_id',
-  ];
+    protected $fillable = [
+        'name',
+        'code',
+        'notes',
+        'parent_id',
+        'status',
+        'tenant_id',
+        'created_by_id',
+        'updated_by_id',
+    ];
 
-  protected $casts = [
-    'status' => Status::class
-  ];
+    protected $casts = [
+        'status' => Status::class,
+    ];
 
-  public function parent()
-  {
-    return $this->belongsTo(Department::class, 'parent_id');
-  }
+    public function parent()
+    {
+        return $this->belongsTo(Department::class, 'parent_id');
+    }
 
-  public function children()
-  {
-    return $this->hasMany(Department::class, 'parent_id');
-  }
+    public function children()
+    {
+        return $this->hasMany(Department::class, 'parent_id');
+    }
 
-  // Note: Users don't have department_id column currently
-  // public function users()
-  // {
-  //   return $this->hasMany(User::class, 'department_id');
-  // }
+    // Note: Users don't have department_id column currently
+    // public function users()
+    // {
+    //   return $this->hasMany(User::class, 'department_id');
+    // }
 
-  public function designations()
-  {
-    return $this->hasMany(Designation::class, 'department_id');
-  }
+    public function designations()
+    {
+        return $this->hasMany(Designation::class, 'department_id');
+    }
 
-  public function parentDepartment(){
-    return $this->belongsTo(Department::class, 'parent_id');
-  }
+    public function parentDepartment()
+    {
+        return $this->belongsTo(Department::class, 'parent_id');
+    }
 }

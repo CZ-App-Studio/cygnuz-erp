@@ -97,7 +97,7 @@ abstract class BaseApiController extends Controller
                 'has_more_pages' => $paginator->hasMorePages(),
                 'from' => $paginator->firstItem(),
                 'to' => $paginator->lastItem(),
-            ]
+            ],
         ], 200);
     }
 }

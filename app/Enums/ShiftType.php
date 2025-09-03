@@ -2,10 +2,10 @@
 
 namespace App\Enums;
 
-enum ShiftType : string
+enum ShiftType: string
 {
-    Case REGULAR = 'regular';
+    case REGULAR = 'regular';
 
-    Case NIGHT = 'night';
+    case NIGHT = 'night';
 
 }

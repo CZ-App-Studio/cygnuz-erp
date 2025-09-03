@@ -2,10 +2,11 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -13,49 +14,49 @@ return new class extends Migration {
     {
         Schema::table('transfers', function (Blueprint $table) {
             // Add new columns with expected names if they don't exist
-            if (!Schema::hasColumn('transfers', 'transfer_date')) {
+            if (! Schema::hasColumn('transfers', 'transfer_date')) {
                 $table->date('transfer_date')->nullable()->after('id');
             }
-            if (!Schema::hasColumn('transfers', 'reference_no')) {
+            if (! Schema::hasColumn('transfers', 'reference_no')) {
                 $table->string('reference_no')->nullable()->after('code');
             }
-            if (!Schema::hasColumn('transfers', 'source_warehouse_id')) {
+            if (! Schema::hasColumn('transfers', 'source_warehouse_id')) {
                 $table->unsignedBigInteger('source_warehouse_id')->nullable()->after('reference_no');
             }
-            if (!Schema::hasColumn('transfers', 'destination_warehouse_id')) {
+            if (! Schema::hasColumn('transfers', 'destination_warehouse_id')) {
                 $table->unsignedBigInteger('destination_warehouse_id')->nullable()->after('source_warehouse_id');
             }
-            if (!Schema::hasColumn('transfers', 'shipping_cost')) {
+            if (! Schema::hasColumn('transfers', 'shipping_cost')) {
                 $table->decimal('shipping_cost', 10, 2)->default(0)->after('notes');
             }
-            if (!Schema::hasColumn('transfers', 'shipping_method')) {
+            if (! Schema::hasColumn('transfers', 'shipping_method')) {
                 $table->string('shipping_method')->nullable()->after('shipping_cost');
             }
-            if (!Schema::hasColumn('transfers', 'tracking_number')) {
+            if (! Schema::hasColumn('transfers', 'tracking_number')) {
                 $table->string('tracking_number')->nullable()->after('shipping_method');
             }
-            if (!Schema::hasColumn('transfers', 'expected_arrival_date')) {
+            if (! Schema::hasColumn('transfers', 'expected_arrival_date')) {
                 $table->date('expected_arrival_date')->nullable()->after('tracking_number');
             }
-            if (!Schema::hasColumn('transfers', 'actual_arrival_date')) {
+            if (! Schema::hasColumn('transfers', 'actual_arrival_date')) {
                 $table->date('actual_arrival_date')->nullable()->after('expected_arrival_date');
             }
-            if (!Schema::hasColumn('transfers', 'approved_by_id')) {
+            if (! Schema::hasColumn('transfers', 'approved_by_id')) {
                 $table->unsignedBigInteger('approved_by_id')->nullable()->after('actual_arrival_date');
             }
-            if (!Schema::hasColumn('transfers', 'approved_at')) {
+            if (! Schema::hasColumn('transfers', 'approved_at')) {
                 $table->timestamp('approved_at')->nullable()->after('approved_by_id');
             }
-            if (!Schema::hasColumn('transfers', 'shipped_by_id')) {
+            if (! Schema::hasColumn('transfers', 'shipped_by_id')) {
                 $table->unsignedBigInteger('shipped_by_id')->nullable()->after('approved_at');
             }
-            if (!Schema::hasColumn('transfers', 'shipped_at')) {
+            if (! Schema::hasColumn('transfers', 'shipped_at')) {
                 $table->timestamp('shipped_at')->nullable()->after('shipped_by_id');
             }
-            if (!Schema::hasColumn('transfers', 'received_by_id')) {
+            if (! Schema::hasColumn('transfers', 'received_by_id')) {
                 $table->unsignedBigInteger('received_by_id')->nullable()->after('shipped_at');
             }
-            if (!Schema::hasColumn('transfers', 'received_at')) {
+            if (! Schema::hasColumn('transfers', 'received_at')) {
                 $table->timestamp('received_at')->nullable()->after('received_by_id');
             }
         });
@@ -114,7 +115,7 @@ return new class extends Migration {
         });
 
         // Update transfer_products table to add notes column if it doesn't exist
-        if (!Schema::hasColumn('transfer_products', 'notes')) {
+        if (! Schema::hasColumn('transfer_products', 'notes')) {
             Schema::table('transfer_products', function (Blueprint $table) {
                 $table->text('notes')->nullable()->after('quantity');
             });
@@ -159,7 +160,7 @@ return new class extends Migration {
                 'shipped_by_id',
                 'shipped_at',
                 'received_by_id',
-                'received_at'
+                'received_at',
             ]);
 
             // Add back foreign key constraints for old columns
