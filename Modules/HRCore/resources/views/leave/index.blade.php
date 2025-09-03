@@ -45,13 +45,7 @@
         ['name' => __('Leave Requests'), 'url' => '']
       ]"
       :home-url="url('/')"
-    >
-      @can('hrcore.create-leave')
-        <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddLeave">
-          <i class="bx bx-plus me-1"></i>{{ __('Add Leave Request') }}
-        </button>
-      @endcan
-    </x-breadcrumb>
+    />
 
   {{-- Filters Card --}}
   <div class="card mb-4">
@@ -61,11 +55,8 @@
         {{-- Employee Filter --}}
         <div class="col-md-3">
           <label for="employeeFilter" class="form-label">{{ __('Filter by Employee') }}</label>
-          <select id="employeeFilter" name="employeeFilter" class="form-select">
+          <select id="employeeFilter" name="employeeFilter" class="form-select" style="width: 100%;">
             <option value="" selected>{{ __('All Employees') }}</option>
-            @foreach($employees as $employee)
-              <option value="{{ $employee->id }}">{{ $employee->getFullName() }} ({{ $employee->code }})</option>
-            @endforeach
           </select>
         </div>
 
@@ -102,6 +93,14 @@
 
   {{-- Leave Requests Table --}}
   <div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h5 class="card-title mb-0">{{ __('Leave Requests List') }}</h5>
+      @can('hrcore.create-leave')
+        <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddLeave">
+          <i class="bx bx-plus me-1"></i>{{ __('Add Leave Request') }}
+        </button>
+      @endcan
+    </div>
     <div class="card-datatable table-responsive">
       <table id="leaveRequestsTable" class="table">
         <thead>
@@ -132,7 +131,8 @@
       urls: {
         datatable: @json(route('hrcore.leaves.datatable')),
         show: @json(route('hrcore.leaves.show', ':id')),
-        action: @json(route('hrcore.leaves.action', ':id'))
+        action: @json(route('hrcore.leaves.action', ':id')),
+        edit: @json(route('hrcore.leaves.edit', ':id'))
       },
       labels: {
         search: @json(__('Search')),
@@ -155,7 +155,11 @@
         approved: @json(__('Approved')),
         rejected: @json(__('Rejected')),
         cancelled: @json(__('Cancelled')),
-        pending: @json(__('Pending'))
+        pending: @json(__('Pending')),
+        addLeaveRequest: @json(__('Add Leave Request')),
+        editLeaveRequest: @json(__('Edit Leave Request')),
+        submitRequest: @json(__('Submit Request')),
+        updateRequest: @json(__('Update Request'))
       }
     };
   </script>

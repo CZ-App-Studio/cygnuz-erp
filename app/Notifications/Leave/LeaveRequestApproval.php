@@ -75,8 +75,8 @@ class LeaveRequestApproval extends Notification implements ShouldQueue
     {
         $actionUrl = route('hrcore.leave.show', $this->leaveRequest->id);
         $approver = $this->leaveRequest->approved_by_id ?
-          \App\Models\User::find($this->leaveRequest->approved_by_id)?->getFullName() :
-          (\App\Models\User::find($this->leaveRequest->rejected_by_id)?->getFullName() ?? __('Manager'));
+            \App\Models\User::find($this->leaveRequest->approved_by_id)?->getFullName() :
+            (\App\Models\User::find($this->leaveRequest->rejected_by_id)?->getFullName() ?? __('Manager'));
 
         $mail = (new MailMessage)
             ->subject($this->title)
