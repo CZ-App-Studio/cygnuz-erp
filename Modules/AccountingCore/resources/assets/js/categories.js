@@ -44,6 +44,7 @@ function initializeDataTable() {
             { data: 'type_badge', name: 'type' },
             { data: 'parent_name', name: 'parent_id' },
             { data: 'icon_display', name: 'icon' },
+            { data: 'color_display', name: 'color' },
             { data: 'transaction_count', name: 'transaction_count' },
             { data: 'status', name: 'is_active' },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
