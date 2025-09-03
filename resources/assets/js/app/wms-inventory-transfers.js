@@ -103,11 +103,11 @@ $(function () {
     const approveUrl = pageData.urls.transfersApprove.replace('__TRANSFER_ID__', id);
 
     Swal.fire({
-      title: pageData.labels.confirmApprove,
-      text: pageData.labels.confirmApproveText,
+      title: pageData.labels?.confirmApprove || 'Confirm Approval',
+      text: pageData.labels?.confirmApproveText || 'Are you sure you want to approve this transfer?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: pageData.labels.confirmApproveButton,
+      confirmButtonText: pageData.labels?.confirmApproveButton || 'Approve',
       customClass: {
         confirmButton: 'btn btn-primary me-3',
         cancelButton: 'btn btn-label-secondary'
@@ -144,7 +144,7 @@ $(function () {
     const shipUrl = pageData.urls.transfersShip.replace('__TRANSFER_ID__', id);
 
     Swal.fire({
-      title: pageData.labels.shipTransfer,
+      title: pageData.labels?.shipTransfer || 'Ship Transfer',
       html: `
         <div class="mb-3">
           <label for="ship_date" class="form-label">Ship Date</label>
@@ -193,7 +193,7 @@ $(function () {
             }
             Swal.fire({
               icon: 'success',
-              title: pageData.labels.shipped,
+              title: pageData.labels?.shipped || 'Success',
               text: response.message || 'Transfer has been shipped successfully.',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -222,7 +222,7 @@ $(function () {
     const receiveUrl = pageData.urls.transfersReceive.replace('__TRANSFER_ID__', id);
 
     Swal.fire({
-      title: pageData.labels.receiveTransfer,
+      title: pageData.labels?.receiveTransfer || 'Receive Transfer',
       html: `
         <div class="mb-3">
           <label for="arrival_date" class="form-label">Arrival Date</label>
