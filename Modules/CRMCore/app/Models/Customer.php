@@ -346,7 +346,7 @@ class Customer extends Model implements AuditableContract
      */
     public function isB2C()
     {
-        return !$this->isB2B();
+        return ! $this->isB2B();
     }
 
     /**
@@ -358,7 +358,7 @@ class Customer extends Model implements AuditableContract
         if ($this->isB2B() && $this->contact->company) {
             return $this->contact->company;
         }
-        
+
         return $this->contact;
     }
 
@@ -370,10 +370,10 @@ class Customer extends Model implements AuditableContract
         if ($this->isB2B()) {
             return 'company';
         }
-        
+
         return 'individual';
     }
-    
+
     /**
      * Get customer segment based on purchase history
      */
@@ -386,10 +386,10 @@ class Customer extends Model implements AuditableContract
         } elseif ($this->lifetime_value >= 10000) {
             return 'standard';
         }
-        
+
         return 'basic';
     }
-    
+
     /**
      * Check if customer has made a purchase
      */
@@ -397,25 +397,25 @@ class Customer extends Model implements AuditableContract
     {
         return $this->purchase_count > 0;
     }
-    
+
     /**
      * Check if customer is new (first purchase within 30 days)
      */
     public function isNew()
     {
-        return $this->first_purchase_date && 
+        return $this->first_purchase_date &&
                $this->first_purchase_date->diffInDays(now()) <= 30;
     }
-    
+
     /**
      * Check if customer is inactive (no purchase in last 90 days)
      */
     public function isInactive()
     {
-        return $this->last_purchase_date && 
+        return $this->last_purchase_date &&
                $this->last_purchase_date->diffInDays(now()) > 90;
     }
-    
+
     /**
      * Get customer's primary contact person
      */
@@ -423,7 +423,7 @@ class Customer extends Model implements AuditableContract
     {
         return $this->contact;
     }
-    
+
     /**
      * Get customer's company if B2B
      */
@@ -432,10 +432,10 @@ class Customer extends Model implements AuditableContract
         if ($this->isB2B()) {
             return $this->contact->company;
         }
-        
+
         return null;
     }
-    
+
     /**
      * Get customer classification
      */
@@ -444,14 +444,14 @@ class Customer extends Model implements AuditableContract
         if ($this->customerGroup) {
             return $this->customerGroup->name;
         }
-        
+
         // Default classification based on type and segment
         $type = $this->isB2B() ? 'B2B' : 'B2C';
         $segment = $this->getSegment();
-        
+
         return "{$type} - {$segment}";
     }
-    
+
     /**
      * Get customer risk level based on credit and payment history
      */
@@ -461,21 +461,21 @@ class Customer extends Model implements AuditableContract
         if ($this->is_blacklisted) {
             return 'high';
         }
-        
+
         // Check credit utilization
-        $creditUtilization = $this->credit_limit > 0 
-            ? ($this->credit_used / $this->credit_limit) * 100 
+        $creditUtilization = $this->credit_limit > 0
+            ? ($this->credit_used / $this->credit_limit) * 100
             : 0;
-            
+
         if ($creditUtilization > 80) {
             return 'medium';
         }
-        
+
         // Check if inactive
         if ($this->isInactive()) {
             return 'medium';
         }
-        
+
         return 'low';
     }
 }

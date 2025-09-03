@@ -18,15 +18,16 @@ class AttendanceSeeder extends Seeder
     {
         // Get all active users
         $users = User::where('status', 'active')->take(10)->get();
-        
+
         if ($users->isEmpty()) {
             $this->command->info('No active users found. Please seed users first.');
+
             return;
         }
 
         // Get default shift (if exists)
         $shift = Shift::first();
-        
+
         // Generate attendance for the last 7 days
         $dates = collect();
         for ($i = 6; $i >= 0; $i--) {
@@ -131,7 +132,7 @@ class AttendanceSeeder extends Seeder
             if ($index < 5) {
                 // First 5 users have checked in
                 $checkInTime = $today->copy()->setTime(8, rand(0, 45), 0);
-                
+
                 AttendanceLog::create([
                     'attendance_id' => $attendance->id,
                     'user_id' => $user->id,
@@ -155,7 +156,7 @@ class AttendanceSeeder extends Seeder
                 if ($index < 2) {
                     // First 2 users have also checked out
                     $checkOutTime = $today->copy()->setTime(17, rand(0, 30), 0);
-                    
+
                     AttendanceLog::create([
                         'attendance_id' => $attendance->id,
                         'user_id' => $user->id,
@@ -187,6 +188,7 @@ class AttendanceSeeder extends Seeder
     private function getRandomStatus(): string
     {
         $statuses = ['present', 'late', 'absent'];
+
         return $statuses[array_rand($statuses)];
     }
 
@@ -221,7 +223,7 @@ class AttendanceSeeder extends Seeder
             '147 Times Square, New York, NY 10036',
             '258 Central Park West, New York, NY 10024',
         ];
-        
+
         return $streets[array_rand($streets)];
     }
 }

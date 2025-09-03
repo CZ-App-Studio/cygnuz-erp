@@ -2,9 +2,9 @@
 
 namespace Modules\HRCore\database\seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Modules\HRCore\app\Models\Holiday;
-use Carbon\Carbon;
 
 class HolidaySeeder extends Seeder
 {
@@ -14,7 +14,7 @@ class HolidaySeeder extends Seeder
     public function run(): void
     {
         $year = Carbon::now()->year;
-        
+
         $holidays = [
             [
                 'name' => "New Year's Day",

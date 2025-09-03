@@ -15,7 +15,7 @@ class AdjustmentType extends Model
         'description',
         'status',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     /**

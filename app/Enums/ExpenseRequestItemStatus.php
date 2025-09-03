@@ -4,16 +4,15 @@ namespace App\Enums;
 
 enum ExpenseRequestItemStatus: string
 {
-  
-  case PENDING = 'pending';
+    case PENDING = 'pending';
 
-  case APPROVED = 'approved';
+    case APPROVED = 'approved';
 
-  case REJECTED = 'rejected';
+    case REJECTED = 'rejected';
 
-  case PROCESSED = 'processed';
+    case PROCESSED = 'processed';
 
-  case CANCELLED = 'cancelled';
+    case CANCELLED = 'cancelled';
 
-  case HOLD = 'hold';
+    case HOLD = 'hold';
 }

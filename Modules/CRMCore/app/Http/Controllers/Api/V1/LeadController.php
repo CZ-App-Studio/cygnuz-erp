@@ -9,11 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Modules\CRMCore\app\Http\Controllers\Api\BaseApiController;
 use Modules\CRMCore\app\Http\Resources\LeadResource;
-use Modules\CRMCore\app\Models\Lead;
-use Modules\CRMCore\app\Models\LeadStatus;
-use Modules\CRMCore\app\Models\LeadSource;
 use Modules\CRMCore\app\Models\Deal;
-use Carbon\Carbon;
+use Modules\CRMCore\app\Models\Lead;
+use Modules\CRMCore\app\Models\LeadSource;
+use Modules\CRMCore\app\Models\LeadStatus;
 
 class LeadController extends BaseApiController
 {
@@ -123,7 +122,7 @@ class LeadController extends BaseApiController
             $data['tenant_id'] = $request->header('X-Tenant-Id');
 
             // Set default status if not provided
-            if (!isset($data['lead_status_id'])) {
+            if (! isset($data['lead_status_id'])) {
                 $defaultStatus = LeadStatus::where('is_default', true)->first();
                 if ($defaultStatus) {
                     $data['lead_status_id'] = $defaultStatus->id;
@@ -142,6 +141,7 @@ class LeadController extends BaseApiController
             );
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to create lead', $e->getMessage(), 500);
         }
     }
@@ -199,10 +199,10 @@ class LeadController extends BaseApiController
 
         try {
             $lead = Lead::findOrFail($id);
-            
+
             $data = $request->all();
             $data['updated_by_id'] = Auth::id();
-            
+
             $lead->update($data);
             $lead->load(['status', 'source', 'assignedTo', 'contact', 'company']);
 
@@ -224,7 +224,7 @@ class LeadController extends BaseApiController
     {
         try {
             $lead = Lead::findOrFail($id);
-            
+
             // Check if lead is converted
             if ($lead->converted_to_deal_id) {
                 return $this->errorResponse('Cannot delete converted lead', null, 400);
@@ -300,9 +300,11 @@ class LeadController extends BaseApiController
             ], 'Lead converted to deal successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
+
             return $this->notFoundResponse('Lead not found');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to convert lead', $e->getMessage(), 500);
         }
     }
@@ -356,7 +358,7 @@ class LeadController extends BaseApiController
                 'total_leads' => $query->count(),
                 'converted_leads' => (clone $query)->whereNotNull('converted_to_deal_id')->count(),
                 'total_value' => (clone $query)->sum('lead_value'),
-                'conversion_rate' => $query->count() > 0 
+                'conversion_rate' => $query->count() > 0
                     ? round(((clone $query)->whereNotNull('converted_to_deal_id')->count() / $query->count()) * 100, 2)
                     : 0,
                 'leads_by_status' => LeadStatus::withCount(['leads' => function ($q) use ($query) {

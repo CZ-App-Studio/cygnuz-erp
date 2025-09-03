@@ -2,12 +2,12 @@
 
 namespace Modules\AccountingCore\Database\Seeders;
 
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Modules\AccountingCore\app\Models\BasicTransaction;
 use Modules\AccountingCore\app\Models\BasicTransactionCategory;
-use Carbon\Carbon;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 class AccountingCoreDemoSeeder extends Seeder
 {
@@ -20,7 +20,7 @@ class AccountingCoreDemoSeeder extends Seeder
             $this->seedCategories();
             $this->seedTransactions();
         });
-        
+
         $this->command->info('AccountingCore demo data seeded successfully!');
     }
 
@@ -30,7 +30,7 @@ class AccountingCoreDemoSeeder extends Seeder
     private function seedCategories(): void
     {
         $this->command->info('Seeding transaction categories...');
-        
+
         $incomeCategories = [
             ['name' => 'Sales Revenue', 'type' => 'income', 'icon' => 'bx-cart', 'color' => '#28a745'],
             ['name' => 'Service Income', 'type' => 'income', 'icon' => 'bx-briefcase', 'color' => '#20c997'],
@@ -81,14 +81,15 @@ class AccountingCoreDemoSeeder extends Seeder
     private function seedTransactions(): void
     {
         $this->command->info('Seeding transactions...');
-        
+
         $incomeCategories = BasicTransactionCategory::where('type', 'income')->pluck('id', 'name');
         $expenseCategories = BasicTransactionCategory::where('type', 'expense')->pluck('id', 'name');
-        
+
         // Get a user for created_by
         $user = User::first();
-        if (!$user) {
+        if (! $user) {
             $this->command->warn('No users found, skipping transaction seeding.');
+
             return;
         }
 
@@ -196,8 +197,10 @@ class AccountingCoreDemoSeeder extends Seeder
 
         // Generate income transactions
         foreach ($incomePatterns as $categoryName => $pattern) {
-            if (!isset($incomeCategories[$categoryName])) continue;
-            
+            if (! isset($incomeCategories[$categoryName])) {
+                continue;
+            }
+
             $this->generateTransactions(
                 'income',
                 $incomeCategories[$categoryName],
@@ -210,8 +213,10 @@ class AccountingCoreDemoSeeder extends Seeder
 
         // Generate expense transactions
         foreach ($expensePatterns as $categoryName => $pattern) {
-            if (!isset($expenseCategories[$categoryName])) continue;
-            
+            if (! isset($expenseCategories[$categoryName])) {
+                continue;
+            }
+
             $this->generateTransactions(
                 'expense',
                 $expenseCategories[$categoryName],
@@ -236,33 +241,33 @@ class AccountingCoreDemoSeeder extends Seeder
 
         while ($current <= $endDate) {
             $shouldCreate = false;
-            
+
             switch ($pattern['frequency']) {
                 case 'daily':
                     $shouldCreate = true;
                     $nextDate = $current->copy()->addDay();
                     break;
-                    
+
                 case 'weekly':
                     $shouldCreate = $current->dayOfWeek === Carbon::MONDAY;
                     $nextDate = $current->copy()->addDay();
                     break;
-                    
+
                 case 'monthly':
                     $shouldCreate = $current->day === 1;
                     $nextDate = $current->copy()->addDay();
                     break;
-                    
+
                 case 'quarterly':
                     $shouldCreate = $current->day === 1 && in_array($current->month, [1, 4, 7, 10]);
                     $nextDate = $current->copy()->addDay();
                     break;
-                    
+
                 case 'random':
                     $shouldCreate = rand(1, 10) <= 3; // 30% chance
                     $nextDate = $current->copy()->addDays(rand(1, 7));
                     break;
-                    
+
                 default:
                     $nextDate = $current->copy()->addDay();
             }
@@ -289,7 +294,7 @@ class AccountingCoreDemoSeeder extends Seeder
                     'category_id' => $categoryId,
                     'description' => str_replace('{date}', $current->format('F Y'), $description),
                     'transaction_date' => $current->toDateString(),
-                    'reference_number' => 'REF-' . strtoupper(uniqid()),
+                    'reference_number' => 'REF-'.strtoupper(uniqid()),
                     'payment_method' => $paymentMethod,
                     'tags' => $this->generateTags($type),
                     'created_by_id' => $userId,
@@ -313,17 +318,17 @@ class AccountingCoreDemoSeeder extends Seeder
     private function getDescriptions($type, $categoryId)
     {
         $category = BasicTransactionCategory::find($categoryId);
-        
+
         $descriptions = [
             'Sales Revenue' => [
                 'Product sales for {date}',
                 'Online store revenue - {date}',
                 'Retail sales income for {date}',
-                'Wholesale order #' . rand(1000, 9999),
+                'Wholesale order #'.rand(1000, 9999),
                 'E-commerce sales - {date}',
             ],
             'Service Income' => [
-                'Consulting services - Client #' . rand(100, 999),
+                'Consulting services - Client #'.rand(100, 999),
                 'Professional services rendered',
                 'Service contract payment - {date}',
                 'Project milestone payment',
@@ -417,7 +422,7 @@ class AccountingCoreDemoSeeder extends Seeder
             ],
         ];
 
-        return $descriptions[$category->name] ?? ['Transaction for ' . $category->name];
+        return $descriptions[$category->name] ?? ['Transaction for '.$category->name];
     }
 
     /**
@@ -426,17 +431,17 @@ class AccountingCoreDemoSeeder extends Seeder
     private function generateTags($type)
     {
         $commonTags = ['business', 'operations', date('Y')];
-        
+
         $typeTags = [
             'income' => ['revenue', 'earnings', 'sales'],
             'expense' => ['cost', 'expenditure', 'overhead'],
         ];
-        
+
         $tags = array_merge($commonTags, $typeTags[$type] ?? []);
-        
+
         // Randomly select 2-4 tags
         $selectedTags = array_rand(array_flip($tags), rand(2, min(4, count($tags))));
-        
+
         return is_array($selectedTags) ? $selectedTags : [$selectedTags];
     }
 
@@ -466,7 +471,7 @@ class AccountingCoreDemoSeeder extends Seeder
             'category_id' => $expenseCategories['Salaries & Wages'] ?? $expenseCategories->first(),
             'description' => 'Annual employee bonuses',
             'transaction_date' => Carbon::create(now()->year - 1, 12, 25),
-            'reference_number' => 'REF-BONUS-' . (now()->year - 1),
+            'reference_number' => 'REF-BONUS-'.(now()->year - 1),
             'payment_method' => 'bank_transfer',
             'tags' => ['bonus', 'year-end', 'compensation'],
             'created_by_id' => $userId,
@@ -494,7 +499,7 @@ class AccountingCoreDemoSeeder extends Seeder
             'category_id' => $expenseCategories['Taxes & Licenses'] ?? $expenseCategories->first(),
             'description' => 'Quarterly tax payment',
             'transaction_date' => now()->subMonths(1)->startOfQuarter(),
-            'reference_number' => 'TAX-Q' . now()->quarter . '-' . now()->year,
+            'reference_number' => 'TAX-Q'.now()->quarter.'-'.now()->year,
             'payment_method' => 'bank_transfer',
             'tags' => ['tax', 'quarterly', 'compliance'],
             'created_by_id' => $userId,

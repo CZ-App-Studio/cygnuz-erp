@@ -12,7 +12,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class ProductPrice extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'product_prices';
 
@@ -22,14 +22,14 @@ class ProductPrice extends Model implements Auditable
         'price',
         'unit_id',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**

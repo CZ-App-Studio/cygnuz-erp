@@ -17,11 +17,11 @@ return new class extends Migration
             $table->unsignedBigInteger('journal_entry_id');
             $table->timestamp('migrated_at');
             $table->timestamps();
-            
+
             // Indexes
             $table->unique('basic_transaction_id');
             $table->index('journal_entry_id');
-            
+
             // Foreign keys
             $table->foreign('basic_transaction_id')->references('id')->on('basic_transactions')->onDelete('cascade');
         });

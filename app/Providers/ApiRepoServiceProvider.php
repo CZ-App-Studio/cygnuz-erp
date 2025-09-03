@@ -12,34 +12,33 @@ use Illuminate\Support\ServiceProvider;
 
 class ApiRepoServiceProvider extends ServiceProvider
 {
-  /**
-   * Register services.
-   */
-  public function register(): void
-  {
-    //
-  }
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        //
+    }
 
-  /**
-   * Bootstrap services.
-   */
-  public function boot(): void
-  {
-    $this->app->bind(
-      IUserService::class,
-      UserService::class
-    );
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        $this->app->bind(
+            IUserService::class,
+            UserService::class
+        );
 
-    $this->app->bind(
-      ISettings::class,
-      SettingsService::class
-    );
+        $this->app->bind(
+            ISettings::class,
+            SettingsService::class
+        );
 
-    $this->app->bind(
-      IAttendance::class,
-      AttendanceService::class
-    );
+        $this->app->bind(
+            IAttendance::class,
+            AttendanceService::class
+        );
 
-
-  }
+    }
 }

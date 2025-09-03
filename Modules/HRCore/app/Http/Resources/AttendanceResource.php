@@ -26,7 +26,7 @@ class AttendanceResource extends JsonResource
             'department_id' => $this->department_id,
             'notes' => $this->notes,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'updated_at' => $this->updated_at,
         ];
     }
 }

@@ -19,12 +19,12 @@ class InventoryReservation extends Model
         'reference_type',
         'reserved_until',
         'status',
-        'created_by_id'
+        'created_by_id',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
-        'reserved_until' => 'datetime'
+        'reserved_until' => 'datetime',
     ];
 
     /**
@@ -96,9 +96,9 @@ class InventoryReservation extends Model
      */
     public function scopeNotExpired($query)
     {
-        return $query->where(function($q) {
+        return $query->where(function ($q) {
             $q->whereNull('reserved_until')
-              ->orWhere('reserved_until', '>=', now());
+                ->orWhere('reserved_until', '>=', now());
         });
     }
 }

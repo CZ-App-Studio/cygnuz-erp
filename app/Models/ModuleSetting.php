@@ -43,6 +43,7 @@ class ModuleSetting extends Model implements AuditableContract
     {
         if (is_null($value)) {
             $this->attributes['value'] = null;
+
             return;
         }
 
@@ -59,13 +60,13 @@ class ModuleSetting extends Model implements AuditableContract
     protected static function boot()
     {
         parent::boot();
-        
+
         static::saved(function ($model) {
             Cache::forget("module_settings_{$model->module}");
             Cache::forget('module_settings_all');
             Cache::forget('global_settings');
         });
-        
+
         static::deleted(function ($model) {
             Cache::forget("module_settings_{$model->module}");
             Cache::forget('module_settings_all');

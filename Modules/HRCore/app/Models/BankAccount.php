@@ -12,30 +12,30 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class BankAccount extends Model implements AuditableContract
 {
-  use Auditable, UserActionsTrait, SoftDeletes;
+    use Auditable, SoftDeletes, UserActionsTrait;
 
-  protected $table = 'bank_accounts';
+    protected $table = 'bank_accounts';
 
-  protected $fillable = [
-    'user_id',
-    'bank_name',
-    'bank_code',
-    'account_name',
-    'account_number',
-    'branch_name',
-    'branch_code',
-    'tax_no',
-    'created_by_id',
-    'updated_by_id',
-    'tenant_id',
-  ];
-  protected $casts = [
-    'status' => Status::class
-  ];
+    protected $fillable = [
+        'user_id',
+        'bank_name',
+        'bank_code',
+        'account_name',
+        'account_number',
+        'branch_name',
+        'branch_code',
+        'tax_no',
+        'created_by_id',
+        'updated_by_id',
+        'tenant_id',
+    ];
 
-  public function user()
-  {
-    return $this->belongsTo(User::class);
-  }
+    protected $casts = [
+        'status' => Status::class,
+    ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -13,11 +13,11 @@ class Variant extends Model
         'status',
         'product_id',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
-        'status' => 'string'
+        'status' => 'string',
     ];
 
     /**

@@ -66,7 +66,7 @@ class SettingsHistoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $history
+            'data' => $history,
         ]);
     }
 
@@ -103,16 +103,16 @@ class SettingsHistoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => __('Setting rolled back successfully')
+                'message' => __('Setting rolled back successfully'),
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error rolling back setting: ' . $e->getMessage());
-            
+            Log::error('Error rolling back setting: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => __('Failed to rollback setting')
+                'message' => __('Failed to rollback setting'),
             ], 500);
         }
     }
@@ -157,11 +157,11 @@ class SettingsHistoryController extends Controller
                     'changed_at' => $item->changed_at->toIso8601String(),
                     'ip_address' => $item->ip_address,
                 ];
-            })
+            }),
         ];
 
         return response()->json($data)
             ->header('Content-Type', 'application/json')
-            ->header('Content-Disposition', 'attachment; filename="settings-history-' . date('Y-m-d-His') . '.json"');
+            ->header('Content-Disposition', 'attachment; filename="settings-history-'.date('Y-m-d-His').'.json"');
     }
 }

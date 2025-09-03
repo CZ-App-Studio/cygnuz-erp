@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SettingMetadata extends Model
 {
     protected $table = 'settings_metadata';
-    
+
     protected $fillable = [
         'category',
         'key',
@@ -52,13 +52,13 @@ class SettingMetadata extends Model
     public function getValidationRulesArray(): array
     {
         $rules = $this->validation_rules ?? [];
-        
+
         if ($this->is_required) {
             array_unshift($rules, 'required');
         } else {
             array_unshift($rules, 'nullable');
         }
-        
+
         return $rules;
     }
 

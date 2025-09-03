@@ -2,18 +2,18 @@
 
 namespace Modules\PMCore\app\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Services\AddonService\AddonService;
-use App\Helpers\FormattingHelper;
 use App\ApiClasses\Error;
 use App\ApiClasses\Success;
+use App\Helpers\FormattingHelper;
+use App\Http\Controllers\Controller;
+use App\Services\AddonService\AddonService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Modules\PMCore\app\Models\Timesheet;
-use Modules\PMCore\app\Models\Project;
 use Modules\PMCore\app\Enums\TimesheetStatus;
+use Modules\PMCore\app\Models\Project;
+use Modules\PMCore\app\Models\Timesheet;
 use Yajra\DataTables\Facades\DataTables;
 
 class TimesheetController extends Controller
@@ -23,7 +23,7 @@ class TimesheetController extends Controller
     public function __construct(AddonService $addonService)
     {
         $this->addonService = $addonService;
-        
+
         // Apply resource authorization
         $this->authorizeResource(Timesheet::class, 'timesheet');
     }
@@ -34,7 +34,7 @@ class TimesheetController extends Controller
     public function index()
     {
         $this->authorize('viewAny', Timesheet::class);
-        
+
         return view('pmcore::timesheets.index');
     }
 
@@ -44,12 +44,12 @@ class TimesheetController extends Controller
     public function indexAjax(Request $request)
     {
         $this->authorize('viewAny', Timesheet::class);
-        
+
         $query = Timesheet::with(['user', 'project', 'task', 'approvedBy'])
             ->select('timesheets.*');
-            
+
         // Restrict to own timesheets if user doesn't have view-timesheets permission
-        if (!auth()->user()->can('pmcore.view-timesheets')) {
+        if (! auth()->user()->can('pmcore.view-timesheets')) {
             $query->where('user_id', auth()->id());
         }
 
@@ -88,76 +88,79 @@ class TimesheetController extends Controller
                 return FormattingHelper::formatDate($timesheet->date);
             })
             ->addColumn('formatted_hours', function ($timesheet) {
-                return number_format($timesheet->hours, 2) . ' hrs';
+                return number_format($timesheet->hours, 2).' hrs';
             })
             ->addColumn('is_billable', function ($timesheet) {
-                return $timesheet->is_billable 
-                    ? '<span class="badge bg-success">' . __('Yes') . '</span>' 
-                    : '<span class="badge bg-secondary">' . __('No') . '</span>';
+                return $timesheet->is_billable
+                    ? '<span class="badge bg-success">'.__('Yes').'</span>'
+                    : '<span class="badge bg-secondary">'.__('No').'</span>';
             })
             ->addColumn('billing_amount', function ($timesheet) {
                 if ($timesheet->is_billable && $timesheet->billing_rate) {
                     return FormattingHelper::formatCurrency($timesheet->hours * $timesheet->billing_rate);
                 }
+
                 return '-';
             })
             ->addColumn('status_badge', function ($timesheet) {
                 $color = $timesheet->status->color();
-                return '<span class="badge bg-' . $color . '">' . $timesheet->status->label() . '</span>';
+
+                return '<span class="badge bg-'.$color.'">'.$timesheet->status->label().'</span>';
             })
             ->addColumn('approved_by', function ($timesheet) {
                 if ($timesheet->approvedBy) {
                     return view('components.datatable-user', ['user' => $timesheet->approvedBy])->render();
                 }
+
                 return '-';
             })
             ->addColumn('actions', function ($timesheet) {
                 $actions = [];
-                
+
                 // Only show edit for draft timesheets by the owner
                 if ($timesheet->canBeEditedBy(Auth::user())) {
                     $actions[] = [
                         'label' => __('Edit'),
                         'icon' => 'bx bx-edit',
-                        'url' => route('pmcore.timesheets.edit', $timesheet->id)
+                        'url' => route('pmcore.timesheets.edit', $timesheet->id),
                     ];
                 }
-                
+
                 // Only show submit for draft timesheets by the owner
                 if ($timesheet->status === \Modules\PMCore\app\Enums\TimesheetStatus::DRAFT && $timesheet->user_id === Auth::id()) {
                     $actions[] = [
                         'label' => __('Submit'),
                         'icon' => 'bx bx-send',
-                        'onclick' => "submitTimesheet({$timesheet->id})"
+                        'onclick' => "submitTimesheet({$timesheet->id})",
                     ];
                 }
-                
+
                 // Only show approve/reject for submitted timesheets
                 if ($timesheet->canBeApprovedBy(Auth::user())) {
                     $actions[] = [
                         'label' => __('Approve'),
                         'icon' => 'bx bx-check',
-                        'onclick' => "approveTimesheet({$timesheet->id})"
+                        'onclick' => "approveTimesheet({$timesheet->id})",
                     ];
                     $actions[] = [
                         'label' => __('Reject'),
                         'icon' => 'bx bx-x',
-                        'onclick' => "rejectTimesheet({$timesheet->id})"
+                        'onclick' => "rejectTimesheet({$timesheet->id})",
                     ];
                 }
-                
+
                 // Only show delete for draft timesheets by the owner
                 if ($timesheet->status === \Modules\PMCore\app\Enums\TimesheetStatus::DRAFT && $timesheet->canBeEditedBy(Auth::user())) {
                     $actions[] = [
                         'label' => __('Delete'),
                         'icon' => 'bx bx-trash',
-                        'onclick' => "deleteTimesheet({$timesheet->id})"
+                        'onclick' => "deleteTimesheet({$timesheet->id})",
                     ];
                 }
-                
+
                 return view('components.datatable-actions', [
                     'id' => $timesheet->id,
-                    'actions' => $actions
+                    'actions' => $actions,
                 ])->render();
             })
             ->rawColumns(['user', 'is_billable', 'status_badge', 'approved_by', 'actions'])
@@ -171,7 +174,7 @@ class TimesheetController extends Controller
     {
         $projects = Project::active()->get();
         $tasks = collect(); // Will be loaded via AJAX based on project
-        
+
         return view('pmcore::timesheets.create', compact('projects', 'tasks'));
     }
 
@@ -195,7 +198,7 @@ class TimesheetController extends Controller
         if ($validator->fails()) {
             return Error::response([
                 'message' => __('Validation failed'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
 
@@ -208,10 +211,11 @@ class TimesheetController extends Controller
 
             return Success::response([
                 'message' => __('Timesheet created successfully!'),
-                'timesheet' => $timesheet
+                'timesheet' => $timesheet,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return Error::response(__('An error occurred while creating the timesheet.'));
         }
     }
@@ -222,7 +226,7 @@ class TimesheetController extends Controller
     public function show($id)
     {
         $timesheet = Timesheet::with(['user', 'project', 'task', 'approvedBy'])->findOrFail($id);
-        
+
         return view('pmcore::timesheets.show', compact('timesheet'));
     }
 
@@ -232,15 +236,15 @@ class TimesheetController extends Controller
     public function edit($id)
     {
         $timesheet = Timesheet::findOrFail($id);
-        
-        if (!$timesheet->canBeEditedBy(Auth::user())) {
+
+        if (! $timesheet->canBeEditedBy(Auth::user())) {
             return Error::response(__('You do not have permission to edit this timesheet.'));
         }
-        
+
         $projects = Project::active()->get();
         // CRM tasks don't have direct project relationship, so we'll pass empty collection
         $tasks = collect();
-        
+
         return view('pmcore::timesheets.edit', compact('timesheet', 'projects', 'tasks'));
     }
 
@@ -250,8 +254,8 @@ class TimesheetController extends Controller
     public function update(Request $request, $id)
     {
         $timesheet = Timesheet::findOrFail($id);
-        
-        if (!$timesheet->canBeEditedBy(Auth::user())) {
+
+        if (! $timesheet->canBeEditedBy(Auth::user())) {
             return Error::response(__('You do not have permission to edit this timesheet.'));
         }
 
@@ -270,7 +274,7 @@ class TimesheetController extends Controller
         if ($validator->fails()) {
             return Error::response([
                 'message' => __('Validation failed'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
 
@@ -283,10 +287,11 @@ class TimesheetController extends Controller
 
             return Success::response([
                 'message' => __('Timesheet updated successfully!'),
-                'timesheet' => $timesheet
+                'timesheet' => $timesheet,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return Error::response(__('An error occurred while updating the timesheet.'));
         }
     }
@@ -297,13 +302,14 @@ class TimesheetController extends Controller
     public function destroy($id)
     {
         $timesheet = Timesheet::findOrFail($id);
-        
-        if (!$timesheet->canBeEditedBy(Auth::user())) {
+
+        if (! $timesheet->canBeEditedBy(Auth::user())) {
             return Error::response(__('You do not have permission to delete this timesheet.'));
         }
 
         try {
             $timesheet->delete();
+
             return Success::response(['message' => __('Timesheet deleted successfully!')]);
         } catch (\Exception $e) {
             return Error::response(__('An error occurred while deleting the timesheet.'));
@@ -316,21 +322,22 @@ class TimesheetController extends Controller
     public function approve($id)
     {
         $timesheet = Timesheet::findOrFail($id);
-        
+
         \Illuminate\Support\Facades\Log::debug('Approve timesheet attempt', [
             'timesheet_id' => $id,
             'timesheet_status' => $timesheet->status->value,
             'user_id' => Auth::id(),
             'user_roles' => Auth::user()->getRoleNames()->toArray(),
-            'is_project_manager' => $timesheet->project->project_manager_id === Auth::id()
+            'is_project_manager' => $timesheet->project->project_manager_id === Auth::id(),
         ]);
-        
-        if (!$timesheet->canBeApprovedBy(Auth::user())) {
+
+        if (! $timesheet->canBeApprovedBy(Auth::user())) {
             return Error::response(__('You do not have permission to approve this timesheet.'));
         }
 
         try {
             $timesheet->approve(Auth::user());
+
             return Success::response(['message' => __('Timesheet approved successfully!')]);
         } catch (\Exception $e) {
             return Error::response(__('An error occurred while approving the timesheet.'));
@@ -343,13 +350,14 @@ class TimesheetController extends Controller
     public function reject($id)
     {
         $timesheet = Timesheet::findOrFail($id);
-        
-        if (!$timesheet->canBeApprovedBy(Auth::user())) {
+
+        if (! $timesheet->canBeApprovedBy(Auth::user())) {
             return Error::response(__('You do not have permission to reject this timesheet.'));
         }
 
         try {
             $timesheet->reject(Auth::user());
+
             return Success::response(['message' => __('Timesheet rejected successfully!')]);
         } catch (\Exception $e) {
             return Error::response(__('An error occurred while rejecting the timesheet.'));
@@ -362,13 +370,14 @@ class TimesheetController extends Controller
     public function submit($id)
     {
         $timesheet = Timesheet::findOrFail($id);
-        
+
         if ($timesheet->user_id !== Auth::id()) {
             return Error::response(__('You can only submit your own timesheets.'));
         }
 
         try {
             $timesheet->submit();
+
             return Success::response(['message' => __('Timesheet submitted for approval!')]);
         } catch (\Exception $e) {
             return Error::response(__('An error occurred while submitting the timesheet.'));
@@ -412,7 +421,7 @@ class TimesheetController extends Controller
         }
 
         $baseQuery = clone $query;
-        
+
         $stats = [
             'total_hours' => $baseQuery->sum('hours'),
             'billable_hours' => (clone $query)->where('is_billable', true)->sum('hours'),

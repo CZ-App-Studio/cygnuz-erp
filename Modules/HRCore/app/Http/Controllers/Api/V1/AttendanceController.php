@@ -2,27 +2,26 @@
 
 namespace Modules\HRCore\app\Http\Controllers\Api\V1;
 
+use App\Models\SystemSetting;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Modules\HRCore\app\Http\Controllers\Api\BaseApiController;
 use Modules\HRCore\app\Models\Attendance;
 use Modules\HRCore\app\Models\AttendanceLog;
-use App\Models\SystemSetting;
 
 class AttendanceController extends BaseApiController
 {
-
     public function checkIn(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'notes' => 'nullable|string|max:500',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            'location_address' => 'nullable|string|max:500'
+            'location_address' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -46,9 +45,10 @@ class AttendanceController extends BaseApiController
 
             if ($existingAttendance) {
                 // Check if already checked in and not checked out
-                if ($existingAttendance->check_in_time && !$existingAttendance->check_out_time) {
-                    if (!$allowMultipleCheckin) {
+                if ($existingAttendance->check_in_time && ! $existingAttendance->check_out_time) {
+                    if (! $allowMultipleCheckin) {
                         DB::rollback();
+
                         return $this->errorResponse('You are already checked in. Please check out first.');
                     }
                 }
@@ -59,7 +59,7 @@ class AttendanceController extends BaseApiController
                 $existingAttendance->status = 'checked_in';
                 $existingAttendance->notes = $request->notes;
                 $existingAttendance->save();
-                
+
                 $attendance = $existingAttendance;
             } else {
                 // Create new attendance record
@@ -70,7 +70,7 @@ class AttendanceController extends BaseApiController
                     'status' => 'checked_in',
                     'shift_id' => $user->shift_id,
                     'department_id' => $user->department_id,
-                    'notes' => $request->notes
+                    'notes' => $request->notes,
                 ]);
             }
 
@@ -90,7 +90,7 @@ class AttendanceController extends BaseApiController
                 'device_type' => 'api',
                 'ip_address' => $request->ip(),
                 'verification_method' => 'api',
-                'created_by_id' => $user->id
+                'created_by_id' => $user->id,
             ]);
 
             DB::commit();
@@ -98,11 +98,12 @@ class AttendanceController extends BaseApiController
             return $this->successResponse([
                 'attendance_id' => $attendance->id,
                 'check_in_time' => $now->toIso8601String(),
-                'status' => $attendance->status
+                'status' => $attendance->status,
             ], 'Checked in successfully');
 
         } catch (\Exception $e) {
             DB::rollback();
+
             return $this->errorResponse('Failed to check in', null, 500);
         }
     }
@@ -113,7 +114,7 @@ class AttendanceController extends BaseApiController
             'notes' => 'nullable|string|max:500',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            'location_address' => 'nullable|string|max:500'
+            'location_address' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -133,33 +134,34 @@ class AttendanceController extends BaseApiController
                 ->whereNull('check_out_time')
                 ->first();
 
-            if (!$attendance) {
+            if (! $attendance) {
                 DB::rollback();
+
                 return $this->errorResponse('You are not checked in. Please check in first.');
             }
 
             // Update attendance with check-out time
             $attendance->check_out_time = $now;
             $attendance->status = 'checked_out';
-            
+
             // Calculate total hours worked
             if ($attendance->check_in_time) {
                 $checkIn = Carbon::parse($attendance->check_in_time);
                 $totalMinutes = $checkIn->diffInMinutes($now);
                 $attendance->working_hours = round($totalMinutes / 60, 2);
-                
+
                 // Calculate overtime (assuming 8 hours standard work day)
                 $standardHours = 8;
                 $overtimeHours = max(0, $attendance->working_hours - $standardHours);
                 $attendance->overtime_hours = round($overtimeHours, 2);
             }
-            
+
             if ($request->notes) {
-                $attendance->notes = $attendance->notes ? 
-                    $attendance->notes . ' | Checkout: ' . $request->notes : 
-                    'Checkout: ' . $request->notes;
+                $attendance->notes = $attendance->notes ?
+                    $attendance->notes.' | Checkout: '.$request->notes :
+                    'Checkout: '.$request->notes;
             }
-            
+
             $attendance->save();
 
             // Create attendance log
@@ -178,7 +180,7 @@ class AttendanceController extends BaseApiController
                 'device_type' => 'api',
                 'ip_address' => $request->ip(),
                 'verification_method' => 'api',
-                'created_by_id' => $user->id
+                'created_by_id' => $user->id,
             ]);
 
             DB::commit();
@@ -187,11 +189,12 @@ class AttendanceController extends BaseApiController
                 'attendance_id' => $attendance->id,
                 'check_out_time' => $now->toIso8601String(),
                 'total_hours' => $attendance->working_hours,
-                'overtime_hours' => $attendance->overtime_hours
+                'overtime_hours' => $attendance->overtime_hours,
             ], 'Checked out successfully');
 
         } catch (\Exception $e) {
             DB::rollback();
+
             return $this->errorResponse('Failed to check out', null, 500);
         }
     }
@@ -211,9 +214,9 @@ class AttendanceController extends BaseApiController
         $workingHours = null;
 
         if ($attendance) {
-            $isCheckedIn = $attendance->check_in_time && !$attendance->check_out_time;
+            $isCheckedIn = $attendance->check_in_time && ! $attendance->check_out_time;
             $checkInTime = $attendance->check_in_time;
-            
+
             if ($isCheckedIn && $attendance->check_in_time) {
                 $checkIn = Carbon::parse($attendance->check_in_time);
                 $workingMinutes = $checkIn->diffInMinutes(Carbon::now());
@@ -231,7 +234,7 @@ class AttendanceController extends BaseApiController
             'working_hours' => $workingHours,
             'total_hours' => $attendance ? $attendance->working_hours : null,
             'allow_multiple_checkin' => $allowMultipleCheckin,
-            'status' => $attendance ? $attendance->status : 'absent'
+            'status' => $attendance ? $attendance->status : 'absent',
         ], 'Attendance status retrieved');
     }
 
@@ -240,7 +243,7 @@ class AttendanceController extends BaseApiController
         $validator = Validator::make($request->all(), [
             'start_date' => 'nullable|date|date_format:Y-m-d',
             'end_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:start_date',
-            'page' => 'nullable|integer|min:1'
+            'page' => 'nullable|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -248,7 +251,7 @@ class AttendanceController extends BaseApiController
         }
 
         $user = Auth::user();
-        
+
         // Default to last 30 days if no dates provided
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->subDays(30);
         $endDate = $request->end_date ? Carbon::parse($request->end_date) : Carbon::now();
@@ -259,14 +262,14 @@ class AttendanceController extends BaseApiController
 
         $attendances = $query->paginate(20);
 
-        $data = $attendances->map(fn($attendance) => [
+        $data = $attendances->map(fn ($attendance) => [
             'id' => $attendance->id,
             'date' => $attendance->date->format('Y-m-d'),
             'check_in_time' => $attendance->check_in_time,
             'check_out_time' => $attendance->check_out_time,
             'total_hours' => $attendance->working_hours,
             'overtime_hours' => $attendance->overtime_hours,
-            'status' => $attendance->status
+            'status' => $attendance->status,
         ]);
 
         return response()->json([
@@ -277,15 +280,15 @@ class AttendanceController extends BaseApiController
                 'current_page' => $attendances->currentPage(),
                 'total' => $attendances->total(),
                 'per_page' => $attendances->perPage(),
-                'last_page' => $attendances->lastPage()
-            ]
+                'last_page' => $attendances->lastPage(),
+            ],
         ]);
     }
 
     public function logs(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'date' => 'nullable|date|date_format:Y-m-d'
+            'date' => 'nullable|date|date_format:Y-m-d',
         ]);
 
         if ($validator->fails()) {
@@ -300,7 +303,7 @@ class AttendanceController extends BaseApiController
             ->whereDate('date', $date)
             ->first();
 
-        if (!$attendance) {
+        if (! $attendance) {
             return $this->successResponse([], 'No attendance logs for this date');
         }
 
@@ -309,13 +312,13 @@ class AttendanceController extends BaseApiController
             ->where('user_id', $user->id)
             ->orderBy('logged_at', 'desc')
             ->get()
-            ->map(fn($log) => [
+            ->map(fn ($log) => [
                 'id' => $log->id,
                 'type' => $log->type,
                 'timestamp' => $log->logged_at,
                 'latitude' => $log->latitude,
                 'longitude' => $log->longitude,
-                'address' => $log->address
+                'address' => $log->address,
             ]);
 
         return $this->successResponse($logs, 'Attendance logs retrieved');

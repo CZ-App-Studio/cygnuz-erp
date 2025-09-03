@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\CRMCore\app\Http\Controllers\CompanyController;
 use Modules\CRMCore\app\Http\Controllers\ContactController;
+use Modules\CRMCore\app\Http\Controllers\CRMCoreSettingsController;
 use Modules\CRMCore\app\Http\Controllers\CustomerController;
 use Modules\CRMCore\app\Http\Controllers\CustomerGroupController;
 use Modules\CRMCore\app\Http\Controllers\DashboardController;
@@ -15,7 +16,6 @@ use Modules\CRMCore\app\Http\Controllers\LeadStatusController;
 use Modules\CRMCore\app\Http\Controllers\TaskController;
 use Modules\CRMCore\app\Http\Controllers\TaskPriorityController;
 use Modules\CRMCore\app\Http\Controllers\TaskStatusController;
-use Modules\CRMCore\app\Http\Controllers\CRMCoreSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{customer}/blacklist', [CustomerController::class, 'toggleBlacklist'])->name('blacklist');
         Route::get('/search/contacts', [CustomerController::class, 'searchContacts'])->name('search.contacts');
     });
-    
+
     // Customer Group Management
     Route::prefix('customer-groups')->name('customer-groups.')->group(function () {
         Route::get('/', [CustomerGroupController::class, 'index'])->name('index');

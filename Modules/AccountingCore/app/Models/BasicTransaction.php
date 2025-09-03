@@ -16,7 +16,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class BasicTransaction extends Model implements AuditableContract
 {
-    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait, HasFiles;
+    use AuditableTrait, HasFactory, HasFiles, SoftDeletes, UserActionsTrait;
 
     protected $table = 'basic_transactions';
 
@@ -229,7 +229,7 @@ class BasicTransaction extends Model implements AuditableContract
         if ($this->files()->count() > 0) {
             return true;
         }
-        
+
         // Fallback to legacy attachment path for backward compatibility
         return ! empty($this->attachment_path) && file_exists(storage_path('app/public/'.$this->attachment_path));
     }
@@ -244,15 +244,15 @@ class BasicTransaction extends Model implements AuditableContract
         if ($file) {
             return $file->url ?? asset('storage/'.$file->path);
         }
-        
+
         // Fallback to legacy attachment path for backward compatibility
         if (! empty($this->attachment_path) && file_exists(storage_path('app/public/'.$this->attachment_path))) {
             return asset('storage/'.$this->attachment_path);
         }
-        
+
         return null;
     }
-    
+
     /**
      * Get transaction attachments from FileManagerCore.
      */

@@ -7,11 +7,9 @@ use Illuminate\Http\JsonResponse;
 
 interface IAttendance
 {
+    public function getStatus(): JsonResponse;
 
-  public function getStatus(): JsonResponse;
+    public function checkInOut(CheckInOutRequest $data): JsonResponse;
 
-  public function checkInOut(CheckInOutRequest $data): JsonResponse;
-
-  public function isCheckedIn(): bool;
-
+    public function isCheckedIn(): bool;
 }

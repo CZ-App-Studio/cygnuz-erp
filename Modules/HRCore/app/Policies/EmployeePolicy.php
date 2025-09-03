@@ -194,7 +194,7 @@ class EmployeePolicy
         // Check hierarchical reporting (up to 3 levels)
         $currentManager = $employee->reportingTo;
         $levels = 0;
-        
+
         while ($currentManager && $levels < 3) {
             if ($currentManager->id === $manager->id) {
                 return true;

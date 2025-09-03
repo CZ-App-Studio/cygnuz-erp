@@ -2,14 +2,12 @@
 
 namespace Modules\PMCore\database\seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\User;
-use Modules\PMCore\app\Models\Project;
-use Modules\PMCore\app\Models\Timesheet;
-use Modules\PMCore\app\Enums\TimesheetStatus;
 use Modules\CRMCore\app\Models\Task;
+use Modules\PMCore\app\Enums\TimesheetStatus;
+use Modules\PMCore\app\Models\Project;
 
 class TimesheetSeeder extends Seeder
 {
@@ -21,9 +19,10 @@ class TimesheetSeeder extends Seeder
         // Get some users and projects
         $users = User::limit(10)->get();
         $projects = Project::limit(5)->get();
-        
+
         if ($users->isEmpty() || $projects->isEmpty()) {
             $this->command->warn('No users or projects found. Please seed users and projects first.');
+
             return;
         }
 
@@ -59,7 +58,7 @@ class TimesheetSeeder extends Seeder
             // Create timesheets for the last 30 days
             for ($daysAgo = 30; $daysAgo >= 0; $daysAgo--) {
                 $date = $now->copy()->subDays($daysAgo);
-                
+
                 // Skip weekends for more realistic data
                 if ($date->isWeekend()) {
                     continue;
@@ -72,10 +71,10 @@ class TimesheetSeeder extends Seeder
                 for ($i = 0; $i < $dailyEntries; $i++) {
                     // Get a random user that hasn't logged time today
                     $user = $users->filter(function ($u) use ($usedUsers) {
-                        return !in_array($u->id, $usedUsers);
+                        return ! in_array($u->id, $usedUsers);
                     })->random();
 
-                    if (!$user) {
+                    if (! $user) {
                         continue;
                     }
 
@@ -83,13 +82,13 @@ class TimesheetSeeder extends Seeder
 
                     // Random hours between 1 and 8
                     $hours = rand(1, 8) + (rand(0, 1) ? 0.5 : 0);
-                    
+
                     // 80% chance of being billable
                     $isBillable = rand(1, 10) <= 8;
-                    
+
                     // Random billing rate between 50-150
                     $billingRate = $isBillable ? rand(50, 150) : null;
-                    
+
                     // Cost rate is usually 40-60% of billing rate
                     $costRate = $billingRate ? round($billingRate * (rand(40, 60) / 100), 2) : null;
 
@@ -103,7 +102,7 @@ class TimesheetSeeder extends Seeder
                     } else {
                         // Very recent entries might be draft
                         $statusRand = rand(1, 3);
-                        $status = $statusRand == 1 ? TimesheetStatus::DRAFT : 
+                        $status = $statusRand == 1 ? TimesheetStatus::DRAFT :
                                  ($statusRand == 2 ? TimesheetStatus::SUBMITTED : TimesheetStatus::APPROVED);
                     }
 
@@ -124,7 +123,7 @@ class TimesheetSeeder extends Seeder
                     $timesheets[] = [
                         'user_id' => $user->id,
                         'project_id' => $project->id,
-                        'task_id' => !empty($projectTasks) && rand(1, 10) <= 7 ? $projectTasks[array_rand($projectTasks)] : null,
+                        'task_id' => ! empty($projectTasks) && rand(1, 10) <= 7 ? $projectTasks[array_rand($projectTasks)] : null,
                         'date' => $date->format('Y-m-d'),
                         'hours' => $hours,
                         'description' => $descriptions[array_rand($descriptions)],
@@ -162,7 +161,7 @@ class TimesheetSeeder extends Seeder
 
         $this->command->info('Timesheet Statistics:');
         foreach ($stats as $stat) {
-            $this->command->info("  - {$stat->status}: {$stat->count} entries, {$stat->total_hours} hours, Cost: $" . number_format($stat->total_cost, 2) . ", Revenue: $" . number_format($stat->total_revenue, 2));
+            $this->command->info("  - {$stat->status}: {$stat->count} entries, {$stat->total_hours} hours, Cost: $".number_format($stat->total_cost, 2).', Revenue: $'.number_format($stat->total_revenue, 2));
         }
 
         // Overall statistics
@@ -174,8 +173,8 @@ class TimesheetSeeder extends Seeder
         $this->command->info("  - Total Entries: {$overall->total_entries}");
         $this->command->info("  - Total Hours: {$overall->total_hours}");
         $this->command->info("  - Billable Hours: {$overall->billable_hours}");
-        $this->command->info("  - Total Cost: $" . number_format($overall->total_cost, 2));
-        $this->command->info("  - Total Revenue: $" . number_format($overall->total_revenue, 2));
-        $this->command->info("  - Profit Margin: $" . number_format($overall->total_revenue - $overall->total_cost, 2));
+        $this->command->info('  - Total Cost: $'.number_format($overall->total_cost, 2));
+        $this->command->info('  - Total Revenue: $'.number_format($overall->total_revenue, 2));
+        $this->command->info('  - Profit Margin: $'.number_format($overall->total_revenue - $overall->total_cost, 2));
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Traits;
 
 use App\Services\AddonService\AddonService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 trait HasImportExport
 {
@@ -14,6 +14,7 @@ trait HasImportExport
     protected function hasImportExport(): bool
     {
         $addonService = app(AddonService::class);
+
         return $addonService->isAddonEnabled('DataImportExport');
     }
 
@@ -22,7 +23,7 @@ trait HasImportExport
      */
     protected function getImportExportUrls(string $dataType): array
     {
-        if (!$this->hasImportExport()) {
+        if (! $this->hasImportExport()) {
             return [];
         }
 
@@ -38,7 +39,7 @@ trait HasImportExport
      */
     protected function getImportExportActions(string $dataType): array
     {
-        if (!$this->hasImportExport()) {
+        if (! $this->hasImportExport()) {
             return [];
         }
 
@@ -52,21 +53,21 @@ trait HasImportExport
                     [
                         'label' => __('Import Data'),
                         'icon' => 'bx bx-download',
-                        'url' => route('master-data.import-export.index', ['type' => $dataType, 'action' => 'import'])
+                        'url' => route('master-data.import-export.index', ['type' => $dataType, 'action' => 'import']),
                     ],
                     [
                         'label' => __('Export Data'),
                         'icon' => 'bx bx-upload',
-                        'url' => route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export'])
+                        'url' => route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export']),
                     ],
                     [
                         'label' => __('Download Template'),
                         'icon' => 'bx bx-file-blank',
                         'url' => route('master-data.import-export.template', ['type' => $dataType]),
-                        'target' => '_blank'
-                    ]
-                ]
-            ]
+                        'target' => '_blank',
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -75,7 +76,7 @@ trait HasImportExport
      */
     public function quickExport(Request $request, string $dataType): JsonResponse
     {
-        if (!$this->hasImportExport()) {
+        if (! $this->hasImportExport()) {
             return response()->json(['error' => 'Import/Export functionality is not available'], 404);
         }
 
@@ -86,14 +87,14 @@ trait HasImportExport
         // Delegate to DataImportExport addon
         if (class_exists('\Modules\DataImportExport\Http\Controllers\ExportController')) {
             $exportController = app('\Modules\DataImportExport\Http\Controllers\ExportController');
-            
+
             return $exportController->processMasterDataExport(
                 $request->merge([
                     'type' => $dataType,
                     'format' => $format,
                     'quick_export' => true,
                     'search' => $search,
-                    'filters' => $filters
+                    'filters' => $filters,
                 ])
             );
         }
@@ -106,43 +107,43 @@ trait HasImportExport
      */
     protected function getDataTableExportButtons(string $dataType): array
     {
-        if (!$this->hasImportExport()) {
+        if (! $this->hasImportExport()) {
             return [];
         }
 
         return [
             [
                 'extend' => 'collection',
-                'text' => '<i class="bx bx-download me-1"></i>' . __('Export'),
+                'text' => '<i class="bx bx-download me-1"></i>'.__('Export'),
                 'className' => 'btn btn-outline-secondary dropdown-toggle',
                 'buttons' => [
                     [
-                        'text' => '<i class="bx bx-file-blank me-2"></i>' . __('Excel'),
+                        'text' => '<i class="bx bx-file-blank me-2"></i>'.__('Excel'),
                         'action' => "function(e, dt, button, config) { 
-                            window.location.href = '" . route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export']) . "&format=xlsx';
-                        }"
+                            window.location.href = '".route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export'])."&format=xlsx';
+                        }",
                     ],
                     [
-                        'text' => '<i class="bx bx-file me-2"></i>' . __('CSV'),
+                        'text' => '<i class="bx bx-file me-2"></i>'.__('CSV'),
                         'action' => "function(e, dt, button, config) { 
-                            window.location.href = '" . route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export']) . "&format=csv';
-                        }"
+                            window.location.href = '".route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export'])."&format=csv';
+                        }",
                     ],
                     [
-                        'text' => '<i class="bx bx-file-pdf me-2"></i>' . __('PDF'),
+                        'text' => '<i class="bx bx-file-pdf me-2"></i>'.__('PDF'),
                         'action' => "function(e, dt, button, config) { 
-                            window.location.href = '" . route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export']) . "&format=pdf';
-                        }"
-                    ]
-                ]
+                            window.location.href = '".route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export'])."&format=pdf';
+                        }",
+                    ],
+                ],
             ],
             [
-                'text' => '<i class="bx bx-upload me-1"></i>' . __('Import'),
+                'text' => '<i class="bx bx-upload me-1"></i>'.__('Import'),
                 'className' => 'btn btn-outline-primary',
                 'action' => "function(e, dt, button, config) { 
-                    window.location.href = '" . route('master-data.import-export.index', ['type' => $dataType, 'action' => 'import']) . "';
-                }"
-            ]
+                    window.location.href = '".route('master-data.import-export.index', ['type' => $dataType, 'action' => 'import'])."';
+                }",
+            ],
         ];
     }
 
@@ -151,7 +152,7 @@ trait HasImportExport
      */
     protected function getImportExportMeta(string $dataType): array
     {
-        if (!$this->hasImportExport()) {
+        if (! $this->hasImportExport()) {
             return [];
         }
 
@@ -159,7 +160,7 @@ trait HasImportExport
             'data-import-url' => route('master-data.import-export.index', ['type' => $dataType, 'action' => 'import']),
             'data-export-url' => route('master-data.import-export.index', ['type' => $dataType, 'action' => 'export']),
             'data-template-url' => route('master-data.import-export.template', ['type' => $dataType]),
-            'data-has-import-export' => 'true'
+            'data-has-import-export' => 'true',
         ];
     }
 
@@ -198,7 +199,7 @@ trait HasImportExport
      */
     protected function getImportExportJsConfig(string $dataType): array
     {
-        if (!$this->hasImportExport()) {
+        if (! $this->hasImportExport()) {
             return [];
         }
 
@@ -210,7 +211,7 @@ trait HasImportExport
                 'export' => route('master-data.import-export.export'),
                 'template' => route('master-data.import-export.template'),
                 'status' => route('master-data.import-export.status'),
-                'quickExport' => route('master-data.quick-export', ['type' => $dataType])
+                'quickExport' => route('master-data.quick-export', ['type' => $dataType]),
             ],
             'permissions' => $this->getImportExportPermissions(),
             'labels' => [
@@ -224,7 +225,7 @@ trait HasImportExport
                 'exportSuccess' => __('Data exported successfully'),
                 'importError' => __('Import failed'),
                 'exportError' => __('Export failed'),
-            ]
+            ],
         ];
     }
 }

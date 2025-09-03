@@ -2,21 +2,21 @@
 
 namespace Modules\FileManagerCore\Services;
 
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
-use Modules\FileManagerCore\Models\File;
-use Modules\FileManagerCore\Services\FileManagerSettingsService;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
+use Modules\FileManagerCore\Models\File;
 
 class ThumbnailService
 {
     protected ImageManager $imageManager;
+
     protected FileManagerSettingsService $settingsService;
 
     public function __construct(FileManagerSettingsService $settingsService)
     {
         $this->settingsService = $settingsService;
-        $this->imageManager = new ImageManager(new Driver());
+        $this->imageManager = new ImageManager(new Driver);
     }
 
     /**
@@ -24,11 +24,11 @@ class ThumbnailService
      */
     public function generateThumbnail(File $file): ?string
     {
-        if (!$this->settingsService->isThumbnailEnabled()) {
+        if (! $this->settingsService->isThumbnailEnabled()) {
             return null;
         }
 
-        if (!$this->canGenerateThumbnail($file)) {
+        if (! $this->canGenerateThumbnail($file)) {
             return null;
         }
 
@@ -38,7 +38,7 @@ class ThumbnailService
             $thumbnailDisk = Storage::disk($config['disk']);
 
             // Check if source file exists
-            if (!$sourceDisk->exists($file->path)) {
+            if (! $sourceDisk->exists($file->path)) {
                 return null;
             }
 
@@ -65,11 +65,11 @@ class ThumbnailService
 
         } catch (\Exception $e) {
             // Log error and return null
-            \Log::error('Thumbnail generation failed: ' . $e->getMessage(), [
+            \Log::error('Thumbnail generation failed: '.$e->getMessage(), [
                 'file_id' => $file->id,
-                'file_path' => $file->path
+                'file_path' => $file->path,
             ]);
-            
+
             return null;
         }
     }
@@ -79,15 +79,15 @@ class ThumbnailService
      */
     public function canGenerateThumbnail(File $file): bool
     {
-        if (!$this->settingsService->isThumbnailEnabled()) {
+        if (! $this->settingsService->isThumbnailEnabled()) {
             return false;
         }
 
         // Check if file is an image
         $imageTypes = $this->settingsService->getAllowedImageTypes();
-        
+
         // Remove SVG from thumbnail generation as it's not supported by Intervention Image
-        $supportedTypes = array_filter($imageTypes, function($type) {
+        $supportedTypes = array_filter($imageTypes, function ($type) {
             return $type !== 'image/svg+xml';
         });
 
@@ -100,13 +100,13 @@ class ThumbnailService
     protected function generateThumbnailPath(File $file): string
     {
         $pathInfo = pathinfo($file->path);
-        $directory = isset($pathInfo['dirname']) && $pathInfo['dirname'] !== '.' 
-            ? $pathInfo['dirname'] . '/thumbnails/' 
+        $directory = isset($pathInfo['dirname']) && $pathInfo['dirname'] !== '.'
+            ? $pathInfo['dirname'].'/thumbnails/'
             : 'thumbnails/';
-        
-        $filename = $pathInfo['filename'] . '_thumb.jpg';
-        
-        return $directory . $filename;
+
+        $filename = $pathInfo['filename'].'_thumb.jpg';
+
+        return $directory.$filename;
     }
 
     /**
@@ -121,18 +121,18 @@ class ThumbnailService
         try {
             $config = $this->settingsService->getThumbnailConfig();
             $thumbnailDisk = Storage::disk($config['disk']);
-            
+
             if ($thumbnailDisk->exists($file->thumbnail_path)) {
                 return $thumbnailDisk->delete($file->thumbnail_path);
             }
-            
+
             return true;
         } catch (\Exception $e) {
-            \Log::error('Thumbnail deletion failed: ' . $e->getMessage(), [
+            \Log::error('Thumbnail deletion failed: '.$e->getMessage(), [
                 'file_id' => $file->id,
-                'thumbnail_path' => $file->thumbnail_path
+                'thumbnail_path' => $file->thumbnail_path,
             ]);
-            
+
             return false;
         }
     }
@@ -148,7 +148,7 @@ class ThumbnailService
 
         $config = $this->settingsService->getThumbnailConfig();
         $thumbnailDisk = Storage::disk($config['disk']);
-        
+
         try {
             return $thumbnailDisk->url($file->thumbnail_path);
         } catch (\Exception $e) {
@@ -163,7 +163,7 @@ class ThumbnailService
     {
         // Delete existing thumbnail
         $this->deleteThumbnail($file);
-        
+
         // Generate new thumbnail
         return $this->generateThumbnail($file);
     }
@@ -174,22 +174,22 @@ class ThumbnailService
     public function batchGenerateThumbnails(array $files): array
     {
         $results = [];
-        
+
         foreach ($files as $file) {
             if ($file instanceof File) {
                 $thumbnailPath = $this->generateThumbnail($file);
                 $results[$file->id] = [
-                    'success' => !is_null($thumbnailPath),
-                    'thumbnail_path' => $thumbnailPath
+                    'success' => ! is_null($thumbnailPath),
+                    'thumbnail_path' => $thumbnailPath,
                 ];
-                
+
                 // Update file record if thumbnail was generated
                 if ($thumbnailPath) {
                     $file->update(['thumbnail_path' => $thumbnailPath]);
                 }
             }
         }
-        
+
         return $results;
     }
 
@@ -201,24 +201,24 @@ class ThumbnailService
         $config = $this->settingsService->getThumbnailConfig();
         $thumbnailDisk = Storage::disk($config['disk']);
         $cleaned = 0;
-        
+
         try {
             // Get all thumbnail files
             $thumbnailFiles = $thumbnailDisk->allFiles('thumbnails');
-            
+
             foreach ($thumbnailFiles as $thumbnailPath) {
                 // Check if corresponding file record exists
                 $fileExists = File::where('thumbnail_path', $thumbnailPath)->exists();
-                
-                if (!$fileExists) {
+
+                if (! $fileExists) {
                     $thumbnailDisk->delete($thumbnailPath);
                     $cleaned++;
                 }
             }
         } catch (\Exception $e) {
-            \Log::error('Thumbnail cleanup failed: ' . $e->getMessage());
+            \Log::error('Thumbnail cleanup failed: '.$e->getMessage());
         }
-        
+
         return $cleaned;
     }
 
@@ -229,13 +229,13 @@ class ThumbnailService
     {
         $totalFiles = File::whereNotNull('thumbnail_path')->count();
         $totalImages = File::whereIn('mime_type', $this->settingsService->getAllowedImageTypes())->count();
-        
+
         return [
             'total_thumbnails' => $totalFiles,
             'total_images' => $totalImages,
             'thumbnail_coverage' => $totalImages > 0 ? round(($totalFiles / $totalImages) * 100, 2) : 0,
             'thumbnail_enabled' => $this->settingsService->isThumbnailEnabled(),
-            'config' => $this->settingsService->getThumbnailConfig()
+            'config' => $this->settingsService->getThumbnailConfig(),
         ];
     }
 }

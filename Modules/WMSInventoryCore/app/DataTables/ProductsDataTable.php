@@ -2,20 +2,18 @@
 
 namespace Modules\WMSInventoryCore\app\DataTables;
 
+use App\Helpers\FormattingHelper;
 use Modules\WMSInventoryCore\app\Models\Product;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
-use App\Helpers\FormattingHelper;
 
 class ProductsDataTable extends DataTable
 {
     /**
      * Build DataTable class.
      *
-     * @param mixed $query Results from query() method.
+     * @param  mixed  $query  Results from query() method.
      * @return \Yajra\DataTables\DataTableAbstract
      */
     public function dataTable($query)
@@ -40,7 +38,6 @@ class ProductsDataTable extends DataTable
     /**
      * Get query source of dataTable.
      *
-     * @param \Modules\WMSInventoryCore\app\Models\Product $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function query(Product $model)
@@ -70,7 +67,7 @@ class ProductsDataTable extends DataTable
             )
             ->parameters([
                 'responsive' => true,
-                'autoWidth' => false
+                'autoWidth' => false,
             ]);
     }
 
@@ -101,11 +98,9 @@ class ProductsDataTable extends DataTable
 
     /**
      * Get filename for export.
-     *
-     * @return string
      */
     protected function filename(): string
     {
-        return 'Products_' . date('YmdHis');
+        return 'Products_'.date('YmdHis');
     }
 }

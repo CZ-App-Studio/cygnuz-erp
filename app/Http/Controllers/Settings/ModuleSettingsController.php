@@ -24,19 +24,19 @@ class ModuleSettingsController extends Controller
     public function index(string $module): View
     {
         $moduleConfig = $this->registry->getModuleConfig($module);
-        
-        if (!$moduleConfig) {
+
+        if (! $moduleConfig) {
             abort(404, __('Module settings not found'));
         }
 
         // Check permissions
-        if (!empty($moduleConfig['permissions'])) {
+        if (! empty($moduleConfig['permissions'])) {
             $this->authorize('any', $moduleConfig['permissions']);
         }
 
         // Get module handler
         $handlerClass = $moduleConfig['handler'];
-        if (!class_exists($handlerClass)) {
+        if (! class_exists($handlerClass)) {
             abort(500, __('Module settings handler not found'));
         }
 
@@ -54,16 +54,16 @@ class ModuleSettingsController extends Controller
     public function update(Request $request, string $module): JsonResponse
     {
         $moduleConfig = $this->registry->getModuleConfig($module);
-        
-        if (!$moduleConfig) {
+
+        if (! $moduleConfig) {
             return response()->json([
                 'success' => false,
-                'message' => __('Module settings not found')
+                'message' => __('Module settings not found'),
             ], 404);
         }
 
         // Check permissions
-        if (!empty($moduleConfig['permissions'])) {
+        if (! empty($moduleConfig['permissions'])) {
             $this->authorize('any', $moduleConfig['permissions']);
         }
 
@@ -76,12 +76,12 @@ class ModuleSettingsController extends Controller
 
             // Save settings through handler
             $data = $request->except(['_token', '_method']);
-            
-            if (!$handler->saveSettings($data)) {
+
+            if (! $handler->saveSettings($data)) {
                 return response()->json([
                     'success' => false,
                     'message' => __('Validation failed'),
-                    'errors' => $handler->validateSettings($data)['errors'] ?? []
+                    'errors' => $handler->validateSettings($data)['errors'] ?? [],
                 ], 422);
             }
 
@@ -89,16 +89,16 @@ class ModuleSettingsController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => __('Module settings updated successfully')
+                'message' => __('Module settings updated successfully'),
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error updating module settings for {$module}: " . $e->getMessage());
-            
+            Log::error("Error updating module settings for {$module}: ".$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => __('Failed to update module settings')
+                'message' => __('Failed to update module settings'),
             ], 500);
         }
     }
@@ -109,13 +109,13 @@ class ModuleSettingsController extends Controller
     public function getModuleForm(string $module)
     {
         $moduleConfig = $this->registry->getModuleConfig($module);
-        
-        if (!$moduleConfig) {
+
+        if (! $moduleConfig) {
             return response('<div class="alert alert-danger">Module settings not found</div>', 404);
         }
 
         // Check permissions
-        if (!empty($moduleConfig['permissions'])) {
+        if (! empty($moduleConfig['permissions'])) {
             try {
                 $this->authorize('any', $moduleConfig['permissions']);
             } catch (\Exception $e) {
@@ -126,7 +126,7 @@ class ModuleSettingsController extends Controller
         // Get module handler
         $handlerClass = $moduleConfig['handler'];
         $handler = app($handlerClass);
-        
+
         $settings = $handler->getSettingsDefinition();
         $values = $handler->getCurrentValues();
 
@@ -139,16 +139,16 @@ class ModuleSettingsController extends Controller
     public function reset(string $module): JsonResponse
     {
         $moduleConfig = $this->registry->getModuleConfig($module);
-        
-        if (!$moduleConfig) {
+
+        if (! $moduleConfig) {
             return response()->json([
                 'success' => false,
-                'message' => __('Module settings not found')
+                'message' => __('Module settings not found'),
             ], 404);
         }
 
         // Check permissions
-        if (!empty($moduleConfig['permissions'])) {
+        if (! empty($moduleConfig['permissions'])) {
             $this->authorize('any', $moduleConfig['permissions']);
         }
 
@@ -161,11 +161,11 @@ class ModuleSettingsController extends Controller
 
             // Reset settings through handler
             $defaultValues = $handler->getDefaultValues();
-            
-            if (!$handler->saveSettings($defaultValues)) {
+
+            if (! $handler->saveSettings($defaultValues)) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('Failed to reset settings')
+                    'message' => __('Failed to reset settings'),
                 ], 500);
             }
 
@@ -173,16 +173,16 @@ class ModuleSettingsController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => __('Module settings reset to defaults successfully')
+                'message' => __('Module settings reset to defaults successfully'),
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error resetting module settings for {$module}: " . $e->getMessage());
-            
+            Log::error("Error resetting module settings for {$module}: ".$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => __('Failed to reset module settings')
+                'message' => __('Failed to reset module settings'),
             ], 500);
         }
     }

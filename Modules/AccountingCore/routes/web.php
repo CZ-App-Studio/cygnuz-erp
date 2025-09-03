@@ -2,11 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\AccountingCore\app\Http\Controllers\AccountingCoreController;
-use Modules\AccountingCore\app\Http\Controllers\DashboardController;
-use Modules\AccountingCore\app\Http\Controllers\TransactionController;
 use Modules\AccountingCore\app\Http\Controllers\CategoryController;
+use Modules\AccountingCore\app\Http\Controllers\DashboardController;
 use Modules\AccountingCore\app\Http\Controllers\ReportsController;
 use Modules\AccountingCore\app\Http\Controllers\TaxRateController;
+use Modules\AccountingCore\app\Http\Controllers\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,11 +22,11 @@ use Modules\AccountingCore\app\Http\Controllers\TaxRateController;
 Route::prefix('accountingcore')->name('accountingcore.')->middleware(['auth', 'web'])->group(function () {
     // Main redirect
     Route::get('/', [AccountingCoreController::class, 'index'])->name('index');
-    
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/statistics', [DashboardController::class, 'statistics'])->name('statistics');
-    
+
     // Transactions
     Route::prefix('transactions')->name('transactions.')->group(function () {
         Route::get('/', [TransactionController::class, 'index'])->name('index');
@@ -40,7 +40,7 @@ Route::prefix('accountingcore')->name('accountingcore.')->middleware(['auth', 'w
         Route::delete('/{id}/attachment', [TransactionController::class, 'deleteAttachment'])->name('delete-attachment');
         Route::get('/{id}/attachment/download/{fileId?}', [TransactionController::class, 'downloadAttachment'])->name('download-attachment');
     });
-    
+
     // Categories
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
@@ -51,7 +51,7 @@ Route::prefix('accountingcore')->name('accountingcore.')->middleware(['auth', 'w
         Route::put('/{id}', [CategoryController::class, 'update'])->name('update');
         Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('destroy');
     });
-    
+
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [ReportsController::class, 'index'])->name('index');
@@ -63,7 +63,7 @@ Route::prefix('accountingcore')->name('accountingcore.')->middleware(['auth', 'w
         Route::get('/cashflow/export-pdf', [ReportsController::class, 'exportCashflowPdf'])->name('cashflow.export-pdf');
         Route::get('/category-performance', [ReportsController::class, 'categoryPerformance'])->name('category-performance');
     });
-    
+
     // Tax Rates
     Route::prefix('tax-rates')->name('tax-rates.')->group(function () {
         Route::get('/', [TaxRateController::class, 'index'])->name('index');

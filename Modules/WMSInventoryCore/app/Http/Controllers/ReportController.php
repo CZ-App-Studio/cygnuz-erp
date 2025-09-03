@@ -2,14 +2,13 @@
 
 namespace Modules\WMSInventoryCore\app\Http\Controllers;
 
+use App\Helpers\FormattingHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Modules\WMSInventoryCore\Models\Product;
 use Modules\WMSInventoryCore\Models\Inventory;
+use Modules\WMSInventoryCore\Models\Product;
 use Modules\WMSInventoryCore\Models\Warehouse;
-use App\Helpers\FormattingHelper;
 
 class ReportController extends Controller
 {

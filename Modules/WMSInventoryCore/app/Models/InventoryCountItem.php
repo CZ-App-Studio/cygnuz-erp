@@ -19,14 +19,14 @@ class InventoryCountItem extends Model
         'status',
         'is_adjusted',
         'adjustment_id',
-        'counted_by_id'
+        'counted_by_id',
     ];
 
     protected $casts = [
         'expected_quantity' => 'integer',
         'counted_quantity' => 'integer',
         'difference' => 'integer',
-        'is_adjusted' => 'boolean'
+        'is_adjusted' => 'boolean',
     ];
 
     /**
@@ -90,7 +90,9 @@ class InventoryCountItem extends Model
      */
     public function getVariancePercentageAttribute()
     {
-        if (!$this->expected_quantity) return 0;
+        if (! $this->expected_quantity) {
+            return 0;
+        }
 
         return ($this->difference / $this->expected_quantity) * 100;
     }

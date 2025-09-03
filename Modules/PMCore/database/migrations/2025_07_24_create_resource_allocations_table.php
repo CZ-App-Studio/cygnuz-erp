@@ -30,19 +30,19 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by_id');
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('user_id');
             $table->index('project_id');
             $table->index(['start_date', 'end_date']);
             $table->index('status');
             $table->index(['user_id', 'start_date', 'end_date']);
-            
+
             // Foreign keys (nullable for cross-module compatibility)
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
         });
-        
+
         // Create resource capacity table for tracking availability
         Schema::create('resource_capacities', function (Blueprint $table) {
             $table->id();
@@ -55,12 +55,12 @@ return new class extends Migration
             $table->string('leave_type')->nullable(); // holiday, vacation, sick, etc.
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             // Indexes
             $table->unique(['user_id', 'date']);
             $table->index('date');
             $table->index(['user_id', 'date']);
-            
+
             // Foreign keys
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

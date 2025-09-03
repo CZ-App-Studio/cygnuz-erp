@@ -15,7 +15,7 @@ enum LeaveRequestStatus: string
      */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => __('Pending'),
             self::APPROVED => __('Approved'),
             self::REJECTED => __('Rejected'),
@@ -29,7 +29,7 @@ enum LeaveRequestStatus: string
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'warning',
             self::APPROVED => 'success',
             self::REJECTED => 'danger',
@@ -43,6 +43,6 @@ enum LeaveRequestStatus: string
      */
     public function badge(): string
     {
-        return '<span class="badge bg-label-' . $this->color() . '">' . $this->label() . '</span>';
+        return '<span class="badge bg-label-'.$this->color().'">'.$this->label().'</span>';
     }
 }

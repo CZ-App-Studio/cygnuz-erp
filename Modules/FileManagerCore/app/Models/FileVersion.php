@@ -2,9 +2,9 @@
 
 namespace Modules\FileManagerCore\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class FileVersion extends Model
 {
@@ -19,12 +19,12 @@ class FileVersion extends Model
         'size',
         'checksum',
         'change_description',
-        'created_by_id'
+        'created_by_id',
     ];
 
     protected $casts = [
         'version_number' => 'integer',
-        'size' => 'integer'
+        'size' => 'integer',
     ];
 
     /**
@@ -57,11 +57,11 @@ class FileVersion extends Model
     private function formatBytes(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 }

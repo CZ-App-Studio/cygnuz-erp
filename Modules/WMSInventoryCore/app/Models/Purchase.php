@@ -13,7 +13,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Purchase extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'purchases';
 
@@ -45,7 +45,7 @@ class Purchase extends Model implements Auditable
         'received_by_id',
         'received_at',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -63,7 +63,7 @@ class Purchase extends Model implements Auditable
         'paid_amount' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -136,7 +136,7 @@ class Purchase extends Model implements Auditable
     public function isFullyReceived()
     {
         foreach ($this->products as $purchaseProduct) {
-            if (!$purchaseProduct->is_fully_received) {
+            if (! $purchaseProduct->is_fully_received) {
                 return false;
             }
         }
@@ -150,9 +150,12 @@ class Purchase extends Model implements Auditable
     public function getReceivingProgressAttribute()
     {
         $totalItems = $this->products->count();
-        if ($totalItems === 0) return 0;
+        if ($totalItems === 0) {
+            return 0;
+        }
 
         $receivedItems = $this->products->where('is_fully_received', true)->count();
+
         return ($receivedItems / $totalItems) * 100;
     }
 }

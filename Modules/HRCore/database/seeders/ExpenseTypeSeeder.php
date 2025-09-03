@@ -2,10 +2,10 @@
 
 namespace Modules\HRCore\Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Modules\HRCore\app\Models\ExpenseType;
-use Illuminate\Support\Facades\DB;
 use App\Enums\Status;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Modules\HRCore\app\Models\ExpenseType;
 
 class ExpenseTypeSeeder extends Seeder
 {
@@ -308,7 +308,7 @@ class ExpenseTypeSeeder extends Seeder
             $this->command->info('Expense types seeded successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->command->error('Error seeding expense types: ' . $e->getMessage());
+            $this->command->error('Error seeding expense types: '.$e->getMessage());
         }
     }
 }

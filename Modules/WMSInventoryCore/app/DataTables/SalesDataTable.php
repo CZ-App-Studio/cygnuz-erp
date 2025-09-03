@@ -2,20 +2,18 @@
 
 namespace Modules\WMSInventoryCore\app\DataTables;
 
+use App\Helpers\FormattingHelper;
 use Modules\WMSInventoryCore\Models\Sale;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
-use App\Helpers\FormattingHelper;
 
 class SalesDataTable extends DataTable
 {
     /**
      * Build DataTable class.
      *
-     * @param mixed $query Results from query() method.
+     * @param  mixed  $query  Results from query() method.
      * @return \Yajra\DataTables\DataTableAbstract
      */
     public function dataTable($query)
@@ -27,29 +25,30 @@ class SalesDataTable extends DataTable
                 $editUrl = route('wmsinventorycore.sales.edit', $sale->id);
 
                 $actions = '<div class="d-inline-block">';
-                $actions .= '<a href="' . $showUrl . '" class="btn btn-sm btn-icon" title="' . __('View Details') . '">';
+                $actions .= '<a href="'.$showUrl.'" class="btn btn-sm btn-icon" title="'.__('View Details').'">';
                 $actions .= '<i class="ti ti-eye"></i>';
                 $actions .= '</a>';
 
                 if ($sale->status === 'pending' || $sale->status === 'draft') {
-                    $actions .= '<a href="' . $editUrl . '" class="btn btn-sm btn-icon" title="' . __('Edit') . '">';
+                    $actions .= '<a href="'.$editUrl.'" class="btn btn-sm btn-icon" title="'.__('Edit').'">';
                     $actions .= '<i class="ti ti-pencil"></i>';
                     $actions .= '</a>';
                 }
 
                 if ($sale->status === 'pending') {
-                    $actions .= '<button class="btn btn-sm btn-icon confirm-record" data-id="' . $sale->id . '" title="' . __('Confirm') . '">';
+                    $actions .= '<button class="btn btn-sm btn-icon confirm-record" data-id="'.$sale->id.'" title="'.__('Confirm').'">';
                     $actions .= '<i class="ti ti-check"></i>';
                     $actions .= '</button>';
                 }
 
                 if ($sale->status === 'draft' || $sale->status === 'pending') {
-                    $actions .= '<button class="btn btn-sm btn-icon delete-record" data-id="' . $sale->id . '" title="' . __('Delete') . '">';
+                    $actions .= '<button class="btn btn-sm btn-icon delete-record" data-id="'.$sale->id.'" title="'.__('Delete').'">';
                     $actions .= '<i class="ti ti-trash"></i>';
                     $actions .= '</button>';
                 }
 
                 $actions .= '</div>';
+
                 return $actions;
             })
             ->addColumn('customer', function ($sale) {
@@ -70,22 +69,22 @@ class SalesDataTable extends DataTable
                     'pending' => 'warning',
                     'confirmed' => 'info',
                     'completed' => 'success',
-                    'cancelled' => 'danger'
+                    'cancelled' => 'danger',
                 ];
                 $statusColor = $statusColors[$sale->status] ?? 'secondary';
 
-                return '<span class="badge bg-label-' . $statusColor . '">' . strtoupper($sale->status) . '</span>';
+                return '<span class="badge bg-label-'.$statusColor.'">'.strtoupper($sale->status).'</span>';
             })
             ->editColumn('payment_status', function ($sale) {
                 $statusColors = [
                     'unpaid' => 'danger',
                     'partially_paid' => 'warning',
                     'paid' => 'success',
-                    'overdue' => 'dark'
+                    'overdue' => 'dark',
                 ];
                 $statusColor = $statusColors[$sale->payment_status] ?? 'secondary';
 
-                return '<span class="badge bg-label-' . $statusColor . '">' . strtoupper(str_replace('_', ' ', $sale->payment_status)) . '</span>';
+                return '<span class="badge bg-label-'.$statusColor.'">'.strtoupper(str_replace('_', ' ', $sale->payment_status)).'</span>';
             })
             ->editColumn('fulfillment_status', function ($sale) {
                 $statusColors = [
@@ -93,11 +92,11 @@ class SalesDataTable extends DataTable
                     'processing' => 'info',
                     'shipped' => 'primary',
                     'delivered' => 'success',
-                    'cancelled' => 'danger'
+                    'cancelled' => 'danger',
                 ];
                 $statusColor = $statusColors[$sale->fulfillment_status] ?? 'secondary';
 
-                return '<span class="badge bg-label-' . $statusColor . '">' . strtoupper(str_replace('_', ' ', $sale->fulfillment_status)) . '</span>';
+                return '<span class="badge bg-label-'.$statusColor.'">'.strtoupper(str_replace('_', ' ', $sale->fulfillment_status)).'</span>';
             })
             ->rawColumns(['actions', 'status', 'payment_status', 'fulfillment_status'])
             ->filter(function ($query) {
@@ -138,7 +137,6 @@ class SalesDataTable extends DataTable
     /**
      * Get query source of dataTable.
      *
-     * @param \Modules\WMSInventoryCore\Models\Sale $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function query(Sale $model)
@@ -168,7 +166,7 @@ class SalesDataTable extends DataTable
             )
             ->parameters([
                 'responsive' => true,
-                'autoWidth' => false
+                'autoWidth' => false,
             ]);
     }
 
@@ -200,11 +198,9 @@ class SalesDataTable extends DataTable
 
     /**
      * Get filename for export.
-     *
-     * @return string
      */
     protected function filename(): string
     {
-        return 'Sales_' . date('YmdHis');
+        return 'Sales_'.date('YmdHis');
     }
 }

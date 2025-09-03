@@ -16,7 +16,7 @@ class SettingsService implements SettingsInterface
     public function get(string $key, $default = null)
     {
         $settings = $this->getAllCached();
-        
+
         return data_get($settings, $key, $default);
     }
 
@@ -27,8 +27,8 @@ class SettingsService implements SettingsInterface
     {
         $setting = SystemSetting::where('key', $key)->first();
         $oldValue = $setting?->value;
-        
-        if (!$setting) {
+
+        if (! $setting) {
             // If setting doesn't exist, create it
             $setting = SystemSetting::create([
                 'key' => $key,
@@ -40,15 +40,15 @@ class SettingsService implements SettingsInterface
             $setting->value = $value;
             $setting->save();
         }
-        
+
         // Log the change
         if ($oldValue !== $value) {
             SettingHistory::logChange('system', $key, $oldValue, $value);
         }
-        
+
         // Clear cache
         $this->clearCache();
-        
+
         return true;
     }
 
@@ -69,7 +69,7 @@ class SettingsService implements SettingsInterface
     {
         $settings = $this->getAllCached();
         $result = [];
-        
+
         foreach ($keys as $key => $default) {
             if (is_numeric($key)) {
                 $result[$default] = data_get($settings, $default);
@@ -77,7 +77,7 @@ class SettingsService implements SettingsInterface
                 $result[$key] = data_get($settings, $key, $default);
             }
         }
-        
+
         return $result;
     }
 
@@ -89,7 +89,7 @@ class SettingsService implements SettingsInterface
         foreach ($settings as $key => $value) {
             $this->set($key, $value);
         }
-        
+
         return true;
     }
 
@@ -99,18 +99,19 @@ class SettingsService implements SettingsInterface
     public function delete(string $key): bool
     {
         $setting = SystemSetting::where('key', $key)->first();
-        
+
         if ($setting) {
             $oldValue = $setting->value;
             $setting->delete();
-            
+
             // Log the deletion
             SettingHistory::logChange('system', $key, $oldValue, null);
-            
+
             $this->clearCache();
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -160,15 +161,15 @@ class SettingsService implements SettingsInterface
         if (is_bool($value)) {
             return 'boolean';
         }
-        
+
         if (is_int($value)) {
             return 'integer';
         }
-        
+
         if (is_array($value) || is_object($value)) {
             return 'json';
         }
-        
+
         return 'string';
     }
 
@@ -178,7 +179,7 @@ class SettingsService implements SettingsInterface
     private function detectCategory(string $key): string
     {
         $parts = explode('_', $key);
-        
+
         // Map common prefixes to categories
         $categoryMap = [
             'app' => 'general',
@@ -189,13 +190,13 @@ class SettingsService implements SettingsInterface
             'payroll' => 'payroll',
             'm_' => 'mobile',
         ];
-        
+
         foreach ($categoryMap as $prefix => $category) {
             if (str_starts_with($key, $prefix)) {
                 return $category;
             }
         }
-        
+
         return 'general';
     }
 }

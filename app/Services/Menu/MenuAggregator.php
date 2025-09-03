@@ -2,15 +2,17 @@
 
 namespace App\Services\Menu;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\File;
 use App\Services\AddonService\IAddonService;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 
 class MenuAggregator
 {
     protected IAddonService $addonService;
+
     protected array $menuCache = [];
+
     protected int $cacheTime = 3600; // 1 hour cache
 
     public function __construct(IAddonService $addonService)
@@ -25,7 +27,7 @@ class MenuAggregator
     {
         $cacheKey = "menu.aggregated.{$menuType}";
 
-        if (!$forceRefresh && Cache::has($cacheKey)) {
+        if (! $forceRefresh && Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
 
@@ -41,7 +43,7 @@ class MenuAggregator
     protected function aggregateMenus(string $menuType): array
     {
         $menus = collect();
-        
+
         // 1. Load core menu (system essentials only)
         $coreMenu = $this->loadCoreMenu($menuType);
         if ($coreMenu) {
@@ -66,9 +68,9 @@ class MenuAggregator
     protected function loadCoreMenu(string $menuType): ?Collection
     {
         $corePath = base_path("resources/menu/core/{$menuType}Menu.json");
-        
+
         // If core menu doesn't exist, use existing main menu but filter to essentials
-        if (!File::exists($corePath)) {
+        if (! File::exists($corePath)) {
             $mainPath = base_path("resources/menu/{$menuType}Menu.json");
             if (File::exists($mainPath)) {
                 $content = json_decode(File::get($mainPath), true);
@@ -79,16 +81,17 @@ class MenuAggregator
                         if (isset($item['menuHeader'])) {
                             return in_array($item['menuHeader'], [
                                 'Dashboard',
-                                'System Management'
+                                'System Management',
                             ]);
                         }
+
                         // Keep core system items without addon
-                        return !isset($item['addon']) && in_array($item['slug'] ?? '', [
+                        return ! isset($item['addon']) && in_array($item['slug'] ?? '', [
                             'dashboard',
                             'users.index',
                             'roles.index',
                             'permissions.index',
-                            'settings.index'
+                            'settings.index',
                         ]);
                     });
                 }
@@ -110,8 +113,8 @@ class MenuAggregator
     {
         $moduleMenus = [];
         $modulesPath = base_path('Modules');
-        
-        if (!File::isDirectory($modulesPath)) {
+
+        if (! File::isDirectory($modulesPath)) {
             return $moduleMenus;
         }
 
@@ -119,9 +122,9 @@ class MenuAggregator
 
         foreach ($modules as $modulePath) {
             $moduleName = basename($modulePath);
-            
+
             // Check if module is enabled
-            if (!$this->addonService->isAddonEnabled($moduleName)) {
+            if (! $this->addonService->isAddonEnabled($moduleName)) {
                 continue;
             }
 
@@ -132,13 +135,14 @@ class MenuAggregator
                 if (isset($content['menu'])) {
                     // Add module context to each menu item
                     $moduleMenu = collect($content['menu'])->map(function ($item) use ($moduleName) {
-                        if (!isset($item['menuHeader'])) {
+                        if (! isset($item['menuHeader'])) {
                             $item['module'] = $moduleName;
                             // Ensure addon field is set for module items
-                            if (!isset($item['addon'])) {
+                            if (! isset($item['addon'])) {
                                 $item['addon'] = $moduleName;
                             }
                         }
+
                         return $item;
                     });
                     $moduleMenus[] = $moduleMenu;
@@ -163,11 +167,11 @@ class MenuAggregator
         foreach ($menus as $item) {
             if (isset($item['menuHeader'])) {
                 $currentHeader = $item['menuHeader'];
-                if (!isset($headerGroups[$currentHeader])) {
+                if (! isset($headerGroups[$currentHeader])) {
                     $headerGroups[$currentHeader] = [
                         'header' => $item,
                         'items' => collect(),
-                        'priority' => $this->getHeaderPriority($currentHeader)
+                        'priority' => $this->getHeaderPriority($currentHeader),
                     ];
                 }
             } else {
@@ -175,11 +179,11 @@ class MenuAggregator
                     $headerGroups[$currentHeader]['items']->push($item);
                 } else {
                     // Items without header go to default group
-                    if (!isset($headerGroups['_default'])) {
+                    if (! isset($headerGroups['_default'])) {
                         $headerGroups['_default'] = [
                             'header' => null,
                             'items' => collect(),
-                            'priority' => 0
+                            'priority' => 0,
                         ];
                     }
                     $headerGroups['_default']['items']->push($item);
@@ -195,7 +199,7 @@ class MenuAggregator
             if ($group['header']) {
                 $organized->push($group['header']);
             }
-            
+
             // Sort items within group
             $sortedItems = $this->sortMenuItems($group['items']);
             foreach ($sortedItems as $item) {
@@ -266,7 +270,7 @@ class MenuAggregator
         $menu = $this->getMenu($menuType);
         $results = collect();
 
-        if (!isset($menu['menu'])) {
+        if (! isset($menu['menu'])) {
             return $results;
         }
 
@@ -301,7 +305,7 @@ class MenuAggregator
         $menu = $this->getMenu($menuType);
         $moduleItems = [];
 
-        if (!isset($menu['menu'])) {
+        if (! isset($menu['menu'])) {
             return $moduleItems;
         }
 

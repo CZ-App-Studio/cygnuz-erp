@@ -2,18 +2,18 @@
 
 namespace Modules\HRCore\database\seeders;
 
-use Illuminate\Database\Seeder;
-use Modules\HRCore\app\Models\Department;
-use Modules\HRCore\app\Models\Designation;
-use Modules\HRCore\app\Models\Shift;
-use Modules\HRCore\app\Models\Team;
-use Modules\HRCore\app\Models\Holiday;
-use Modules\HRCore\app\Models\LeaveType;
-use Modules\HRCore\app\Models\UserAvailableLeave;
-use Modules\HRCore\app\Models\LeaveBalanceAdjustment;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
+use Modules\HRCore\app\Models\Department;
+use Modules\HRCore\app\Models\Designation;
+use Modules\HRCore\app\Models\Holiday;
+use Modules\HRCore\app\Models\LeaveBalanceAdjustment;
+use Modules\HRCore\app\Models\LeaveType;
+use Modules\HRCore\app\Models\Shift;
+use Modules\HRCore\app\Models\Team;
+use Modules\HRCore\app\Models\UserAvailableLeave;
 
 class HRCoreDemoDataSeeder extends Seeder
 {
@@ -65,7 +65,7 @@ class HRCoreDemoDataSeeder extends Seeder
                 'wednesday' => true,
                 'thursday' => true,
                 'friday' => true,
-                'saturday' => false
+                'saturday' => false,
             ],
             [
                 'name' => 'Evening Shift',
@@ -79,7 +79,7 @@ class HRCoreDemoDataSeeder extends Seeder
                 'wednesday' => true,
                 'thursday' => true,
                 'friday' => true,
-                'saturday' => false
+                'saturday' => false,
             ],
             [
                 'name' => 'Night Shift',
@@ -93,7 +93,7 @@ class HRCoreDemoDataSeeder extends Seeder
                 'wednesday' => true,
                 'thursday' => true,
                 'friday' => true,
-                'saturday' => false
+                'saturday' => false,
             ],
         ];
 
@@ -114,7 +114,7 @@ class HRCoreDemoDataSeeder extends Seeder
                 'notes' => 'Default Department',
                 'designations' => [
                     ['name' => 'Default Designation', 'code' => 'DES-001', 'notes' => 'Default Designation'],
-                ]
+                ],
             ],
             [
                 'name' => 'Sales Department',
@@ -125,7 +125,7 @@ class HRCoreDemoDataSeeder extends Seeder
                     ['name' => 'Sales Executive', 'code' => 'DES-003', 'notes' => 'Sales Executive'],
                     ['name' => 'Sales Associate', 'code' => 'DES-004', 'notes' => 'Sales Associate'],
                     ['name' => 'Sales Representative', 'code' => 'DES-005', 'notes' => 'Sales Representative'],
-                ]
+                ],
             ],
             [
                 'name' => 'HR Department',
@@ -143,7 +143,7 @@ class HRCoreDemoDataSeeder extends Seeder
                     ],
                     ['name' => 'HR Executive', 'code' => 'DES-007', 'notes' => 'HR Executive'],
                     ['name' => 'HR Associate', 'code' => 'DES-008', 'notes' => 'HR Associate'],
-                ]
+                ],
             ],
             [
                 'name' => 'IT Department',
@@ -153,7 +153,7 @@ class HRCoreDemoDataSeeder extends Seeder
                     ['name' => 'IT Manager', 'code' => 'DES-009', 'notes' => 'IT Manager'],
                     ['name' => 'IT Executive', 'code' => 'DES-010', 'notes' => 'IT Executive'],
                     ['name' => 'IT Associate', 'code' => 'DES-011', 'notes' => 'IT Associate'],
-                ]
+                ],
             ],
             [
                 'name' => 'Finance Department',
@@ -163,7 +163,7 @@ class HRCoreDemoDataSeeder extends Seeder
                     ['name' => 'Finance Manager', 'code' => 'DES-012', 'notes' => 'Finance Manager'],
                     ['name' => 'Finance Executive', 'code' => 'DES-013', 'notes' => 'Finance Executive'],
                     ['name' => 'Finance Associate', 'code' => 'DES-014', 'notes' => 'Finance Associate'],
-                ]
+                ],
             ],
             [
                 'name' => 'Marketing Department',
@@ -173,7 +173,7 @@ class HRCoreDemoDataSeeder extends Seeder
                     ['name' => 'Marketing Manager', 'code' => 'DES-015', 'notes' => 'Marketing Manager'],
                     ['name' => 'Marketing Executive', 'code' => 'DES-016', 'notes' => 'Marketing Executive'],
                     ['name' => 'Marketing Associate', 'code' => 'DES-017', 'notes' => 'Marketing Associate'],
-                ]
+                ],
             ],
             [
                 'name' => 'Operations Department',
@@ -183,7 +183,7 @@ class HRCoreDemoDataSeeder extends Seeder
                     ['name' => 'Operations Manager', 'code' => 'DES-018', 'notes' => 'Operations Manager'],
                     ['name' => 'Operations Executive', 'code' => 'DES-019', 'notes' => 'Operations Executive'],
                     ['name' => 'Operations Associate', 'code' => 'DES-020', 'notes' => 'Operations Associate'],
-                ]
+                ],
             ],
             [
                 'name' => 'Admin Department',
@@ -193,7 +193,7 @@ class HRCoreDemoDataSeeder extends Seeder
                     ['name' => 'Admin Manager', 'code' => 'DES-021', 'notes' => 'Admin Manager'],
                     ['name' => 'Admin Executive', 'code' => 'DES-022', 'notes' => 'Admin Executive'],
                     ['name' => 'Admin Associate', 'code' => 'DES-023', 'notes' => 'Admin Associate'],
-                ]
+                ],
             ],
         ];
 
@@ -248,6 +248,7 @@ class HRCoreDemoDataSeeder extends Seeder
 
         if ($leaveTypes->isEmpty()) {
             $this->command->warn('No leave types found. Skipping leave balance seeding.');
+
             return;
         }
 
@@ -261,8 +262,12 @@ class HRCoreDemoDataSeeder extends Seeder
                 $carriedForward = 0;
 
                 // Skip gender-specific leaves for inappropriate users
-                if ($leaveType->code === 'ML' && $user->gender !== 'female') continue;
-                if ($leaveType->code === 'PTL' && $user->gender !== 'male') continue;
+                if ($leaveType->code === 'ML' && $user->gender !== 'female') {
+                    continue;
+                }
+                if ($leaveType->code === 'PTL' && $user->gender !== 'male') {
+                    continue;
+                }
 
                 // Calculate service years for the user
                 $serviceYears = $user->date_of_joining ?

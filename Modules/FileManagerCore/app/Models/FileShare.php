@@ -2,9 +2,9 @@
 
 namespace Modules\FileManagerCore\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 
 class FileShare extends Model
@@ -20,14 +20,14 @@ class FileShare extends Model
         'share_token',
         'download_count',
         'max_downloads',
-        'created_by_id'
+        'created_by_id',
     ];
 
     protected $casts = [
         'permissions' => 'array',
         'expires_at' => 'datetime',
         'download_count' => 'integer',
-        'max_downloads' => 'integer'
+        'max_downloads' => 'integer',
     ];
 
     protected static function boot()
@@ -64,7 +64,7 @@ class FileShare extends Model
     {
         return $query->where(function ($q) {
             $q->whereNull('expires_at')
-              ->orWhere('expires_at', '>', now());
+                ->orWhere('expires_at', '>', now());
         });
     }
 
@@ -97,7 +97,7 @@ class FileShare extends Model
      */
     public function isValid(): bool
     {
-        return !$this->isExpired() && !$this->hasReachedDownloadLimit();
+        return ! $this->isExpired() && ! $this->hasReachedDownloadLimit();
     }
 
     /**
@@ -129,7 +129,7 @@ class FileShare extends Model
      */
     public function getTimeUntilExpiration(): ?string
     {
-        if (!$this->expires_at) {
+        if (! $this->expires_at) {
             return null;
         }
 
@@ -145,7 +145,7 @@ class FileShare extends Model
      */
     public function getRemainingDownloads(): ?int
     {
-        if (!$this->max_downloads) {
+        if (! $this->max_downloads) {
             return null; // Unlimited
         }
 

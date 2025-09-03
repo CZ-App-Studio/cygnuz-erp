@@ -121,11 +121,11 @@ class PMCorePermissionSeeder extends Seeder
                 $perm = Permission::firstOrCreate(
                     [
                         'name' => $permission['name'],
-                        'guard_name' => 'web'
+                        'guard_name' => 'web',
                     ],
                     [
                         'module' => 'PMCore',
-                        'description' => $permission['description']
+                        'description' => $permission['description'],
                     ]
                 );
 
@@ -135,12 +135,12 @@ class PMCorePermissionSeeder extends Seeder
                     // Update the module and description if permission already exists
                     $perm->update([
                         'module' => 'PMCore',
-                        'description' => $permission['description']
+                        'description' => $permission['description'],
                     ]);
                     $this->command->info("Updated permission: {$permission['name']}");
                 }
             } catch (\Exception $e) {
-                $this->command->error("Failed to create/update permission {$permission['name']}: " . $e->getMessage());
+                $this->command->error("Failed to create/update permission {$permission['name']}: ".$e->getMessage());
             }
         }
     }
@@ -178,13 +178,13 @@ class PMCorePermissionSeeder extends Seeder
             $role = Role::where('name', 'super_admin')->first();
             if ($role) {
                 $permissions = Permission::where('name', 'like', 'pmcore.%')->pluck('name')->toArray();
-                if (!empty($permissions)) {
+                if (! empty($permissions)) {
                     $role->givePermissionTo($permissions);
-                    $this->command->info('Updated Super Admin role with all PMCore permissions (' . count($permissions) . ' permissions)');
+                    $this->command->info('Updated Super Admin role with all PMCore permissions ('.count($permissions).' permissions)');
                 }
             }
         } catch (\Exception $e) {
-            $this->command->error('Failed to update Super Admin role: ' . $e->getMessage());
+            $this->command->error('Failed to update Super Admin role: '.$e->getMessage());
         }
     }
 
@@ -201,7 +201,7 @@ class PMCorePermissionSeeder extends Seeder
                 $this->command->info('Updated Admin role with PMCore permissions');
             }
         } catch (\Exception $e) {
-            $this->command->error('Failed to update Admin role: ' . $e->getMessage());
+            $this->command->error('Failed to update Admin role: '.$e->getMessage());
         }
     }
 
@@ -222,14 +222,14 @@ class PMCorePermissionSeeder extends Seeder
                     'pmcore.archive-project',
                     'pmcore.duplicate-project',
                     'pmcore.export-projects',
-                    
+
                     // Team management
                     'pmcore.manage-project-team',
                     'pmcore.view-project-members',
                     'pmcore.add-project-member',
                     'pmcore.remove-project-member',
                     'pmcore.update-member-role',
-                    
+
                     // Tasks
                     'pmcore.view-project-tasks',
                     'pmcore.create-project-task',
@@ -239,7 +239,7 @@ class PMCorePermissionSeeder extends Seeder
                     'pmcore.complete-project-task',
                     'pmcore.start-project-task',
                     'pmcore.reorder-project-tasks',
-                    
+
                     // Dashboard & Reports
                     'pmcore.view-project-dashboard',
                     'pmcore.view-project-reports',
@@ -247,13 +247,13 @@ class PMCorePermissionSeeder extends Seeder
                     'pmcore.view-budget-reports',
                     'pmcore.view-resource-reports',
                     'pmcore.export-reports',
-                    
+
                     // Timesheets
                     'pmcore.view-timesheets',
                     'pmcore.approve-timesheet',
                     'pmcore.reject-timesheet',
                     'pmcore.export-timesheets',
-                    
+
                     // Resources
                     'pmcore.view-resources',
                     'pmcore.manage-resources',
@@ -261,7 +261,7 @@ class PMCorePermissionSeeder extends Seeder
                     'pmcore.view-resource-capacity',
                     'pmcore.view-resource-schedule',
                     'pmcore.check-resource-availability',
-                    
+
                     // Status management
                     'pmcore.view-project-statuses',
                 ];
@@ -269,7 +269,7 @@ class PMCorePermissionSeeder extends Seeder
                 $this->command->info('Updated Project Manager role with PMCore permissions');
             }
         } catch (\Exception $e) {
-            $this->command->error('Failed to update Project Manager role: ' . $e->getMessage());
+            $this->command->error('Failed to update Project Manager role: '.$e->getMessage());
         }
     }
 
@@ -285,10 +285,10 @@ class PMCorePermissionSeeder extends Seeder
                     // View projects
                     'pmcore.view-projects',
                     'pmcore.edit-own-project',
-                    
+
                     // Team viewing
                     'pmcore.view-project-members',
-                    
+
                     // Tasks
                     'pmcore.view-project-tasks',
                     'pmcore.create-project-task',
@@ -296,19 +296,19 @@ class PMCorePermissionSeeder extends Seeder
                     'pmcore.assign-project-task',
                     'pmcore.complete-project-task',
                     'pmcore.start-project-task',
-                    
+
                     // Dashboard & Reports
                     'pmcore.view-project-dashboard',
                     'pmcore.view-project-reports',
                     'pmcore.view-time-reports',
                     'pmcore.view-resource-reports',
-                    
+
                     // Timesheets
                     'pmcore.view-timesheets',
                     'pmcore.create-timesheet',
                     'pmcore.edit-own-timesheet',
                     'pmcore.submit-timesheet',
-                    
+
                     // Resources
                     'pmcore.view-resources',
                     'pmcore.view-resource-capacity',
@@ -318,7 +318,7 @@ class PMCorePermissionSeeder extends Seeder
                 $this->command->info('Updated Team Leader role with PMCore permissions');
             }
         } catch (\Exception $e) {
-            $this->command->error('Failed to update Team Leader role: ' . $e->getMessage());
+            $this->command->error('Failed to update Team Leader role: '.$e->getMessage());
         }
     }
 
@@ -333,22 +333,22 @@ class PMCorePermissionSeeder extends Seeder
                 $permissions = [
                     // View own projects
                     'pmcore.view-own-projects',
-                    
+
                     // View team
                     'pmcore.view-project-members',
-                    
+
                     // Tasks
                     'pmcore.view-project-tasks',
                     'pmcore.edit-own-task',
                     'pmcore.complete-project-task',
                     'pmcore.start-project-task',
-                    
+
                     // Timesheets
                     'pmcore.view-own-timesheets',
                     'pmcore.create-timesheet',
                     'pmcore.edit-own-timesheet',
                     'pmcore.submit-timesheet',
-                    
+
                     // View schedules
                     'pmcore.view-resource-schedule',
                 ];
@@ -356,7 +356,7 @@ class PMCorePermissionSeeder extends Seeder
                 $this->command->info('Updated Employee role with PMCore permissions');
             }
         } catch (\Exception $e) {
-            $this->command->error('Failed to update Employee role: ' . $e->getMessage());
+            $this->command->error('Failed to update Employee role: '.$e->getMessage());
         }
     }
 
@@ -377,7 +377,7 @@ class PMCorePermissionSeeder extends Seeder
                 $this->command->info('Updated Client role with PMCore permissions');
             }
         } catch (\Exception $e) {
-            $this->command->error('Failed to update Client role: ' . $e->getMessage());
+            $this->command->error('Failed to update Client role: '.$e->getMessage());
         }
     }
 }

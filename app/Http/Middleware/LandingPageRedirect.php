@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\AddonService\IAddonService;
 use Closure;
 use Illuminate\Http\Request;
-use App\Services\AddonService\IAddonService;
 
 class LandingPageRedirect
 {
@@ -18,14 +18,12 @@ class LandingPageRedirect
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
         // If the request is for the root path and user is not authenticated
-        if ($request->path() === '/' && !auth()->check()) {
+        if ($request->path() === '/' && ! auth()->check()) {
             // Check if LandingPage module is enabled
             if ($this->addonService->isAddonEnabled('LandingPage')) {
                 return redirect()->route('landingPage.index');

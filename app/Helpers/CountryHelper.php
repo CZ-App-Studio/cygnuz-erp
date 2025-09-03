@@ -214,6 +214,7 @@ class CountryHelper
     public static function getCountryName(string $code): ?string
     {
         $countries = self::getCountries();
+
         return $countries[$code] ?? null;
     }
 
