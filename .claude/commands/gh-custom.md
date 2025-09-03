@@ -17,11 +17,11 @@ Complete workflow for GitHub issue $ARGUMENTS:
   - Code logic and response structures
   - File contents and patterns
   - Service class behavior
-- Create Playwright E2E test if UI is affected
+- If UI is affected, use Playwright MCP to test the live application directly
 
 **Step 5: Run all tests**
 - `php artisan test` to verify all tests pass
-- `npm run test:e2e` if E2E tests exist
+- Use Playwright MCP to verify UI functionality works correctly in live application
 
 **Step 6: Clean up before commit**
 - Remove any unnecessary test files, factories, or seeders created during development
