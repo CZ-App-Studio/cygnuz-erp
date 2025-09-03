@@ -2,13 +2,13 @@
 
 namespace Modules\AICore\Services;
 
-use Modules\AICore\Models\AIProvider;
-use Modules\AICore\Models\AIModel;
-use Modules\AICore\Models\AIUsageLog;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Modules\AICore\Models\AIModel;
+use Modules\AICore\Models\AIProvider;
+use Modules\AICore\Models\AIUsageLog;
 
 class AIProviderService
 {
@@ -43,7 +43,7 @@ class AIProviderService
     /**
      * Get the best model for a specific task
      */
-    public function getBestModelForTask(string $taskType, int $maxTokens = null, string $providerType = null): ?AIModel
+    public function getBestModelForTask(string $taskType, ?int $maxTokens = null, ?string $providerType = null): ?AIModel
     {
         $query = AIModel::with('provider')
             ->whereHas('provider', function ($q) use ($providerType) {
@@ -74,41 +74,41 @@ class AIProviderService
     {
         try {
             $startTime = microtime(true);
-            
+
             $response = $this->makeTestRequest($provider);
-            
+
             $responseTime = round((microtime(true) - $startTime) * 1000, 2);
-            
+
             return [
                 'success' => true,
                 'response_time' => $responseTime,
                 'message' => 'Connection successful',
-                'provider_info' => $response
+                'provider_info' => $response,
             ];
         } catch (RequestException $e) {
-            Log::error("AI Provider connection test failed", [
+            Log::error('AI Provider connection test failed', [
                 'provider_id' => $provider->id,
                 'provider_type' => $provider->type,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
                 'response_time' => null,
-                'message' => 'Connection failed: ' . $e->getMessage(),
-                'error_code' => $e->getCode()
+                'message' => 'Connection failed: '.$e->getMessage(),
+                'error_code' => $e->getCode(),
             ];
         } catch (\Exception $e) {
-            Log::error("AI Provider connection test error", [
+            Log::error('AI Provider connection test error', [
                 'provider_id' => $provider->id,
                 'provider_type' => $provider->type,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
                 'response_time' => null,
-                'message' => 'Unexpected error: ' . $e->getMessage()
+                'message' => 'Unexpected error: '.$e->getMessage(),
             ];
         }
     }
@@ -120,7 +120,7 @@ class AIProviderService
     {
         // Get model IDs for this provider
         $modelIds = $provider->models()->pluck('id');
-        
+
         // Query usage logs directly to avoid GROUP BY issues with hasManyThrough
         $stats = AIUsageLog::whereIn('model_id', $modelIds)
             ->where('created_at', '>=', now()->subDays($days))
@@ -142,9 +142,9 @@ class AIProviderService
             'total_cost' => round($stats->total_cost ?? 0, 2),
             'avg_processing_time' => round($stats->avg_processing_time ?? 0, 2),
             'successful_requests' => $stats->successful_requests ?? 0,
-            'success_rate' => $stats->total_requests > 0 
-                ? round(($stats->successful_requests / $stats->total_requests) * 100, 2) 
-                : 0
+            'success_rate' => $stats->total_requests > 0
+                ? round(($stats->successful_requests / $stats->total_requests) * 100, 2)
+                : 0,
         ];
     }
 
@@ -163,13 +163,13 @@ class AIProviderService
                 $results[$provider->id] = [
                     'provider_name' => $provider->name,
                     'rotated' => false,
-                    'message' => 'Manual rotation required'
+                    'message' => 'Manual rotation required',
                 ];
             } catch (\Exception $e) {
                 $results[$provider->id] = [
                     'provider_name' => $provider->name,
                     'rotated' => false,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ];
             }
         }
@@ -187,21 +187,21 @@ class AIProviderService
 
         foreach ($providers as $provider) {
             $stats = $this->getUsageStats($provider, 7); // Last 7 days
-            
+
             $load = $stats['total_requests'] / 7; // Average requests per day
             $efficiency = $stats['success_rate'] / 100 * (1000 / max($stats['avg_processing_time'], 1));
-            
+
             $recommendations[] = [
                 'provider_id' => $provider->id,
                 'provider_name' => $provider->name,
                 'current_load' => round($load, 2),
                 'efficiency_score' => round($efficiency, 2),
-                'recommendation' => $this->getProviderRecommendation($load, $efficiency, $stats['success_rate'])
+                'recommendation' => $this->getProviderRecommendation($load, $efficiency, $stats['success_rate']),
             ];
         }
 
         // Sort by efficiency score descending
-        usort($recommendations, function($a, $b) {
+        usort($recommendations, function ($a, $b) {
             return $b['efficiency_score'] <=> $a['efficiency_score'];
         });
 
@@ -213,7 +213,7 @@ class AIProviderService
      */
     protected function isProviderAvailable(AIProvider $provider, string $taskType): bool
     {
-        if (!$provider->isAvailable()) {
+        if (! $provider->isAvailable()) {
             return false;
         }
 
@@ -249,17 +249,17 @@ class AIProviderService
     {
         $response = $this->httpClient->get('https://api.openai.com/v1/models', [
             'headers' => [
-                'Authorization' => 'Bearer ' . $provider->decrypted_api_key,
-                'Content-Type' => 'application/json'
-            ]
+                'Authorization' => 'Bearer '.$provider->decrypted_api_key,
+                'Content-Type' => 'application/json',
+            ],
         ]);
 
         $data = json_decode($response->getBody()->getContents(), true);
-        
+
         return [
             'provider' => 'OpenAI',
             'models_available' => count($data['data'] ?? []),
-            'api_version' => 'v1'
+            'api_version' => 'v1',
         ];
     }
 
@@ -273,21 +273,21 @@ class AIProviderService
             'headers' => [
                 'x-api-key' => $provider->decrypted_api_key,
                 'Content-Type' => 'application/json',
-                'anthropic-version' => '2023-06-01'
+                'anthropic-version' => '2023-06-01',
             ],
             'json' => [
                 'model' => 'claude-3-haiku-20240307',
                 'max_tokens' => 10,
                 'messages' => [
-                    ['role' => 'user', 'content' => 'Test']
-                ]
-            ]
+                    ['role' => 'user', 'content' => 'Test'],
+                ],
+            ],
         ]);
 
         return [
             'provider' => 'Claude',
             'api_version' => '2023-06-01',
-            'test_request' => 'successful'
+            'test_request' => 'successful',
         ];
     }
 
@@ -296,16 +296,16 @@ class AIProviderService
      */
     protected function testGemini(AIProvider $provider): array
     {
-        $response = $this->httpClient->get("https://generativelanguage.googleapis.com/v1/models", [
-            'query' => ['key' => $provider->decrypted_api_key]
+        $response = $this->httpClient->get('https://generativelanguage.googleapis.com/v1/models', [
+            'query' => ['key' => $provider->decrypted_api_key],
         ]);
 
         $data = json_decode($response->getBody()->getContents(), true);
-        
+
         return [
             'provider' => 'Gemini',
             'models_available' => count($data['models'] ?? []),
-            'api_version' => 'v1'
+            'api_version' => 'v1',
         ];
     }
 
@@ -317,15 +317,15 @@ class AIProviderService
         if ($successRate < 95) {
             return 'Consider reducing load - low success rate';
         }
-        
+
         if ($load > 1000) {
             return 'High load - consider additional capacity';
         }
-        
+
         if ($efficiency > 50) {
             return 'Optimal performance - consider increasing load';
         }
-        
+
         return 'Normal operation';
     }
 
@@ -343,11 +343,11 @@ class AIProviderService
             'cost_per_token' => $data['cost_per_token'] ?? 0,
             'is_active' => $data['is_active'] ?? true,
             'priority' => $data['priority'] ?? 1,
-            'configuration' => $data['configuration'] ?? null
+            'configuration' => $data['configuration'] ?? null,
         ]);
 
         // Set API key separately to trigger encryption
-        if (!empty($data['api_key'])) {
+        if (! empty($data['api_key'])) {
             $provider->api_key = $data['api_key'];
             $provider->save();
         }
@@ -361,14 +361,14 @@ class AIProviderService
     public function updateProvider(AIProvider $provider, array $data): AIProvider
     {
         $provider->fill($data);
-        
+
         // Handle API key update separately
-        if (isset($data['api_key']) && !empty($data['api_key'])) {
+        if (isset($data['api_key']) && ! empty($data['api_key'])) {
             $provider->api_key = $data['api_key'];
         }
-        
+
         $provider->save();
-        
+
         return $provider;
     }
 
@@ -377,10 +377,11 @@ class AIProviderService
      */
     public function getAllProvidersStatus(): Collection
     {
-        return AIProvider::with(['models' => function($query) {
+        return AIProvider::with(['models' => function ($query) {
             $query->active();
-        }])->get()->map(function($provider) {
+        }])->get()->map(function ($provider) {
             $status = $this->testConnection($provider);
+
             return [
                 'id' => $provider->id,
                 'name' => $provider->name,
@@ -390,7 +391,7 @@ class AIProviderService
                 'models_count' => $provider->models->count(),
                 'status' => $status['success'] ? 'connected' : 'error',
                 'response_time' => $status['response_time'],
-                'last_checked' => now()
+                'last_checked' => now(),
             ];
         });
     }

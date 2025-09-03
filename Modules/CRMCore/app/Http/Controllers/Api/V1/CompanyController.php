@@ -117,6 +117,7 @@ class CompanyController extends BaseApiController
             );
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to create company', $e->getMessage(), 500);
         }
     }
@@ -147,7 +148,7 @@ class CompanyController extends BaseApiController
     public function update(Request $request, $id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255|unique:companies,name,' . $id,
+            'name' => 'sometimes|required|string|max:255|unique:companies,name,'.$id,
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'website' => 'nullable|url|max:255',
@@ -172,10 +173,10 @@ class CompanyController extends BaseApiController
 
         try {
             $company = Company::findOrFail($id);
-            
+
             $data = $request->all();
             $data['updated_by_id'] = Auth::id();
-            
+
             $company->update($data);
             $company->load(['contacts', 'primaryContact', 'createdBy']);
 
@@ -197,16 +198,16 @@ class CompanyController extends BaseApiController
     {
         try {
             $company = Company::findOrFail($id);
-            
+
             // Check if company has related records
             if ($company->contacts()->exists()) {
                 return $this->errorResponse('Cannot delete company with existing contacts', null, 400);
             }
-            
+
             if ($company->leads()->exists()) {
                 return $this->errorResponse('Cannot delete company with existing leads', null, 400);
             }
-            
+
             if ($company->deals()->exists()) {
                 return $this->errorResponse('Cannot delete company with existing deals', null, 400);
             }
@@ -228,7 +229,7 @@ class CompanyController extends BaseApiController
     {
         try {
             $search = $request->input('search', '');
-            
+
             $companies = Company::with(['primaryContact'])
                 ->where(function ($query) use ($search) {
                     $query->where('name', 'like', "%{$search}%")
@@ -292,7 +293,7 @@ class CompanyController extends BaseApiController
             DB::beginTransaction();
 
             $company = Company::findOrFail($id);
-            
+
             $data = $request->all();
             $data['company_id'] = $company->id;
             $data['created_by_id'] = Auth::id();
@@ -317,9 +318,11 @@ class CompanyController extends BaseApiController
             );
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
+
             return $this->notFoundResponse('Company not found');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to add contact to company', $e->getMessage(), 500);
         }
     }

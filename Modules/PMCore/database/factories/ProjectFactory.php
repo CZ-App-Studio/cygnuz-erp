@@ -3,10 +3,10 @@
 namespace Modules\PMCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\PMCore\app\Models\Project;
+use Modules\PMCore\app\Enums\ProjectPriority;
 use Modules\PMCore\app\Enums\ProjectStatus;
 use Modules\PMCore\app\Enums\ProjectType;
-use Modules\PMCore\app\Enums\ProjectPriority;
+use Modules\PMCore\app\Models\Project;
 
 class ProjectFactory extends Factory
 {
@@ -24,7 +24,7 @@ class ProjectFactory extends Factory
         $endDate = $this->faker->dateTimeBetween($startDate, '+3 months');
 
         return [
-            'name' => $this->faker->company() . ' ' . $this->faker->randomElement(['Website', 'App', 'System', 'Platform']),
+            'name' => $this->faker->company().' '.$this->faker->randomElement(['Website', 'App', 'System', 'Platform']),
             'code' => strtoupper($this->faker->bothify('???-###')),
             'description' => $this->faker->paragraph(),
             'status' => $this->faker->randomElement(ProjectStatus::cases()),

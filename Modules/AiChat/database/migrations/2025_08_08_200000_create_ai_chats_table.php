@@ -28,14 +28,14 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('user_id');
             $table->index('company_id');
             $table->index('status');
             $table->index('chat_type');
             $table->index('created_at');
-            
+
             // Foreign keys
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

@@ -2,10 +2,10 @@
 
 namespace Modules\AICore\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AIRequestLog extends Model
 {
@@ -43,7 +43,7 @@ class AIRequestLog extends Model
         'is_flagged',
         'admin_notes',
         'reviewed_by',
-        'reviewed_at'
+        'reviewed_at',
     ];
 
     /**
@@ -54,7 +54,7 @@ class AIRequestLog extends Model
         'response_metadata' => 'array',
         'is_flagged' => 'boolean',
         'reviewed_at' => 'datetime',
-        'cost' => 'decimal:6'
+        'cost' => 'decimal:6',
     ];
 
     /**
@@ -62,7 +62,7 @@ class AIRequestLog extends Model
      */
     protected $hidden = [
         'request_ip',
-        'request_user_agent'
+        'request_user_agent',
     ];
 
     /**
@@ -166,8 +166,8 @@ class AIRequestLog extends Model
      */
     public function needsReview()
     {
-        return $this->status === 'error' || 
-               $this->cost > 1.0 || 
+        return $this->status === 'error' ||
+               $this->cost > 1.0 ||
                $this->total_tokens > 4000 ||
                $this->is_flagged;
     }
@@ -190,7 +190,7 @@ class AIRequestLog extends Model
      */
     public function toggleFlag()
     {
-        $this->is_flagged = !$this->is_flagged;
+        $this->is_flagged = ! $this->is_flagged;
         $this->save();
     }
 }

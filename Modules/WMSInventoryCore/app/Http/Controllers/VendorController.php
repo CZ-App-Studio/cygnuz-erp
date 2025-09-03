@@ -2,16 +2,16 @@
 
 namespace Modules\WMSInventoryCore\app\Http\Controllers;
 
+use App\ApiClasses\Error;
+use App\ApiClasses\Success;
+use App\Helpers\FormattingHelper;
+use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\ApiClasses\Success;
-use App\ApiClasses\Error;
-use App\Helpers\FormattingHelper;
-use Modules\WMSInventoryCore\Models\Vendor;
 use Modules\WMSInventoryCore\Models\Purchase;
+use Modules\WMSInventoryCore\Models\Vendor;
 
 class VendorController extends Controller
 {
@@ -23,22 +23,21 @@ class VendorController extends Controller
     public function index()
     {
         // $this->authorize('wmsinventory.view-vendors');
-        
+
         return view('wmsinventorycore::vendors.index');
     }
 
     /**
      * Process ajax request for vendors datatable.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function getDataAjax(Request $request)
     {
         // $this->authorize('wmsinventory.view-vendors');
         $draw = $request->get('draw');
-        $start = $request->get("start");
-        $rowPerPage = $request->get("length");
+        $start = $request->get('start');
+        $rowPerPage = $request->get('length');
 
         $columnIndex_arr = $request->get('order');
         $columnName_arr = $request->get('columns');
@@ -52,16 +51,16 @@ class VendorController extends Controller
             ->withSum('purchases', 'total_amount')
             ->with(['createdBy', 'updatedBy']);
 
-        if (!empty($searchValue)) {
+        if (! empty($searchValue)) {
             $query->where(function ($q) use ($searchValue) {
-                $q->where('name', 'like', '%' . $searchValue . '%')
-                    ->orWhere('email', 'like', '%' . $searchValue . '%')
-                    ->orWhere('company_name', 'like', '%' . $searchValue . '%')
-                    ->orWhere('phone_number', 'like', '%' . $searchValue . '%');
+                $q->where('name', 'like', '%'.$searchValue.'%')
+                    ->orWhere('email', 'like', '%'.$searchValue.'%')
+                    ->orWhere('company_name', 'like', '%'.$searchValue.'%')
+                    ->orWhere('phone_number', 'like', '%'.$searchValue.'%');
             });
         }
 
-        if (!empty($statusFilter)) {
+        if (! empty($statusFilter)) {
             $query->where('status', $statusFilter);
         }
 
@@ -69,7 +68,7 @@ class VendorController extends Controller
         $totalRecords = $query->count();
 
         // Handle ordering
-        if (!empty($columnIndex_arr)) {
+        if (! empty($columnIndex_arr)) {
             $columnIndex = $columnIndex_arr[0]['column'];
             $columnName = $columnName_arr[$columnIndex]['data'];
             $columnSortOrder = $order_arr[0]['dir'];
@@ -93,7 +92,7 @@ class VendorController extends Controller
 
         foreach ($vendors as $vendor) {
             // Calculate outstanding balance
-            $outstandingBalance = $vendor->purchases->sum(function($purchase) {
+            $outstandingBalance = $vendor->purchases->sum(function ($purchase) {
                 return ($purchase->total_amount ?? 0) - ($purchase->paid_amount ?? 0);
             });
 
@@ -105,26 +104,26 @@ class VendorController extends Controller
                 'company_name' => $vendor->company_name ?? '-',
                 'status' => view('components.status-badge', [
                     'status' => $vendor->status,
-                    'type' => $vendor->status === 'active' ? 'success' : 'secondary'
+                    'type' => $vendor->status === 'active' ? 'success' : 'secondary',
                 ])->render(),
                 'payment_terms' => $vendor->payment_terms ?? '-',
-                'lead_time_days' => $vendor->lead_time_days ? $vendor->lead_time_days . ' ' . __('days') : '-',
+                'lead_time_days' => $vendor->lead_time_days ? $vendor->lead_time_days.' '.__('days') : '-',
                 'actions' => view('components.datatable-actions', [
                     'id' => $vendor->id,
                     'actions' => [
                         ['label' => __('View'), 'icon' => 'bx bx-show', 'onclick' => "viewVendor({$vendor->id})"],
                         ['label' => __('Edit'), 'icon' => 'bx bx-edit', 'onclick' => "editVendor({$vendor->id})"],
                         ['label' => __('Delete'), 'icon' => 'bx bx-trash', 'onclick' => "deleteVendor({$vendor->id})"],
-                    ]
-                ])->render()
+                    ],
+                ])->render(),
             ];
         }
 
         return response()->json([
-            "draw" => intval($draw),
-            "recordsTotal" => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $data
+            'draw' => intval($draw),
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalRecords,
+            'data' => $data,
         ]);
     }
 
@@ -136,20 +135,19 @@ class VendorController extends Controller
     public function create()
     {
         // $this->authorize('wmsinventory.create-vendor');
-        
+
         return view('wmsinventorycore::vendors.create');
     }
 
     /**
      * Store a newly created vendor in storage.
      *
-     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
         // $this->authorize('wmsinventory.create-vendor');
-        
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:vendors,email',
@@ -198,14 +196,15 @@ class VendorController extends Controller
             if ($request->ajax()) {
                 return Success::response([
                     'message' => __('Vendor has been created successfully'),
-                    'vendor' => $vendor
+                    'vendor' => $vendor,
                 ]);
             }
 
             return redirect()->route('wmsinventorycore.vendors.show', $vendor->id)
                 ->with('success', __('Vendor has been created successfully'));
         } catch (\Exception $e) {
-            Log::error('Failed to create vendor: ' . $e->getMessage());
+            Log::error('Failed to create vendor: '.$e->getMessage());
+
             return redirect()->back()
                 ->with('error', __('Failed to create vendor'))
                 ->withInput();
@@ -215,13 +214,13 @@ class VendorController extends Controller
     /**
      * Display the specified vendor.
      *
-     * @param int $id
+     * @param  int  $id
      * @return Renderable
      */
     public function show($id)
     {
         // $this->authorize('wmsinventory.view-vendors');
-        
+
         $vendor = Vendor::with(['createdBy', 'updatedBy'])->findOrFail($id);
 
         // Get vendor statistics
@@ -252,50 +251,49 @@ class VendorController extends Controller
             'outstandingBalance' => FormattingHelper::formatCurrency($outstandingBalance),
             'purchaseCount' => $purchaseCount,
             'recentPurchases' => $recentPurchases,
-            'monthlyPurchases' => $monthlyPurchases
+            'monthlyPurchases' => $monthlyPurchases,
         ]);
     }
 
     /**
      * Show the form for editing the specified vendor.
      *
-     * @param int $id
+     * @param  int  $id
      * @return Renderable
      */
     public function edit($id)
     {
         // $this->authorize('wmsinventory.edit-vendor');
-        
+
         $vendor = Vendor::findOrFail($id);
 
         // Check if it's an AJAX request for offcanvas form
         if (request()->ajax()) {
             return Success::response([
-                'vendor' => $vendor
+                'vendor' => $vendor,
             ]);
         }
 
         return view('wmsinventorycore::vendors.edit', [
-            'vendor' => $vendor
+            'vendor' => $vendor,
         ]);
     }
 
     /**
      * Update the specified vendor in storage.
      *
-     * @param Request $request
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $id)
     {
         // $this->authorize('wmsinventory.edit-vendor');
-        
+
         $vendor = Vendor::findOrFail($id);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:vendors,email,' . $vendor->id,
+            'email' => 'nullable|email|unique:vendors,email,'.$vendor->id,
             'phone_number' => 'nullable|string|max:20',
             'company_name' => 'nullable|string|max:255',
             'address' => 'nullable|string',
@@ -339,14 +337,15 @@ class VendorController extends Controller
             if ($request->ajax()) {
                 return Success::response([
                     'message' => __('Vendor has been updated successfully'),
-                    'vendor' => $vendor
+                    'vendor' => $vendor,
                 ]);
             }
 
             return redirect()->route('wmsinventorycore.vendors.show', $vendor->id)
                 ->with('success', __('Vendor has been updated successfully'));
         } catch (\Exception $e) {
-            Log::error('Failed to update vendor: ' . $e->getMessage());
+            Log::error('Failed to update vendor: '.$e->getMessage());
+
             return redirect()->back()
                 ->with('error', __('Failed to update vendor'))
                 ->withInput();
@@ -356,13 +355,13 @@ class VendorController extends Controller
     /**
      * Remove the specified vendor from storage.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
         // $this->authorize('wmsinventory.delete-vendor');
-        
+
         try {
             $vendor = Vendor::findOrFail($id);
 
@@ -377,7 +376,8 @@ class VendorController extends Controller
 
             return Success::response(__('Vendor has been deleted successfully'));
         } catch (\Exception $e) {
-            Log::error('Failed to delete vendor: ' . $e->getMessage());
+            Log::error('Failed to delete vendor: '.$e->getMessage());
+
             return Error::response(__('Failed to delete vendor'));
         }
     }
@@ -386,13 +386,12 @@ class VendorController extends Controller
      * Global vendor search for Select2 integration
      * Used by other modules (Purchasing, etc.)
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function searchVendors(Request $request)
     {
         // $this->authorize('wmsinventory.search-vendors');
-        
+
         try {
             $search = $request->get('search', '');
             $activeOnly = $request->get('active_only', true);
@@ -400,7 +399,7 @@ class VendorController extends Controller
 
             $query = Vendor::query();
 
-            if (!empty($search)) {
+            if (! empty($search)) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('company_name', 'like', "%{$search}%")
@@ -430,7 +429,8 @@ class VendorController extends Controller
 
             return response()->json($vendors);
         } catch (\Exception $e) {
-            Log::error('Global vendor search failed: ' . $e->getMessage());
+            Log::error('Global vendor search failed: '.$e->getMessage());
+
             return response()->json([]);
         }
     }

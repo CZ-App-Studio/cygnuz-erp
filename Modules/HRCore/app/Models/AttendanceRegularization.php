@@ -13,7 +13,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class AttendanceRegularization extends Model implements AuditableContract
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, Auditable;
+    use Auditable, HasFactory, SoftDeletes, UserActionsTrait;
 
     /**
      * The table associated with the model.
@@ -37,7 +37,7 @@ class AttendanceRegularization extends Model implements AuditableContract
         'status',
         'approved_by',
         'approved_at',
-        'attachments'
+        'attachments',
     ];
 
     /**
@@ -82,7 +82,7 @@ class AttendanceRegularization extends Model implements AuditableContract
      */
     public function getTypeLabel(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'missing_checkin' => __('Missing Check-in'),
             'missing_checkout' => __('Missing Check-out'),
             'wrong_time' => __('Wrong Time'),
@@ -97,7 +97,7 @@ class AttendanceRegularization extends Model implements AuditableContract
      */
     public function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => __('Pending'),
             'approved' => __('Approved'),
             'rejected' => __('Rejected'),
@@ -110,7 +110,7 @@ class AttendanceRegularization extends Model implements AuditableContract
      */
     public function getStatusBadgeClass(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'bg-label-warning',
             'approved' => 'bg-label-success',
             'rejected' => 'bg-label-danger',

@@ -3,8 +3,8 @@
 namespace Modules\PMCore\app\Policies;
 
 use App\Models\User;
-use Modules\PMCore\app\Models\Project;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Modules\PMCore\app\Models\Project;
 
 class ProjectPolicy
 {

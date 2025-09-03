@@ -28,16 +28,17 @@ class ValidAttendanceType implements Rule
             'qr_code' => 'QRAttendance',
             'site' => 'SiteAttendance',
             'dynamic_qr' => 'DynamicQrAttendance',
-            'face_recognition' => 'FaceAttendance'
+            'face_recognition' => 'FaceAttendance',
         ];
 
         // Check if the attendance type is valid
-        if (!isset($moduleMap[$value])) {
+        if (! isset($moduleMap[$value])) {
             return false;
         }
 
         // Check if the required module is installed and enabled
         $requiredModule = $moduleMap[$value];
+
         return Module::has($requiredModule) && Module::isEnabled($requiredModule);
     }
 

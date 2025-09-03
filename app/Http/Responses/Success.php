@@ -20,9 +20,9 @@ class Success
             if (is_array($data) && isset($data['message'])) {
                 $response['message'] = $data['message'];
                 unset($data['message']);
-                
+
                 // If there's remaining data, add it
-                if (!empty($data)) {
+                if (! empty($data)) {
                     $response['data'] = $data;
                 }
             } else {

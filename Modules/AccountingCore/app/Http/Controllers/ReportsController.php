@@ -2,16 +2,14 @@
 
 namespace Modules\AccountingCore\app\Http\Controllers;
 
+use App\ApiClasses\Success;
 use App\Http\Controllers\Controller;
+use App\Services\AddonService\AddonService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Modules\AccountingCore\app\Models\BasicTransaction;
 use Modules\AccountingCore\app\Models\BasicTransactionCategory;
-use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Services\AddonService\AddonService;
-use App\ApiClasses\Success;
-use App\ApiClasses\Error;
 
 class ReportsController extends Controller
 {
@@ -40,10 +38,10 @@ class ReportsController extends Controller
         }
 
         $categories = BasicTransactionCategory::active()->orderBy('name')->get();
-        
+
         $breadcrumbs = [
             ['name' => __('Accounting'), 'url' => route('accountingcore.dashboard')],
-            ['name' => __('Reports'), 'url' => '']
+            ['name' => __('Reports'), 'url' => ''],
         ];
 
         return view('accountingcore::reports.index', compact('categories', 'breadcrumbs'));
@@ -62,7 +60,7 @@ class ReportsController extends Controller
         $dates = explode(' to ', $request->dateRange);
         $startDate = Carbon::parse($dates[0])->startOfDay();
         $endDate = Carbon::parse($dates[1] ?? $dates[0])->endOfDay();
-        
+
         $data = match ($request->reportType) {
             'summary' => $this->generateSummaryReport($startDate, $endDate, $request->categoryFilter),
             'category' => $this->generateCategoryReport($startDate, $endDate, $request->categoryFilter),
@@ -80,7 +78,7 @@ class ReportsController extends Controller
         $dates = explode(' to ', $request->dateRange);
         $startDate = Carbon::parse($dates[0])->startOfDay();
         $endDate = Carbon::parse($dates[1] ?? $dates[0])->endOfDay();
-        
+
         $data = match ($request->reportType) {
             'summary' => $this->generateSummaryReport($startDate, $endDate, $request->categoryFilter),
             'category' => $this->generateCategoryReport($startDate, $endDate, $request->categoryFilter),
@@ -88,7 +86,8 @@ class ReportsController extends Controller
         };
 
         $pdf = Pdf::loadView('accountingcore::reports.export', compact('data'));
-        return $pdf->download('accounting-report-' . now()->format('Y-m-d') . '.pdf');
+
+        return $pdf->download('accounting-report-'.now()->format('Y-m-d').'.pdf');
     }
 
     /**
@@ -108,7 +107,7 @@ class ReportsController extends Controller
 
         // Get summary data
         $summary = BasicTransaction::getSummaryForPeriod($startDate, $endDate);
-        
+
         // Get category breakdown
         $incomeByCategory = BasicTransaction::income()
             ->forDateRange($startDate, $endDate)
@@ -117,7 +116,7 @@ class ReportsController extends Controller
             ->with('category')
             ->orderBy('total', 'desc')
             ->get();
-            
+
         $expenseByCategory = BasicTransaction::expense()
             ->forDateRange($startDate, $endDate)
             ->selectRaw('category_id, SUM(amount) as total, COUNT(*) as count')
@@ -133,7 +132,7 @@ class ReportsController extends Controller
         $breadcrumbs = [
             ['name' => __('Accounting'), 'url' => route('accountingcore.dashboard')],
             ['name' => __('Reports'), 'url' => route('accountingcore.reports.summary')],
-            ['name' => __('Income & Expense Summary'), 'url' => '']
+            ['name' => __('Income & Expense Summary'), 'url' => ''],
         ];
 
         return view('accountingcore::reports.summary', compact(
@@ -158,7 +157,7 @@ class ReportsController extends Controller
 
         // Get opening balance
         $openingBalance = BasicTransaction::getRunningBalance($startDate->copy()->subDay());
-        
+
         // Get transactions for the period
         $transactions = BasicTransaction::with('category')
             ->forDateRange($startDate, $endDate)
@@ -169,18 +168,18 @@ class ReportsController extends Controller
         // Calculate running balance
         $runningBalance = $openingBalance['balance'];
         $cashflowData = [];
-        
+
         foreach ($transactions as $transaction) {
             if ($transaction->type === 'income') {
                 $runningBalance += $transaction->amount;
             } else {
                 $runningBalance -= $transaction->amount;
             }
-            
+
             $cashflowData[] = [
                 'date' => $transaction->transaction_date,
                 'transaction' => $transaction,
-                'running_balance' => $runningBalance
+                'running_balance' => $runningBalance,
             ];
         }
 
@@ -191,7 +190,7 @@ class ReportsController extends Controller
         $breadcrumbs = [
             ['name' => __('Accounting'), 'url' => route('accountingcore.dashboard')],
             ['name' => __('Reports'), 'url' => route('accountingcore.reports.summary')],
-            ['name' => __('Cash Flow'), 'url' => '']
+            ['name' => __('Cash Flow'), 'url' => ''],
         ];
 
         return view('accountingcore::reports.cashflow', compact(
@@ -213,7 +212,7 @@ class ReportsController extends Controller
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date')) : now()->endOfMonth();
 
         $summary = BasicTransaction::getSummaryForPeriod($startDate, $endDate);
-        
+
         $incomeByCategory = BasicTransaction::income()
             ->forDateRange($startDate, $endDate)
             ->selectRaw('category_id, SUM(amount) as total, COUNT(*) as count')
@@ -221,7 +220,7 @@ class ReportsController extends Controller
             ->with('category')
             ->orderBy('total', 'desc')
             ->get();
-            
+
         $expenseByCategory = BasicTransaction::expense()
             ->forDateRange($startDate, $endDate)
             ->selectRaw('category_id, SUM(amount) as total, COUNT(*) as count')
@@ -238,8 +237,8 @@ class ReportsController extends Controller
             'endDate'
         ));
 
-        $filename = 'income-expense-summary-' . $startDate->format('Y-m-d') . '-to-' . $endDate->format('Y-m-d') . '.pdf';
-        
+        $filename = 'income-expense-summary-'.$startDate->format('Y-m-d').'-to-'.$endDate->format('Y-m-d').'.pdf';
+
         return $pdf->download($filename);
     }
 
@@ -252,7 +251,7 @@ class ReportsController extends Controller
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date')) : now()->endOfMonth();
 
         $openingBalance = BasicTransaction::getRunningBalance($startDate->copy()->subDay());
-        
+
         $transactions = BasicTransaction::with('category')
             ->forDateRange($startDate, $endDate)
             ->orderBy('transaction_date')
@@ -261,18 +260,18 @@ class ReportsController extends Controller
 
         $runningBalance = $openingBalance['balance'];
         $cashflowData = [];
-        
+
         foreach ($transactions as $transaction) {
             if ($transaction->type === 'income') {
                 $runningBalance += $transaction->amount;
             } else {
                 $runningBalance -= $transaction->amount;
             }
-            
+
             $cashflowData[] = [
                 'date' => $transaction->transaction_date,
                 'transaction' => $transaction,
-                'running_balance' => $runningBalance
+                'running_balance' => $runningBalance,
             ];
         }
 
@@ -286,8 +285,8 @@ class ReportsController extends Controller
             'endDate'
         ));
 
-        $filename = 'cashflow-' . $startDate->format('Y-m-d') . '-to-' . $endDate->format('Y-m-d') . '.pdf';
-        
+        $filename = 'cashflow-'.$startDate->format('Y-m-d').'-to-'.$endDate->format('Y-m-d').'.pdf';
+
         return $pdf->download($filename);
     }
 
@@ -301,34 +300,34 @@ class ReportsController extends Controller
         $type = $request->get('type', 'all'); // income, expense, all
 
         $query = BasicTransactionCategory::active();
-        
+
         if ($type !== 'all') {
             $query->where('type', $type);
         }
-        
+
         $categories = $query->get();
-        
+
         $performanceData = [];
-        
+
         foreach ($categories as $category) {
             $transactionQuery = $category->transactions()
                 ->forDateRange($startDate, $endDate);
-                
+
             $total = $transactionQuery->sum('amount');
             $count = $transactionQuery->count();
-            
+
             if ($total > 0) {
                 $performanceData[] = [
                     'category' => $category,
                     'total' => $total,
                     'count' => $count,
-                    'average' => $count > 0 ? $total / $count : 0
+                    'average' => $count > 0 ? $total / $count : 0,
                 ];
             }
         }
-        
+
         // Sort by total descending
-        usort($performanceData, function($a, $b) {
+        usort($performanceData, function ($a, $b) {
             return $b['total'] <=> $a['total'];
         });
 
@@ -336,7 +335,7 @@ class ReportsController extends Controller
         $breadcrumbs = [
             ['name' => __('Accounting'), 'url' => route('accountingcore.dashboard')],
             ['name' => __('Reports'), 'url' => route('accountingcore.reports.summary')],
-            ['name' => __('Category Performance'), 'url' => '']
+            ['name' => __('Category Performance'), 'url' => ''],
         ];
 
         return view('accountingcore::reports.category-performance', compact(
@@ -355,29 +354,29 @@ class ReportsController extends Controller
     {
         $months = [];
         $current = $startDate->copy()->startOfMonth();
-        
+
         while ($current <= $endDate) {
             $monthStart = $current->copy()->startOfMonth();
             $monthEnd = $current->copy()->endOfMonth();
-            
+
             if ($monthEnd > $endDate) {
                 $monthEnd = $endDate;
             }
-            
+
             $summary = BasicTransaction::getSummaryForPeriod($monthStart, $monthEnd);
-            
+
             $months[] = [
                 'month' => $current->format('F Y'),
                 'start_date' => $monthStart,
                 'end_date' => $monthEnd,
                 'income' => $summary['income'],
                 'expense' => $summary['expense'],
-                'profit' => $summary['profit']
+                'profit' => $summary['profit'],
             ];
-            
+
             $current->addMonth();
         }
-        
+
         return $months;
     }
 
@@ -387,7 +386,7 @@ class ReportsController extends Controller
     private function generateSummaryReport($startDate, $endDate, $categoryId = null)
     {
         $query = BasicTransaction::forDateRange($startDate, $endDate);
-        
+
         if ($categoryId) {
             $query->where('category_id', $categoryId);
         }
@@ -427,14 +426,14 @@ class ReportsController extends Controller
     private function generateCategoryReport($startDate, $endDate, $categoryId = null)
     {
         $query = BasicTransactionCategory::active();
-        
+
         if ($categoryId) {
             $query->where('id', $categoryId);
         }
 
         $categories = $query->withSum(['transactions' => function ($q) use ($startDate, $endDate) {
-                $q->forDateRange($startDate, $endDate)->income();
-            }], 'amount')
+            $q->forDateRange($startDate, $endDate)->income();
+        }], 'amount')
             ->withSum(['transactions as expense_total' => function ($q) use ($startDate, $endDate) {
                 $q->forDateRange($startDate, $endDate)->expense();
             }], 'amount')
@@ -454,6 +453,7 @@ class ReportsController extends Controller
             'rows' => $categories->map(function ($c) {
                 $income = $c->transactions_sum_amount ?? 0;
                 $expense = $c->expense_total ?? 0;
+
                 return [
                     $c->name,
                     ucfirst($c->type),
@@ -472,7 +472,7 @@ class ReportsController extends Controller
     private function generateMonthlyReport($startDate, $endDate, $categoryId = null)
     {
         $query = BasicTransaction::forDateRange($startDate, $endDate);
-        
+
         if ($categoryId) {
             $query->where('category_id', $categoryId);
         }
@@ -485,10 +485,10 @@ class ReportsController extends Controller
 
         $months = [];
         $rows = [];
-        
+
         foreach ($monthlyData as $data) {
-            $monthKey = $data->year . '-' . str_pad($data->month, 2, '0', STR_PAD_LEFT);
-            if (!isset($months[$monthKey])) {
+            $monthKey = $data->year.'-'.str_pad($data->month, 2, '0', STR_PAD_LEFT);
+            if (! isset($months[$monthKey])) {
                 $months[$monthKey] = ['income' => 0, 'expense' => 0];
             }
             $months[$monthKey][$data->type] = $data->total;
@@ -496,15 +496,15 @@ class ReportsController extends Controller
 
         $totalIncome = 0;
         $totalExpenses = 0;
-        
+
         foreach ($months as $month => $data) {
             $income = $data['income'];
             $expense = $data['expense'];
             $totalIncome += $income;
             $totalExpenses += $expense;
-            
+
             $rows[] = [
-                Carbon::parse($month . '-01')->format('F Y'),
+                Carbon::parse($month.'-01')->format('F Y'),
                 $income,
                 -$expense,
                 $income - $expense,

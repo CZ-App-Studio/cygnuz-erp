@@ -11,40 +11,40 @@ class BillingEntityDetector
     /**
      * Detect the billing entity based on available data
      * Priority: Customer > Company > Contact
-     * 
-     * @param array $data Array containing possible entity IDs
+     *
+     * @param  array  $data  Array containing possible entity IDs
      * @return object|null
      */
     public function detect(array $data)
     {
         // Check for customer_id first (highest priority)
-        if (!empty($data['customer_id'])) {
+        if (! empty($data['customer_id'])) {
             $customer = Customer::find($data['customer_id']);
             if ($customer) {
                 return [
                     'entity' => $customer,
                     'type' => 'customer',
                     'is_b2b' => $customer->isB2B(),
-                    'billing_info' => $this->getCustomerBillingInfo($customer)
+                    'billing_info' => $this->getCustomerBillingInfo($customer),
                 ];
             }
         }
-        
+
         // Check for company_id (B2B scenario)
-        if (!empty($data['company_id'])) {
+        if (! empty($data['company_id'])) {
             $company = Company::find($data['company_id']);
             if ($company) {
                 return [
                     'entity' => $company,
                     'type' => 'company',
                     'is_b2b' => true,
-                    'billing_info' => $this->getCompanyBillingInfo($company)
+                    'billing_info' => $this->getCompanyBillingInfo($company),
                 ];
             }
         }
-        
+
         // Check for contact_id (individual scenario)
-        if (!empty($data['contact_id'])) {
+        if (! empty($data['contact_id'])) {
             $contact = Contact::find($data['contact_id']);
             if ($contact) {
                 // Check if contact has a customer record
@@ -53,22 +53,22 @@ class BillingEntityDetector
                         'entity' => $contact->customer,
                         'type' => 'customer',
                         'is_b2b' => $contact->customer->isB2B(),
-                        'billing_info' => $this->getCustomerBillingInfo($contact->customer)
+                        'billing_info' => $this->getCustomerBillingInfo($contact->customer),
                     ];
                 }
-                
+
                 // Return contact if no customer record exists yet
                 return [
                     'entity' => $contact,
                     'type' => 'contact',
                     'is_b2b' => $contact->company_id !== null,
-                    'billing_info' => $this->getContactBillingInfo($contact)
+                    'billing_info' => $this->getContactBillingInfo($contact),
                 ];
             }
         }
-        
+
         // Handle walk-in customer data
-        if (!empty($data['customer_name']) || !empty($data['customer_email'])) {
+        if (! empty($data['customer_name']) || ! empty($data['customer_email'])) {
             return [
                 'entity' => null,
                 'type' => 'walk_in',
@@ -80,13 +80,13 @@ class BillingEntityDetector
                     'address' => $this->formatWalkInAddress($data),
                     'tax_number' => $data['tax_number'] ?? '',
                     'tax_exempt' => $data['tax_exempt'] ?? false,
-                ]
+                ],
             ];
         }
-        
+
         return null;
     }
-    
+
     /**
      * Detect billing entity from a field order
      */
@@ -108,7 +108,7 @@ class BillingEntityDetector
             'tax_exempt' => $fieldOrder->tax_exempt,
         ]);
     }
-    
+
     /**
      * Get billing information for a customer
      */
@@ -116,7 +116,7 @@ class BillingEntityDetector
     {
         $contact = $customer->contact;
         $company = $contact ? $contact->company : null;
-        
+
         return [
             'name' => $customer->getDisplayNameAttribute(),
             'email' => $customer->getEmailAttribute(),
@@ -130,7 +130,7 @@ class BillingEntityDetector
             'discount_percentage' => $customer->discount_percentage,
         ];
     }
-    
+
     /**
      * Get billing information for a company
      */
@@ -149,7 +149,7 @@ class BillingEntityDetector
             'discount_percentage' => 0,
         ];
     }
-    
+
     /**
      * Get billing information for a contact
      */
@@ -168,7 +168,7 @@ class BillingEntityDetector
             'discount_percentage' => 0,
         ];
     }
-    
+
     /**
      * Format company address
      */
@@ -181,10 +181,10 @@ class BillingEntityDetector
             $company->address_postal_code,
             $company->address_country,
         ]);
-        
+
         return implode(', ', $parts);
     }
-    
+
     /**
      * Format contact address
      */
@@ -197,10 +197,10 @@ class BillingEntityDetector
             $contact->address_postal_code,
             $contact->address_country,
         ]);
-        
+
         return implode(', ', $parts);
     }
-    
+
     /**
      * Format walk-in customer address
      */
@@ -213,10 +213,10 @@ class BillingEntityDetector
             $data['billing_postal_code'] ?? $data['delivery_postal_code'] ?? '',
             $data['billing_country'] ?? $data['delivery_country'] ?? '',
         ]);
-        
+
         return implode(', ', $parts);
     }
-    
+
     /**
      * Create or get customer from billing entity
      */
@@ -226,24 +226,24 @@ class BillingEntityDetector
         if ($billingEntity['type'] === 'customer') {
             return $billingEntity['entity'];
         }
-        
+
         // If contact without customer, create customer
         if ($billingEntity['type'] === 'contact' && $billingEntity['entity']) {
             $contact = $billingEntity['entity'];
-            
+
             // Check if customer already exists
             if ($contact->customer) {
                 return $contact->customer;
             }
-            
+
             // Create new customer
             return Customer::createFromFirstPurchase($contact->id);
         }
-        
+
         // For walk-in, create contact and customer
         if ($billingEntity['type'] === 'walk_in') {
             $billingInfo = $billingEntity['billing_info'];
-            
+
             // Create contact
             $nameParts = explode(' ', $billingInfo['name']);
             $contact = Contact::create([
@@ -253,34 +253,34 @@ class BillingEntityDetector
                 'phone_primary' => $billingInfo['phone'],
                 'is_active' => true,
             ]);
-            
+
             // Create customer
             return Customer::createFromFirstPurchase($contact->id);
         }
-        
+
         // For company, find or create associated customer
         if ($billingEntity['type'] === 'company' && $billingEntity['entity']) {
             $company = $billingEntity['entity'];
-            
+
             // Find primary contact for company
             $primaryContact = Contact::where('company_id', $company->id)
                 ->where('is_primary_contact_for_company', true)
                 ->first();
-            
-            if (!$primaryContact) {
+
+            if (! $primaryContact) {
                 // Find any contact for this company
                 $primaryContact = Contact::where('company_id', $company->id)->first();
             }
-            
+
             if ($primaryContact) {
                 if ($primaryContact->customer) {
                     return $primaryContact->customer;
                 }
-                
+
                 return Customer::createFromFirstPurchase($primaryContact->id);
             }
         }
-        
+
         return null;
     }
 }

@@ -40,6 +40,7 @@ class UserSettings extends Model implements AuditableContract
     public static function getSetting($userId, $key, $default = null)
     {
         $setting = self::where('user_id', $userId)->where('key', $key)->first();
+
         return $setting ? $setting->value : $default;
     }
 

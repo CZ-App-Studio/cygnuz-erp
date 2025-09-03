@@ -12,7 +12,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class PurchaseProduct extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'purchase_products';
 
@@ -38,7 +38,7 @@ class PurchaseProduct extends Model implements Auditable
         'rejected_quantity',
         'rejection_reason',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -57,7 +57,7 @@ class PurchaseProduct extends Model implements Auditable
         'expiry_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -105,7 +105,9 @@ class PurchaseProduct extends Model implements Auditable
      */
     public function getReceivingProgressAttribute()
     {
-        if ($this->quantity === 0) return 100;
+        if ($this->quantity === 0) {
+            return 100;
+        }
 
         return ($this->received_quantity / $this->quantity) * 100;
     }
@@ -116,6 +118,7 @@ class PurchaseProduct extends Model implements Auditable
     public function getUnitPriceWithTaxAttribute()
     {
         $taxAmount = $this->unit_cost * ($this->tax_rate / 100);
+
         return $this->unit_cost + $taxAmount;
     }
 

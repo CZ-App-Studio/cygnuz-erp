@@ -7,39 +7,39 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateActivityStatusRequest extends FormRequest
 {
-  /**
-   * Determine if the user is authorized to make this request.
-   */
-  public function authorize(): bool
-  {
-    return true;
-  }
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
 
-  /**
-   * Get the validation rules that apply to the request.
-   *
-   * @return array<string, ValidationRule|array<mixed>|string>
-   */
-  public function rules(): array
-  {
-    return [
-      'batteryPercentage' => 'required|numeric',
-      'isGPSOn' => 'required|boolean',
-      'isWifiOn' => 'required|boolean',
-      'isMock' => 'required|boolean',
-      'isCharging' => 'boolean',
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'batteryPercentage' => 'required|numeric',
+            'isGPSOn' => 'required|boolean',
+            'isWifiOn' => 'required|boolean',
+            'isMock' => 'required|boolean',
+            'isCharging' => 'boolean',
 
-      'latitude' => 'required',
-      'longitude' => 'required',
-      'altitude' => 'required',
-      'speed' => 'required',
-      'horizontalAccuracy' => 'required',
-      'verticalAccuracy' => 'required',
-      'course' => 'required',
-      'courseAccuracy' => 'required',
-      'speedAccuracy' => 'required',
-      'activity' => 'required',
-      'activityConfidence' => 'required',
-    ];
-  }
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'altitude' => 'required',
+            'speed' => 'required',
+            'horizontalAccuracy' => 'required',
+            'verticalAccuracy' => 'required',
+            'course' => 'required',
+            'courseAccuracy' => 'required',
+            'speedAccuracy' => 'required',
+            'activity' => 'required',
+            'activityConfidence' => 'required',
+        ];
+    }
 }

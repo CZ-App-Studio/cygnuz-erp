@@ -2,11 +2,11 @@
 
 namespace Modules\FileManagerCore\Traits;
 
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\FileManagerCore\Models\File;
-use Modules\FileManagerCore\Enums\FileType;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\FileManagerCore\Enums\FileStatus;
+use Modules\FileManagerCore\Enums\FileType;
+use Modules\FileManagerCore\Models\File;
 
 trait HasFiles
 {
@@ -16,7 +16,7 @@ trait HasFiles
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'attachable')
-                    ->where('status', FileStatus::ACTIVE);
+            ->where('status', FileStatus::ACTIVE);
     }
 
     /**
@@ -33,8 +33,8 @@ trait HasFiles
     public function filesByType(FileType $type): Collection
     {
         return $this->files()
-                    ->where('metadata->type', $type->value)
-                    ->get();
+            ->where('metadata->type', $type->value)
+            ->get();
     }
 
     /**
@@ -43,8 +43,8 @@ trait HasFiles
     public function fileByType(FileType $type): ?File
     {
         return $this->files()
-                    ->where('metadata->type', $type->value)
-                    ->first();
+            ->where('metadata->type', $type->value)
+            ->first();
     }
 
     /**
@@ -53,8 +53,8 @@ trait HasFiles
     public function images(): Collection
     {
         return $this->files()
-                    ->where('mime_type', 'LIKE', 'image/%')
-                    ->get();
+            ->where('mime_type', 'LIKE', 'image/%')
+            ->get();
     }
 
     /**
@@ -68,12 +68,12 @@ trait HasFiles
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/vnd.ms-excel',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'text/plain'
+            'text/plain',
         ];
 
         return $this->files()
-                    ->whereIn('mime_type', $documentMimes)
-                    ->get();
+            ->whereIn('mime_type', $documentMimes)
+            ->get();
     }
 
     /**
@@ -83,7 +83,7 @@ trait HasFiles
     {
         $file->update([
             'attachable_type' => static::class,
-            'attachable_id' => $this->id
+            'attachable_id' => $this->id,
         ]);
 
         return true;
@@ -97,7 +97,7 @@ trait HasFiles
         if ($file->attachable_type === static::class && $file->attachable_id === $this->id) {
             $file->update([
                 'attachable_type' => null,
-                'attachable_id' => null
+                'attachable_id' => null,
             ]);
 
             return true;
@@ -113,7 +113,7 @@ trait HasFiles
     {
         return $this->files()->update([
             'attachable_type' => null,
-            'attachable_id' => null
+            'attachable_id' => null,
         ]);
     }
 
@@ -155,8 +155,8 @@ trait HasFiles
     public function hasFileOfType(FileType $type): bool
     {
         return $this->files()
-                    ->where('metadata->type', $type->value)
-                    ->exists();
+            ->where('metadata->type', $type->value)
+            ->exists();
     }
 
     /**
@@ -165,8 +165,8 @@ trait HasFiles
     public function getFirstImage(): ?File
     {
         return $this->files()
-                    ->where('mime_type', 'LIKE', 'image/%')
-                    ->first();
+            ->where('mime_type', 'LIKE', 'image/%')
+            ->first();
     }
 
     /**
@@ -183,14 +183,14 @@ trait HasFiles
     public function getProfilePictureUrl(): ?string
     {
         $profilePicture = $this->getProfilePicture();
-        
-        if (!$profilePicture) {
+
+        if (! $profilePicture) {
             return null;
         }
 
         // This would use the FileManagerService to get the URL
         return app(\Modules\FileManagerCore\Contracts\FileManagerInterface::class)
-               ->getFileUrl($profilePicture);
+            ->getFileUrl($profilePicture);
     }
 
     /**
@@ -200,9 +200,9 @@ trait HasFiles
     {
         // When model is deleted, optionally handle file cleanup
         static::deleting(function ($model) {
-            if (method_exists($model, 'shouldDeleteFilesOnModelDelete') && 
+            if (method_exists($model, 'shouldDeleteFilesOnModelDelete') &&
                 $model->shouldDeleteFilesOnModelDelete()) {
-                
+
                 $model->files()->each(function ($file) {
                     app(\Modules\FileManagerCore\Contracts\FileManagerInterface::class)
                         ->deleteFile($file);
@@ -220,11 +220,11 @@ trait HasFiles
     private function formatBytes(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 }

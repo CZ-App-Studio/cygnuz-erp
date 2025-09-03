@@ -2,9 +2,9 @@
 
 namespace Modules\FileManagerCore\Traits;
 
-use Modules\FileManagerCore\Models\StorageUsage;
-use Modules\FileManagerCore\DTO\StorageQuota;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\FileManagerCore\DTO\StorageQuota;
+use Modules\FileManagerCore\Models\StorageUsage;
 
 trait TracksStorage
 {
@@ -22,8 +22,8 @@ trait TracksStorage
     public function getStorageUsage(string $provider = 'local'): ?StorageUsage
     {
         return $this->storageUsages()
-                    ->where('storage_provider', $provider)
-                    ->first();
+            ->where('storage_provider', $provider)
+            ->first();
     }
 
     /**
@@ -32,15 +32,15 @@ trait TracksStorage
     public function getOrCreateStorageUsage(string $provider = 'local'): StorageUsage
     {
         return $this->storageUsages()
-                    ->firstOrCreate(
-                        ['storage_provider' => $provider],
-                        [
-                            'used_space' => 0,
-                            'file_count' => 0,
-                            'quota_limit' => $this->getDefaultQuotaLimit(),
-                            'last_calculated_at' => now()
-                        ]
-                    );
+            ->firstOrCreate(
+                ['storage_provider' => $provider],
+                [
+                    'used_space' => 0,
+                    'file_count' => 0,
+                    'quota_limit' => $this->getDefaultQuotaLimit(),
+                    'last_calculated_at' => now(),
+                ]
+            );
     }
 
     /**
@@ -50,7 +50,7 @@ trait TracksStorage
     {
         $usage = $this->getStorageUsage($provider);
 
-        if (!$usage) {
+        if (! $usage) {
             return new StorageQuota(
                 usedSpace: 0,
                 totalSpace: $this->getDefaultQuotaLimit(),
@@ -76,7 +76,7 @@ trait TracksStorage
         $total = [
             'used_space' => 0,
             'file_count' => 0,
-            'providers' => []
+            'providers' => [],
         ];
 
         foreach ($usages as $usage) {
@@ -86,7 +86,7 @@ trait TracksStorage
                 fileCount: $usage->file_count,
                 provider: $usage->storage_provider
             );
-            
+
             $total['used_space'] += $usage->used_space;
             $total['file_count'] += $usage->file_count;
             $total['providers'][$usage->storage_provider] = $quota->toArray();
@@ -110,7 +110,7 @@ trait TracksStorage
     public function removeStorageUsage(int $size, string $provider = 'local'): void
     {
         $usage = $this->getStorageUsage($provider);
-        
+
         if ($usage) {
             $usage->removeUsage($size);
         }
@@ -122,6 +122,7 @@ trait TracksStorage
     public function canUploadFile(int $fileSize, string $provider = 'local'): bool
     {
         $quota = $this->getStorageQuota($provider);
+
         return $quota->canUpload($fileSize);
     }
 
@@ -131,6 +132,7 @@ trait TracksStorage
     public function isStorageQuotaExceeded(string $provider = 'local'): bool
     {
         $quota = $this->getStorageQuota($provider);
+
         return $quota->isExceeded();
     }
 
@@ -140,6 +142,7 @@ trait TracksStorage
     public function isStorageNearLimit(string $provider = 'local'): bool
     {
         $quota = $this->getStorageQuota($provider);
+
         return $quota->isNearLimit();
     }
 
@@ -149,6 +152,7 @@ trait TracksStorage
     public function getStorageUsagePercentage(string $provider = 'local'): ?float
     {
         $quota = $this->getStorageQuota($provider);
+
         return $quota->getUsagePercentage();
     }
 
@@ -177,6 +181,7 @@ trait TracksStorage
     public function getFormattedStorageUsage(string $provider = 'local'): array
     {
         $quota = $this->getStorageQuota($provider);
+
         return $quota->toArray();
     }
 
@@ -195,6 +200,7 @@ trait TracksStorage
     protected function getDefaultQuotaLimit(): ?int
     {
         $quotaConfig = config('filemanagercore.quotas.per_user');
+
         return $quotaConfig ?: null;
     }
 

@@ -29,15 +29,15 @@ class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
-        
+
         // Load user relationships
         $user->load(['roles']);
-        
+
         // Check if HRCore is enabled for employee data
         if ($this->addonService->isAddonEnabled('HRCore')) {
             $user->load(['team', 'designation.department', 'shift', 'manager']);
         }
-        
+
         // Check if 2FA is enabled
         $has2FA = false;
         $twoFactorData = null;
@@ -47,14 +47,14 @@ class ProfileController extends Controller
                 $twoFactorData = [
                     'enabled_at' => $user->twoFactorAuth->confirmed_at ?? $user->twoFactorAuth->created_at,
                     'recovery_codes_count' => count(array_filter($user->twoFactorAuth->recovery_codes ?? [])),
-                    'trusted_devices' => $user->twoFactorAuth->trusted_devices ?? []
+                    'trusted_devices' => $user->twoFactorAuth->trusted_devices ?? [],
                 ];
             }
         }
-        
+
         // Get recent activity/sessions
         $sessions = collect();
-        
+
         // Only get sessions if using database driver
         if (config('session.driver') === 'database') {
             $sessions = DB::table('sessions')
@@ -68,10 +68,10 @@ class ProfileController extends Controller
                         'ip_address' => $session->ip_address,
                         'user_agent' => $session->user_agent,
                         'last_activity' => \Carbon\Carbon::createFromTimestamp($session->last_activity),
-                        'is_current' => $session->id === session()->getId()
+                        'is_current' => $session->id === session()->getId(),
                     ];
                 });
-                
+
             // If no sessions found but user is logged in, create current session entry
             if ($sessions->isEmpty() && auth()->check()) {
                 // Try to update current session with user_id
@@ -81,9 +81,9 @@ class ProfileController extends Controller
                         'user_id' => $user->id,
                         'ip_address' => request()->ip(),
                         'user_agent' => request()->userAgent(),
-                        'last_activity' => now()->timestamp
+                        'last_activity' => now()->timestamp,
                     ]);
-                    
+
                 // Fetch again
                 $sessions = DB::table('sessions')
                     ->where('user_id', $user->id)
@@ -96,12 +96,12 @@ class ProfileController extends Controller
                             'ip_address' => $session->ip_address,
                             'user_agent' => $session->user_agent,
                             'last_activity' => \Carbon\Carbon::createFromTimestamp($session->last_activity),
-                            'is_current' => $session->id === session()->getId()
+                            'is_current' => $session->id === session()->getId(),
                         ];
                     });
             }
         }
-        
+
         // Get login history if available
         $loginHistory = [];
         if (DB::getSchemaBuilder()->hasTable('login_history')) {
@@ -111,7 +111,7 @@ class ProfileController extends Controller
                 ->limit(10)
                 ->get();
         }
-        
+
         return view('profile.index', compact('user', 'has2FA', 'twoFactorData', 'sessions', 'loginHistory'));
     }
 
@@ -122,19 +122,19 @@ class ProfileController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => [
                     'required',
                     'email',
-                    Rule::unique('users')->ignore($user->id)
+                    Rule::unique('users')->ignore($user->id),
                 ],
                 'phone' => [
                     'nullable',
                     'string',
                     'max:20',
-                    Rule::unique('users')->ignore($user->id)
+                    Rule::unique('users')->ignore($user->id),
                 ],
                 'date_of_birth' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
@@ -142,25 +142,25 @@ class ProfileController extends Controller
                 'city' => 'nullable|string|max:100',
                 'state' => 'nullable|string|max:100',
                 'country' => 'nullable|string|max:100',
-                'postal_code' => 'nullable|string|max:20'
+                'postal_code' => 'nullable|string|max:20',
             ]);
 
             if ($validator->fails()) {
                 return Error::response([
                     'message' => __('Validation failed'),
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ]);
             }
 
             $user->update($request->only([
-                'name', 'email', 'phone', 'date_of_birth', 
-                'gender', 'address', 'city', 'state', 
-                'country', 'postal_code'
+                'name', 'email', 'phone', 'date_of_birth',
+                'gender', 'address', 'city', 'state',
+                'country', 'postal_code',
             ]));
 
             return Success::response([
                 'message' => __('Profile updated successfully'),
-                'data' => $user
+                'data' => $user,
             ]);
 
         } catch (\Exception $e) {
@@ -175,13 +175,13 @@ class ProfileController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+                'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
             if ($validator->fails()) {
                 return Error::response([
                     'message' => __('Validation failed'),
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ]);
             }
 
@@ -194,14 +194,14 @@ class ProfileController extends Controller
 
             // Store new profile picture
             $path = $request->file('profile_picture')->store('profile-pictures', 'public');
-            
+
             $user->update(['profile_picture' => $path]);
 
             return Success::response([
                 'message' => __('Profile picture updated successfully'),
                 'data' => [
-                    'profile_picture_url' => Storage::url($path)
-                ]
+                    'profile_picture_url' => Storage::url($path),
+                ],
             ]);
 
         } catch (\Exception $e) {
@@ -223,7 +223,7 @@ class ProfileController extends Controller
             }
 
             return Success::response([
-                'message' => __('Profile picture removed successfully')
+                'message' => __('Profile picture removed successfully'),
             ]);
 
         } catch (\Exception $e) {
@@ -246,21 +246,21 @@ class ProfileController extends Controller
                         ->mixedCase()
                         ->numbers()
                         ->symbols()
-                        ->uncompromised()
-                ]
+                        ->uncompromised(),
+                ],
             ]);
 
             if ($validator->fails()) {
                 return Error::response([
                     'message' => __('Validation failed'),
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ]);
             }
 
             $user = auth()->user();
 
             // Check if current password is correct
-            if (!Hash::check($request->current_password, $user->password)) {
+            if (! Hash::check($request->current_password, $user->password)) {
                 return Error::response(__('Current password is incorrect'));
             }
 
@@ -271,7 +271,7 @@ class ProfileController extends Controller
 
             // Update password
             $user->update([
-                'password' => Hash::make($request->new_password)
+                'password' => Hash::make($request->new_password),
             ]);
 
             // Log password change activity
@@ -282,12 +282,12 @@ class ProfileController extends Controller
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
                     'created_at' => now(),
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
             }
 
             return Success::response([
-                'message' => __('Password changed successfully')
+                'message' => __('Password changed successfully'),
             ]);
 
         } catch (\Exception $e) {
@@ -306,25 +306,25 @@ class ProfileController extends Controller
                 'push_notifications' => 'boolean',
                 'sms_notifications' => 'boolean',
                 'newsletter' => 'boolean',
-                'marketing_emails' => 'boolean'
+                'marketing_emails' => 'boolean',
             ]);
 
             if ($validator->fails()) {
                 return Error::response([
                     'message' => __('Validation failed'),
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ]);
             }
 
             $user = auth()->user();
-            
+
             // Store preferences in user_preferences table or user meta
             $preferences = $request->only([
                 'email_notifications',
-                'push_notifications', 
+                'push_notifications',
                 'sms_notifications',
                 'newsletter',
-                'marketing_emails'
+                'marketing_emails',
             ]);
 
             // If user_preferences table exists
@@ -332,13 +332,13 @@ class ProfileController extends Controller
                 DB::table('user_preferences')->updateOrInsert(
                     ['user_id' => $user->id],
                     array_merge($preferences, [
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ])
                 );
             }
 
             return Success::response([
-                'message' => __('Notification preferences updated successfully')
+                'message' => __('Notification preferences updated successfully'),
             ]);
 
         } catch (\Exception $e) {
@@ -353,7 +353,7 @@ class ProfileController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             $sessions = DB::table('sessions')
                 ->where('user_id', $user->id)
                 ->orderBy('last_activity', 'desc')
@@ -364,12 +364,12 @@ class ProfileController extends Controller
                         'ip_address' => $session->ip_address,
                         'user_agent' => $this->parseUserAgent($session->user_agent),
                         'last_activity' => \Carbon\Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
-                        'is_current' => $session->id === session()->getId()
+                        'is_current' => $session->id === session()->getId(),
                     ];
                 });
 
             return Success::response([
-                'data' => $sessions
+                'data' => $sessions,
             ]);
 
         } catch (\Exception $e) {
@@ -384,13 +384,13 @@ class ProfileController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'session_id' => 'required|string'
+                'session_id' => 'required|string',
             ]);
 
             if ($validator->fails()) {
                 return Error::response([
                     'message' => __('Validation failed'),
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ]);
             }
 
@@ -405,7 +405,7 @@ class ProfileController extends Controller
                 ->delete();
 
             return Success::response([
-                'message' => __('Session terminated successfully')
+                'message' => __('Session terminated successfully'),
             ]);
 
         } catch (\Exception $e) {
@@ -420,20 +420,20 @@ class ProfileController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'password' => 'required'
+                'password' => 'required',
             ]);
 
             if ($validator->fails()) {
                 return Error::response([
                     'message' => __('Validation failed'),
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ]);
             }
 
             $user = auth()->user();
 
             // Verify password
-            if (!Hash::check($request->password, $user->password)) {
+            if (! Hash::check($request->password, $user->password)) {
                 return Error::response(__('Password is incorrect'));
             }
 
@@ -444,7 +444,7 @@ class ProfileController extends Controller
                 ->delete();
 
             return Success::response([
-                'message' => __('All other sessions terminated successfully')
+                'message' => __('All other sessions terminated successfully'),
             ]);
 
         } catch (\Exception $e) {

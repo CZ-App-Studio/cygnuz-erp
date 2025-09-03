@@ -23,11 +23,11 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index(['type', 'is_active']);
             $table->index('parent_id');
-            
+
             // Foreign keys
             $table->foreign('parent_id')->references('id')->on('basic_transaction_categories')->onDelete('cascade');
         });

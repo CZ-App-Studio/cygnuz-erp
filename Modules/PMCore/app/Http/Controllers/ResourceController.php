@@ -3,15 +3,15 @@
 namespace Modules\PMCore\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Modules\PMCore\app\Models\Project;
 use Modules\PMCore\app\Models\ResourceAllocation;
 use Modules\PMCore\app\Models\ResourceCapacity;
-use Modules\PMCore\app\Models\Project;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
-use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 class ResourceController extends Controller
@@ -23,17 +23,17 @@ class ResourceController extends Controller
     {
         $projectId = $request->get('project_id');
         $project = null;
-        
+
         if ($projectId) {
             $project = Project::findOrFail($projectId);
         }
-        
+
         $stats = [
             'total_resources' => User::whereHas('roles', function ($q) {
                 $q->whereNotIn('name', ['client', 'customer']);
             })->count(),
             'allocated_resources' => ResourceAllocation::whereIn('status', ['active', 'planned'])
-                ->when($projectId, function($query) use ($projectId) {
+                ->when($projectId, function ($query) use ($projectId) {
                     $query->where('project_id', $projectId);
                 })
                 ->distinct('user_id')
@@ -97,7 +97,7 @@ class ResourceController extends Controller
                     ->whereIn('status', ['active', 'planned'])
                     ->currentAndFuture()
                     ->get();
-                
+
                 return view('pmcore::resources._allocation_summary', compact('allocations'))->render();
             })
             ->addColumn('availability', function ($user) {
@@ -105,39 +105,40 @@ class ResourceController extends Controller
                     ->whereIn('status', ['active', 'planned'])
                     ->currentAndFuture()
                     ->sum('allocation_percentage');
-                
+
                 $available = 100 - $totalAllocation;
                 $statusClass = $available > 50 ? 'success' : ($available > 0 ? 'warning' : 'danger');
-                
+
                 return '<div class="progress" style="height: 20px;">
-                    <div class="progress-bar bg-' . $statusClass . '" style="width: ' . $available . '%">
-                        ' . $available . '% Available
+                    <div class="progress-bar bg-'.$statusClass.'" style="width: '.$available.'%">
+                        '.$available.'% Available
                     </div>
                 </div>';
             })
             ->addColumn('actions', function ($user) {
                 $userName = addslashes($user->name ?? $user->getFullName());
+
                 return view('components.datatable-actions', [
                     'id' => $user->id,
                     'actions' => [
                         [
                             'label' => __('View Schedule'),
                             'icon' => 'bx bx-calendar',
-                            'url' => route('pmcore.resources.schedule', $user->id)
+                            'url' => route('pmcore.resources.schedule', $user->id),
                         ],
                         [
                             'label' => __('Allocate'),
                             'icon' => 'bx bx-plus',
-                            'onclick' => "allocateResource({$user->id}, '{$userName}')"
-                        ]
-                    ]
+                            'onclick' => "allocateResource({$user->id}, '{$userName}')",
+                        ],
+                    ],
                 ])->render();
             })
             ->filterColumn('user', function ($query, $keyword) {
                 $query->where(function ($q) use ($keyword) {
                     $q->where('users.name', 'like', "%{$keyword}%")
-                      ->orWhere('users.email', 'like', "%{$keyword}%");
-                    
+                        ->orWhere('users.email', 'like', "%{$keyword}%");
+
                     // Check if user has first_name and last_name fields for full name search
                     if (Schema::hasColumn('users', 'first_name')) {
                         $q->orWhere('users.first_name', 'like', "%{$keyword}%");
@@ -162,18 +163,18 @@ class ResourceController extends Controller
     public function schedule($userId)
     {
         $user = User::findOrFail($userId);
-        
+
         // Get allocations for the next 3 months
         $startDate = now()->startOfMonth();
         $endDate = now()->addMonths(3)->endOfMonth();
-        
+
         $allocations = ResourceAllocation::with(['project', 'task'])
             ->where('user_id', $userId)
             ->whereIn('status', ['active', 'planned'])
             ->inDateRange($startDate, $endDate)
             ->orderBy('start_date')
             ->get();
-            
+
         $capacities = ResourceCapacity::where('user_id', $userId)
             ->forDateRange($startDate, $endDate)
             ->get()
@@ -189,11 +190,11 @@ class ResourceController extends Controller
     {
         $user = null;
         $project = null;
-        
+
         if ($request->filled('user_id')) {
             $user = User::findOrFail($request->user_id);
         }
-        
+
         if ($request->filled('project_id')) {
             $project = Project::findOrFail($request->project_id);
         }
@@ -218,7 +219,7 @@ class ResourceController extends Controller
             'phase' => 'nullable|required_if:allocation_type,phase|string|max:255',
             'notes' => 'nullable|string',
             'is_billable' => 'boolean',
-            'is_confirmed' => 'boolean'
+            'is_confirmed' => 'boolean',
         ]);
 
         DB::beginTransaction();
@@ -238,22 +239,22 @@ class ResourceController extends Controller
                 'is_confirmed' => $request->boolean('is_confirmed', false),
                 'status' => $request->boolean('is_confirmed') ? 'active' : 'planned',
                 'created_by_id' => Auth::id(),
-                'updated_by_id' => Auth::id()
+                'updated_by_id' => Auth::id(),
             ]);
 
             // Check for capacity conflicts
             $conflicts = $allocation->checkCapacityConflicts();
-            
+
             // Update resource capacity
             $this->updateResourceCapacity($allocation);
-            
+
             DB::commit();
 
             if ($request->ajax()) {
                 return \App\ApiClasses\Success::response([
                     'message' => __('Resource allocated successfully!'),
                     'allocation' => $allocation,
-                    'conflicts' => $conflicts
+                    'conflicts' => $conflicts,
                 ]);
             }
 
@@ -268,11 +269,11 @@ class ResourceController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             if ($request->ajax()) {
                 return \App\ApiClasses\Error::response(__('Failed to allocate resource.'));
             }
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', __('Failed to allocate resource.'));
@@ -285,8 +286,8 @@ class ResourceController extends Controller
     public function edit($id)
     {
         $allocation = ResourceAllocation::with(['user', 'project', 'task'])->findOrFail($id);
-        
-        if (!$allocation->canBeEditedBy(Auth::user())) {
+
+        if (! $allocation->canBeEditedBy(Auth::user())) {
             abort(403, 'Unauthorized');
         }
 
@@ -299,8 +300,8 @@ class ResourceController extends Controller
     public function update(Request $request, $id)
     {
         $allocation = ResourceAllocation::findOrFail($id);
-        
-        if (!$allocation->canBeEditedBy(Auth::user())) {
+
+        if (! $allocation->canBeEditedBy(Auth::user())) {
             if ($request->ajax()) {
                 return \App\ApiClasses\Error::response(__('You do not have permission to edit this allocation.'));
             }
@@ -314,7 +315,7 @@ class ResourceController extends Controller
             'hours_per_day' => 'required|numeric|min:0.5|max:24',
             'notes' => 'nullable|string',
             'is_billable' => 'boolean',
-            'is_confirmed' => 'boolean'
+            'is_confirmed' => 'boolean',
         ]);
 
         DB::beginTransaction();
@@ -328,22 +329,22 @@ class ResourceController extends Controller
                 'is_billable' => $request->boolean('is_billable', true),
                 'is_confirmed' => $request->boolean('is_confirmed', false),
                 'status' => $request->boolean('is_confirmed') ? 'active' : $allocation->status,
-                'updated_by_id' => Auth::id()
+                'updated_by_id' => Auth::id(),
             ]);
 
             // Check for capacity conflicts
             $conflicts = $allocation->checkCapacityConflicts();
-            
+
             // Update resource capacity
             $this->updateResourceCapacity($allocation);
-            
+
             DB::commit();
 
             if ($request->ajax()) {
                 return \App\ApiClasses\Success::response([
                     'message' => __('Resource allocation updated successfully!'),
                     'allocation' => $allocation,
-                    'conflicts' => $conflicts
+                    'conflicts' => $conflicts,
                 ]);
             }
 
@@ -352,11 +353,11 @@ class ResourceController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             if ($request->ajax()) {
                 return \App\ApiClasses\Error::response(__('Failed to update resource allocation.'));
             }
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', __('Failed to update resource allocation.'));
@@ -369,8 +370,8 @@ class ResourceController extends Controller
     public function destroy(Request $request, $id)
     {
         $allocation = ResourceAllocation::findOrFail($id);
-        
-        if (!$allocation->canBeEditedBy(Auth::user())) {
+
+        if (! $allocation->canBeEditedBy(Auth::user())) {
             if ($request->ajax()) {
                 return \App\ApiClasses\Error::response(__('You do not have permission to delete this allocation.'));
             }
@@ -380,9 +381,9 @@ class ResourceController extends Controller
         try {
             $userId = $allocation->user_id;
             $dates = $this->getDateRange($allocation->start_date, $allocation->end_date);
-            
+
             $allocation->delete();
-            
+
             // Update capacity for affected dates
             foreach ($dates as $date) {
                 ResourceCapacity::updateAllocatedHours($userId, $date);
@@ -394,12 +395,12 @@ class ResourceController extends Controller
 
             return redirect()->route('pmcore.resources.index')
                 ->with('success', __('Resource allocation deleted successfully!'));
-                
+
         } catch (\Exception $e) {
             if ($request->ajax()) {
                 return \App\ApiClasses\Error::response(__('Failed to delete resource allocation.'));
             }
-            
+
             return redirect()->back()
                 ->with('error', __('Failed to delete resource allocation.'));
         }
@@ -413,7 +414,7 @@ class ResourceController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date'
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
         $userId = $request->user_id;
@@ -436,12 +437,12 @@ class ResourceController extends Controller
                 'remaining_hours' => $capacity->remaining_hours,
                 'is_working_day' => $capacity->is_working_day,
                 'is_overallocated' => $capacity->is_overallocated,
-                'allocation_percentage' => $capacity->allocation_percentage
+                'allocation_percentage' => $capacity->allocation_percentage,
             ];
         }
 
         return \App\ApiClasses\Success::response([
-            'availability' => $availability
+            'availability' => $availability,
         ]);
     }
 
@@ -451,7 +452,7 @@ class ResourceController extends Controller
     private function updateResourceCapacity(ResourceAllocation $allocation): void
     {
         $dates = $this->getDateRange($allocation->start_date, $allocation->end_date);
-        
+
         foreach ($dates as $date) {
             ResourceCapacity::updateAllocatedHours($allocation->user_id, $date);
         }
@@ -465,14 +466,14 @@ class ResourceController extends Controller
         $dates = [];
         $current = $startDate->copy();
         $end = $endDate ?? now()->addYear();
-        
+
         while ($current <= $end) {
             if ($current->isWeekday()) {
                 $dates[] = $current->copy();
             }
             $current->addDay();
         }
-        
+
         return $dates;
     }
 
@@ -483,19 +484,19 @@ class ResourceController extends Controller
     {
         $query = ResourceAllocation::whereIn('status', ['active', 'planned'])
             ->currentAndFuture();
-            
+
         if ($projectId) {
             // For project-specific view, get users overallocated on this project
             $query->where('project_id', $projectId);
         }
-        
+
         $overallocatedUserIds = $query
             ->select('user_id')
             ->selectRaw('SUM(allocation_percentage) as total_percentage')
             ->groupBy('user_id')
             ->having('total_percentage', '>', 100)
             ->pluck('user_id');
-            
+
         return $overallocatedUserIds->count();
     }
 
@@ -508,23 +509,23 @@ class ResourceController extends Controller
         $allResourceUsers = User::whereHas('roles', function ($q) {
             $q->whereNotIn('name', ['client', 'customer']);
         })->pluck('id');
-        
+
         // Get users who are fully allocated (100% or more)
         $query = ResourceAllocation::whereIn('status', ['active', 'planned'])
             ->currentAndFuture();
-            
+
         if ($projectId) {
             // For project-specific view, show users available for this project
             $query->where('project_id', $projectId);
         }
-        
+
         $fullyAllocatedUserIds = $query
             ->select('user_id')
             ->selectRaw('SUM(allocation_percentage) as total_percentage')
             ->groupBy('user_id')
             ->having('total_percentage', '>=', 100)
             ->pluck('user_id');
-            
+
         // Count available users (those not fully allocated)
         return $allResourceUsers->diff($fullyAllocatedUserIds)->count();
     }
@@ -537,27 +538,27 @@ class ResourceController extends Controller
         $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', now()->endOfMonth()->format('Y-m-d'));
         $departmentId = $request->get('department_id');
-        
+
         // Get all resources
         $query = User::whereHas('roles', function ($q) {
             $q->whereNotIn('name', ['client', 'customer']);
         });
-        
+
         if ($departmentId) {
             $query->where('department_id', $departmentId);
         }
-        
+
         $resources = $query->get();
-        
+
         // Calculate capacity data
         $capacityData = $this->calculateCapacityData($resources, $startDate, $endDate);
-        
+
         // Get departments for filter
         $departments = [];
         if (class_exists('\Modules\HRCore\app\Models\Department')) {
             $departments = \Modules\HRCore\app\Models\Department::orderBy('name')->get();
         }
-        
+
         return view('pmcore::resources.capacity', compact('capacityData', 'startDate', 'endDate', 'departments'));
     }
 
@@ -570,18 +571,18 @@ class ResourceController extends Controller
         $endDate = Carbon::parse($request->get('end_date', now()->endOfMonth()));
         $departmentId = $request->get('department_id');
         $viewType = $request->get('view_type', 'utilization'); // utilization, forecast, heatmap
-        
+
         // Get resources
         $query = User::whereHas('roles', function ($q) {
             $q->whereNotIn('name', ['client', 'customer']);
         });
-        
+
         if ($departmentId) {
             $query->where('department_id', $departmentId);
         }
-        
+
         $resources = $query->get();
-        
+
         switch ($viewType) {
             case 'utilization':
                 $data = $this->getUtilizationData($resources, $startDate, $endDate);
@@ -595,7 +596,7 @@ class ResourceController extends Controller
             default:
                 $data = [];
         }
-        
+
         return \App\ApiClasses\Success::response($data);
     }
 
@@ -606,7 +607,7 @@ class ResourceController extends Controller
     {
         $startDate = Carbon::parse($startDate);
         $endDate = Carbon::parse($endDate);
-        
+
         $data = [
             'total_resources' => $resources->count(),
             'total_capacity_hours' => 0,
@@ -615,37 +616,37 @@ class ResourceController extends Controller
             'utilization_percentage' => 0,
             'overallocated_resources' => 0,
             'underutilized_resources' => 0,
-            'resource_breakdown' => []
+            'resource_breakdown' => [],
         ];
-        
+
         foreach ($resources as $resource) {
             $allocations = ResourceAllocation::where('user_id', $resource->id)
                 ->whereIn('status', ['active', 'planned'])
                 ->inDateRange($startDate, $endDate)
                 ->get();
-            
+
             $workingDays = $this->getWorkingDays($startDate, $endDate);
             $totalCapacity = $workingDays * 8; // 8 hours per day
             $allocatedHours = 0;
-            
+
             foreach ($allocations as $allocation) {
                 $allocationStart = Carbon::parse($allocation->start_date)->max($startDate);
                 $allocationEnd = $allocation->end_date ? Carbon::parse($allocation->end_date)->min($endDate) : $endDate;
                 $allocationDays = $this->getWorkingDays($allocationStart, $allocationEnd);
                 $allocatedHours += ($allocationDays * $allocation->hours_per_day * ($allocation->allocation_percentage / 100));
             }
-            
+
             $utilization = $totalCapacity > 0 ? ($allocatedHours / $totalCapacity) * 100 : 0;
-            
+
             $data['total_capacity_hours'] += $totalCapacity;
             $data['allocated_hours'] += $allocatedHours;
-            
+
             if ($utilization > 100) {
                 $data['overallocated_resources']++;
             } elseif ($utilization < 70) {
                 $data['underutilized_resources']++;
             }
-            
+
             $data['resource_breakdown'][] = [
                 'resource' => $resource,
                 'capacity_hours' => $totalCapacity,
@@ -653,15 +654,15 @@ class ResourceController extends Controller
                 'available_hours' => max(0, $totalCapacity - $allocatedHours),
                 'utilization_percentage' => round($utilization, 1),
                 'is_overallocated' => $utilization > 100,
-                'is_underutilized' => $utilization < 70
+                'is_underutilized' => $utilization < 70,
             ];
         }
-        
+
         $data['available_hours'] = max(0, $data['total_capacity_hours'] - $data['allocated_hours']);
-        $data['utilization_percentage'] = $data['total_capacity_hours'] > 0 
-            ? round(($data['allocated_hours'] / $data['total_capacity_hours']) * 100, 1) 
+        $data['utilization_percentage'] = $data['total_capacity_hours'] > 0
+            ? round(($data['allocated_hours'] / $data['total_capacity_hours']) * 100, 1)
             : 0;
-        
+
         return $data;
     }
 
@@ -674,19 +675,19 @@ class ResourceController extends Controller
             'categories' => [],
             'series' => [
                 ['name' => 'Allocated %', 'data' => []],
-                ['name' => 'Available %', 'data' => []]
-            ]
+                ['name' => 'Available %', 'data' => []],
+            ],
         ];
-        
+
         foreach ($resources as $resource) {
             $workingDays = $this->getWorkingDays($startDate, $endDate);
             $totalCapacity = $workingDays * 8;
-            
+
             $allocations = ResourceAllocation::where('user_id', $resource->id)
                 ->whereIn('status', ['active', 'planned'])
                 ->inDateRange($startDate, $endDate)
                 ->get();
-            
+
             $allocatedHours = 0;
             foreach ($allocations as $allocation) {
                 $allocationStart = Carbon::parse($allocation->start_date)->max($startDate);
@@ -694,14 +695,14 @@ class ResourceController extends Controller
                 $allocationDays = $this->getWorkingDays($allocationStart, $allocationEnd);
                 $allocatedHours += ($allocationDays * $allocation->hours_per_day * ($allocation->allocation_percentage / 100));
             }
-            
+
             $utilization = $totalCapacity > 0 ? ($allocatedHours / $totalCapacity) * 100 : 0;
-            
+
             $data['categories'][] = $resource->name;
             $data['series'][0]['data'][] = round(min($utilization, 100), 1);
             $data['series'][1]['data'][] = round(max(0, 100 - $utilization), 1);
         }
-        
+
         return $data;
     }
 
@@ -715,23 +716,23 @@ class ResourceController extends Controller
             'series' => [
                 ['name' => 'Current Allocation', 'data' => []],
                 ['name' => 'Planned Allocation', 'data' => []],
-                ['name' => 'Forecasted Demand', 'data' => []]
-            ]
+                ['name' => 'Forecasted Demand', 'data' => []],
+            ],
         ];
-        
+
         // Generate monthly data points
         $current = $startDate->copy()->startOfMonth();
         while ($current <= $endDate) {
             $monthEnd = $current->copy()->endOfMonth();
-            
+
             $currentAllocation = 0;
             $plannedAllocation = 0;
-            
+
             foreach ($resources as $resource) {
                 $allocations = ResourceAllocation::where('user_id', $resource->id)
                     ->inDateRange($current, $monthEnd)
                     ->get();
-                
+
                 foreach ($allocations as $allocation) {
                     if ($allocation->status === 'active') {
                         $currentAllocation += $allocation->allocation_percentage;
@@ -740,22 +741,22 @@ class ResourceController extends Controller
                     }
                 }
             }
-            
+
             $totalResources = $resources->count() * 100; // 100% per resource
             $currentUtilization = $totalResources > 0 ? ($currentAllocation / $totalResources) * 100 : 0;
             $plannedUtilization = $totalResources > 0 ? ($plannedAllocation / $totalResources) * 100 : 0;
-            
+
             // Simple forecast based on trend (you can make this more sophisticated)
             $forecastedDemand = $currentUtilization * 1.1; // 10% growth assumption
-            
+
             $data['categories'][] = $current->format('M Y');
             $data['series'][0]['data'][] = round($currentUtilization, 1);
             $data['series'][1]['data'][] = round($plannedUtilization, 1);
             $data['series'][2]['data'][] = round($forecastedDemand, 1);
-            
+
             $current->addMonth();
         }
-        
+
         return $data;
     }
 
@@ -767,9 +768,9 @@ class ResourceController extends Controller
         $data = [
             'resources' => [],
             'dates' => [],
-            'allocations' => []
+            'allocations' => [],
         ];
-        
+
         // Generate date range
         $current = $startDate->copy();
         while ($current <= $endDate) {
@@ -778,29 +779,29 @@ class ResourceController extends Controller
             }
             $current->addDay();
         }
-        
+
         // Get allocation data for each resource
         foreach ($resources as $resource) {
             $data['resources'][] = $resource->name;
             $resourceAllocations = [];
-            
+
             foreach ($data['dates'] as $date) {
                 $dateCarbon = Carbon::parse($date);
                 $dayAllocation = ResourceAllocation::where('user_id', $resource->id)
                     ->whereIn('status', ['active', 'planned'])
                     ->where('start_date', '<=', $date)
-                    ->where(function($q) use ($date) {
+                    ->where(function ($q) use ($date) {
                         $q->whereNull('end_date')
-                          ->orWhere('end_date', '>=', $date);
+                            ->orWhere('end_date', '>=', $date);
                     })
                     ->sum('allocation_percentage');
-                
+
                 $resourceAllocations[] = min($dayAllocation, 100);
             }
-            
+
             $data['allocations'][] = $resourceAllocations;
         }
-        
+
         return $data;
     }
 
@@ -811,14 +812,14 @@ class ResourceController extends Controller
     {
         $days = 0;
         $current = $startDate->copy();
-        
+
         while ($current <= $endDate) {
             if ($current->isWeekday()) {
                 $days++;
             }
             $current->addDay();
         }
-        
+
         return $days;
     }
 }

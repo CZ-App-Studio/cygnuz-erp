@@ -17,7 +17,7 @@ use Modules\Announcement\app\Http\Controllers\AnnouncementController;
 Route::middleware(['auth', 'verified'])->group(function () {
     // Main announcement routes
     Route::resource('announcements', AnnouncementController::class);
-    
+
     // Additional announcement routes
     Route::prefix('announcements')->name('announcements.')->group(function () {
         Route::post('{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])->name('acknowledge');

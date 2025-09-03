@@ -11,112 +11,114 @@ use OpenAI;
 
 class GptService
 {
-  protected $schemaService;
+    protected $schemaService;
 
-  public function __construct(SchemaService $schemaService)
-  {
-    $this->schemaService = $schemaService;
-  }
-
-  public function interpretQuery($userQuery)
-  {
-    // Retrieve the schema from the session
-    $schema = Session::get('schema');
-
-    if (!$schema) {
-      return $this->initiateSessionWithSchema();
+    public function __construct(SchemaService $schemaService)
+    {
+        $this->schemaService = $schemaService;
     }
 
-    Log::info($schema);
+    public function interpretQuery($userQuery)
+    {
+        // Retrieve the schema from the session
+        $schema = Session::get('schema');
 
-    // Generate SQL query from user input
-    $prompt = "You are an SQL database assistant. Based on the schema provided below, generate a valid SQL query:\n\n";
-    $prompt .= "Schema:\n$schema\n\n";
-    $prompt .= "User Query: \"$userQuery\"\n\n";
-    $prompt .= "Requirements:\n";
-    $prompt .= "- Ensure the query is syntactically correct.\n";
-    $prompt .= "- Avoid SQL injection risks.\n";
-    $prompt .= "- If you are unsure, return an error message instead of generating an invalid query.\n";
-    $prompt .= "- If the query is related to attendance records, if the status of the attendance are checked_in or checked_out you can consider them as present.";
-    $prompt .= "- If the query is related to employees/workers, you can consider them as users in the system.";
-    $sqlQuery = $this->chatWithGpt($prompt);
+        if (! $schema) {
+            return $this->initiateSessionWithSchema();
+        }
 
-    $cleanedResponse = preg_replace('/```sql|```/', '', $sqlQuery);
+        Log::info($schema);
 
-    $finalSqlQuery = strip_tags($cleanedResponse);
+        // Generate SQL query from user input
+        $prompt = "You are an SQL database assistant. Based on the schema provided below, generate a valid SQL query:\n\n";
+        $prompt .= "Schema:\n$schema\n\n";
+        $prompt .= "User Query: \"$userQuery\"\n\n";
+        $prompt .= "Requirements:\n";
+        $prompt .= "- Ensure the query is syntactically correct.\n";
+        $prompt .= "- Avoid SQL injection risks.\n";
+        $prompt .= "- If you are unsure, return an error message instead of generating an invalid query.\n";
+        $prompt .= '- If the query is related to attendance records, if the status of the attendance are checked_in or checked_out you can consider them as present.';
+        $prompt .= '- If the query is related to employees/workers, you can consider them as users in the system.';
+        $sqlQuery = $this->chatWithGpt($prompt);
 
-    $finalSqlQuery = trim($finalSqlQuery);
+        $cleanedResponse = preg_replace('/```sql|```/', '', $sqlQuery);
 
-    if (!$this->validateSQL($finalSqlQuery)) {
-      return "The generated SQL query appears to be invalid.";
+        $finalSqlQuery = strip_tags($cleanedResponse);
+
+        $finalSqlQuery = trim($finalSqlQuery);
+
+        if (! $this->validateSQL($finalSqlQuery)) {
+            return 'The generated SQL query appears to be invalid.';
+        }
+
+        // Execute the SQL query on the database
+        try {
+            $results = DB::select($finalSqlQuery);
+
+            // Convert query result to natural language summary
+            $response = $this->convertResultsToNaturalLanguageUsingGpt($results);
+
+            return $response;
+        } catch (Exception $e) {
+            Log::error('SQL Error: '.$e->getMessage());
+
+            return 'Error executing the query: '.$e->getMessage();
+        }
     }
 
-    // Execute the SQL query on the database
-    try {
-      $results = DB::select($finalSqlQuery);
+    public function initiateSessionWithSchema()
+    {
+        $schema = $this->schemaService->getSchema();
 
-      // Convert query result to natural language summary
-      $response = $this->convertResultsToNaturalLanguageUsingGpt($results);
+        // Save schema in session (simulates "memory" for the model)
+        Session::put('schema', $schema);
 
-      return $response;
-    } catch (Exception $e) {
-      Log::error("SQL Error: " . $e->getMessage());
-      return "Error executing the query: " . $e->getMessage();
-    }
-  }
+        // Prepare an initial system message
+        $initialMessage = "Here is my database schema:\n$schema\nNow, I want to ask some questions about this schema.";
 
-  public function initiateSessionWithSchema()
-  {
-    $schema = $this->schemaService->getSchema();
-
-
-    // Save schema in session (simulates "memory" for the model)
-    Session::put('schema', $schema);
-
-    // Prepare an initial system message
-    $initialMessage = "Here is my database schema:\n$schema\nNow, I want to ask some questions about this schema.";
-
-    return $this->chatWithGpt($initialMessage);
-  }
-
-  private function chatWithGpt($prompt)
-  {
-    $yourApiKey = Settings::first()->chat_gpt_key;
-    $client = OpenAI::client($yourApiKey);
-
-    $response = $client->chat()->create([
-      'model' => 'gpt-4-turbo',
-      'messages' => [
-        ['role' => 'system', 'content' => 'You are a database assistant. You help users query a database schema.'],
-        ['role' => 'user', 'content' => $prompt],
-      ],
-    ]);
-
-    return $response['choices'][0]['message']['content'];
-  }
-
-  private function validateSQL($query)
-  {
-    try {
-      DB::statement("EXPLAIN $query");
-      return true;
-    } catch (Exception $e) {
-      Log::error("SQL Validation Error: " . $e->getMessage());
-      return false;
-    }
-  }
-
-  private function convertResultsToNaturalLanguageUsingGpt($results)
-  {
-    if (empty($results)) {
-      return "No results found for your query.";
+        return $this->chatWithGpt($initialMessage);
     }
 
-    // Convert the query result to JSON for passing to GPT
-    $jsonResults = json_encode(array_slice($results, 0, 5)); // Pass a few rows for summarization
+    private function chatWithGpt($prompt)
+    {
+        $yourApiKey = Settings::first()->chat_gpt_key;
+        $client = OpenAI::client($yourApiKey);
 
-    // Prepare the prompt for GPT to summarize the results in natural language
-    $prompt = <<<PROMPT
+        $response = $client->chat()->create([
+            'model' => 'gpt-4-turbo',
+            'messages' => [
+                ['role' => 'system', 'content' => 'You are a database assistant. You help users query a database schema.'],
+                ['role' => 'user', 'content' => $prompt],
+            ],
+        ]);
+
+        return $response['choices'][0]['message']['content'];
+    }
+
+    private function validateSQL($query)
+    {
+        try {
+            DB::statement("EXPLAIN $query");
+
+            return true;
+        } catch (Exception $e) {
+            Log::error('SQL Validation Error: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    private function convertResultsToNaturalLanguageUsingGpt($results)
+    {
+        if (empty($results)) {
+            return 'No results found for your query.';
+        }
+
+        // Convert the query result to JSON for passing to GPT
+        $jsonResults = json_encode(array_slice($results, 0, 5)); // Pass a few rows for summarization
+
+        // Prepare the prompt for GPT to summarize the results in natural language
+        $prompt = <<<PROMPT
 Here is a JSON array of query results:
 $jsonResults
 
@@ -127,16 +129,17 @@ Please summarize this data in clear, natural language. Ensure:
 - If data is tabular, suggest key trends or patterns.
 - Format the response as clean HTML with emojis where appropriate.
 PROMPT;
-    // Use the chatWithGpt method to get the natural language summary
-    return $this->chatWithGpt($prompt);
-  }
 
-  public function interpretQueryV2($userQuery)
-  {
-    // Fetch a summarized schema
-    $schemaSummary = $this->schemaService->getSchema(true);
+        // Use the chatWithGpt method to get the natural language summary
+        return $this->chatWithGpt($prompt);
+    }
 
-    $extractTablePrompt = <<<EOD
+    public function interpretQueryV2($userQuery)
+    {
+        // Fetch a summarized schema
+        $schemaSummary = $this->schemaService->getSchema(true);
+
+        $extractTablePrompt = <<<EOD
 You are an SQL assistant with knowledge of the following database schema:
 $schemaSummary
 
@@ -147,18 +150,18 @@ User Query: "$userQuery"
 Only respond with the table names, separated by commas. Do not include any additional text.
 EOD;
 
-// Call OpenAI to extract table names
-    $tablesResponse = $this->chatWithGpt($extractTablePrompt);
-    Log::info('Tables response from GPT: ' . $tablesResponse);
-    $tables = array_map('trim', explode(',', $tablesResponse));
+        // Call OpenAI to extract table names
+        $tablesResponse = $this->chatWithGpt($extractTablePrompt);
+        Log::info('Tables response from GPT: '.$tablesResponse);
+        $tables = array_map('trim', explode(',', $tablesResponse));
 
-    $schemaDetails = '';
-    foreach ($tables as $tableName) {
-      $schemaDetails .= $this->schemaService->getTableSchema($tableName) . "\n";
-      Log::info('Table schema for ' . $tableName . ': ' . $schemaDetails);
-    }
+        $schemaDetails = '';
+        foreach ($tables as $tableName) {
+            $schemaDetails .= $this->schemaService->getTableSchema($tableName)."\n";
+            Log::info('Table schema for '.$tableName.': '.$schemaDetails);
+        }
 
-    $prompt = <<<EOD
+        $prompt = <<<EOD
 You are an SQL assistant with the following table schema:
 
 $schemaDetails
@@ -173,46 +176,46 @@ Points to consider:
 Generate a valid SQL query based on the schema. Do not include any explanation, just return the SQL query.
 EOD;
 
+        $sqlQuery = $this->chatWithGpt($prompt);
 
-    $sqlQuery = $this->chatWithGpt($prompt);
+        $cleanedResponse = preg_replace('/```sql|```/', '', $sqlQuery);
 
-    $cleanedResponse = preg_replace('/```sql|```/', '', $sqlQuery);
+        $finalSqlQuery = strip_tags($cleanedResponse);
 
-    $finalSqlQuery = strip_tags($cleanedResponse);
+        $finalSqlQuery = trim($finalSqlQuery);
 
-    $finalSqlQuery = trim($finalSqlQuery);
+        Log::info('Final SQL query: '.$finalSqlQuery);
 
-    Log::info('Final SQL query: ' . $finalSqlQuery);
+        if (! $this->validateSQL($finalSqlQuery)) {
+            return 'The generated SQL query appears to be invalid.';
+        }
 
-    if (!$this->validateSQL($finalSqlQuery)) {
-      return "The generated SQL query appears to be invalid.";
+        // Execute the SQL query on the database
+        try {
+            $results = DB::select($finalSqlQuery);
+
+            // Convert query result to natural language summary
+            $response = $this->convertResultsToNaturalLanguageUsingGpt($results);
+
+            return $response;
+        } catch (Exception $e) {
+            Log::error('SQL Error: '.$e->getMessage());
+
+            return 'Error executing the query: '.$e->getMessage();
+        }
     }
 
-    // Execute the SQL query on the database
-    try {
-      $results = DB::select($finalSqlQuery);
+    private function convertResultsToNaturalLanguageUsingGptV3($results)
+    {
+        if (empty($results)) {
+            return 'No relevant data found for your query.';
+        }
 
-      // Convert query result to natural language summary
-      $response = $this->convertResultsToNaturalLanguageUsingGpt($results);
+        // Convert results to JSON (first few rows for clarity)
+        $jsonResults = json_encode(array_slice($results, 0, 5)); // Take the top 5 rows
 
-      return $response;
-    } catch (Exception $e) {
-      Log::error("SQL Error: " . $e->getMessage());
-      return "Error executing the query: " . $e->getMessage();
-    }
-  }
-
-  private function convertResultsToNaturalLanguageUsingGptV3($results)
-  {
-    if (empty($results)) {
-      return "No relevant data found for your query.";
-    }
-
-    // Convert results to JSON (first few rows for clarity)
-    $jsonResults = json_encode(array_slice($results, 0, 5)); // Take the top 5 rows
-
-    // Prepare an optimized HRMS-specific GPT prompt
-    $prompt = <<<PROMPT
+        // Prepare an optimized HRMS-specific GPT prompt
+        $prompt = <<<PROMPT
 You are an AI HR Assistant specializing in **Human Resource Management Systems (HRMS)** data analysis.
 
 ### Context:
@@ -243,21 +246,21 @@ Overall attendance and performance trends indicate stable productivity across te
 Now, analyze the provided data and produce a summary adhering to these instructions.
 PROMPT;
 
-    // Get a summarized response from GPT
-    return $this->chatWithGpt($prompt);
-  }
-
-  private function convertResultsToNaturalLanguageUsingGptV2($results)
-  {
-    if (empty($results)) {
-      return "No results found for your query.";
+        // Get a summarized response from GPT
+        return $this->chatWithGpt($prompt);
     }
 
-    // Convert the query result to JSON for summarization
-    $jsonResults = json_encode(array_slice($results, 0, 5)); // Take the first 5 rows for clarity
+    private function convertResultsToNaturalLanguageUsingGptV2($results)
+    {
+        if (empty($results)) {
+            return 'No results found for your query.';
+        }
 
-    // Build the improved prompt for GPT
-    $prompt = <<<PROMPT
+        // Convert the query result to JSON for summarization
+        $jsonResults = json_encode(array_slice($results, 0, 5)); // Take the first 5 rows for clarity
+
+        // Build the improved prompt for GPT
+        $prompt = <<<PROMPT
 You are an AI data assistant tasked with summarizing SQL query results into a natural, human-readable format.
 
 ### Data:
@@ -282,42 +285,41 @@ $jsonResults
 ### Now, please summarize the data accordingly.
 PROMPT;
 
-    // Get the natural language summary using GPT
-    return $this->chatWithGpt($prompt);
-  }
-
-  private function convertResultsToNaturalLanguage($results)
-  {
-    if (empty($results)) {
-      return "No results found for your query.";
+        // Get the natural language summary using GPT
+        return $this->chatWithGpt($prompt);
     }
 
-    // Example: summarize the first few results
-    $summary = "The query returned " . count($results) . " records. Here are some details:\n";
+    private function convertResultsToNaturalLanguage($results)
+    {
+        if (empty($results)) {
+            return 'No results found for your query.';
+        }
 
-    foreach (array_slice($results, 0, 3) as $result) {
-      $summary .= json_encode($result) . "\n"; // You can format this in a more readable way
+        // Example: summarize the first few results
+        $summary = 'The query returned '.count($results)." records. Here are some details:\n";
+
+        foreach (array_slice($results, 0, 3) as $result) {
+            $summary .= json_encode($result)."\n"; // You can format this in a more readable way
+        }
+
+        return $summary;
     }
 
-    return $summary;
-  }
+    private function extractTableNameFromKeywords($userQuery)
+    {
+        $keywords = [
+            'orders' => 'orders',
+            'clients' => 'clients',
+            'employees' => 'employees',
+            'attendance' => 'attendances',
+        ];
 
+        foreach ($keywords as $keyword => $table) {
+            if (stripos($userQuery, $keyword) !== false) {
+                return $table;
+            }
+        }
 
-  private function extractTableNameFromKeywords($userQuery)
-  {
-    $keywords = [
-      'orders' => 'orders',
-      'clients' => 'clients',
-      'employees' => 'employees',
-      'attendance' => 'attendances'
-    ];
-
-    foreach ($keywords as $keyword => $table) {
-      if (stripos($userQuery, $keyword) !== false) {
-        return $table;
-      }
+        return null;
     }
-
-    return null;
-  }
 }

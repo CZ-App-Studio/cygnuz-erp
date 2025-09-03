@@ -2,18 +2,18 @@
 
 namespace App\Enums;
 
-enum SalaryType : string
+enum SalaryType: string
 {
-    Case HOURLY = 'hourly';
+    case HOURLY = 'hourly';
 
-    Case DAILY = 'daily';
+    case DAILY = 'daily';
 
-    Case WEEKLY = 'weekly';
+    case WEEKLY = 'weekly';
 
-    Case MONTHLY = 'monthly';
+    case MONTHLY = 'monthly';
 
-    Case COMMISSION = 'commission';
+    case COMMISSION = 'commission';
 
-    Case CONTRACT = 'contract';
+    case CONTRACT = 'contract';
 
 }

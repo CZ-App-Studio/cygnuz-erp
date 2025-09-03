@@ -25,18 +25,18 @@ return new class extends Migration
             $table->string('color_code', 7)->default('#007bff');
             $table->boolean('is_billable')->default(true);
             $table->decimal('hourly_rate', 8, 2)->nullable();
-            
+
             // Foreign keys (soft relationships)
             $table->unsignedBigInteger('client_id')->nullable(); // References companies table from CRMCore
             $table->unsignedBigInteger('project_manager_id')->nullable(); // References users table
-            
+
             // Standard audit fields
             $table->unsignedBigInteger('created_by_id')->nullable();
             $table->unsignedBigInteger('updated_by_id')->nullable();
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes for performance
             $table->index(['status', 'type']);
             $table->index(['client_id']);

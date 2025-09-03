@@ -23,7 +23,7 @@ class TaxRate extends Model
         'tax_authority',
         'created_by_id',
         'updated_by_id',
-        'tenant_id'
+        'tenant_id',
     ];
 
     protected $casts = [
@@ -73,7 +73,7 @@ class TaxRate extends Model
      */
     public function getFormattedRateAttribute()
     {
-        return number_format($this->rate, 2) . '%';
+        return number_format($this->rate, 2).'%';
     }
 
     /**

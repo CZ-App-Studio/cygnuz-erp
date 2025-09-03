@@ -10,51 +10,49 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-  /**
-   * The path to the "home" route for your application.
-   *
-   * Typically, users are redirected here after authentication.
-   *
-   * @var string
-   */
-  public const HOME = '/';
+    /**
+     * The path to the "home" route for your application.
+     *
+     * Typically, users are redirected here after authentication.
+     *
+     * @var string
+     */
+    public const HOME = '/';
 
-  /**
-   * Bootstrap services.
-   */
-  public function boot(): void
-  {
-    $this->configureRateLimiting();
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        $this->configureRateLimiting();
 
-    $this->routes(function () {
-      Route::middleware('api')
-        ->prefix('api')
-        ->namespace($this->namespace)
-        ->group(base_path('routes/api.php'));
+        $this->routes(function () {
+            Route::middleware('api')
+                ->prefix('api')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/api.php'));
 
-      Route::middleware('web')
-        ->namespace($this->namespace)
-        ->group(base_path('routes/web.php'));
-    });
-    $this->configureRateLimiting();
+            Route::middleware('web')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/web.php'));
+        });
+        $this->configureRateLimiting();
 
-  }
+    }
 
-  protected function configureRateLimiting()
-  {
-    RateLimiter::for('api', function (Request $request) {
-      return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-    });
+    protected function configureRateLimiting()
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
 
-    // Desktop tracker rate limits
-    RateLimiter::for('tracking', function (Request $request) {
-      return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-    });
+        // Desktop tracker rate limits
+        RateLimiter::for('tracking', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
 
-    RateLimiter::for('screenshots', function (Request $request) {
-      return Limit::perMinute(20)->by($request->user()?->id ?: $request->ip());
-    });
-  }
-
-
+        RateLimiter::for('screenshots', function (Request $request) {
+            return Limit::perMinute(20)->by($request->user()?->id ?: $request->ip());
+        });
+    }
 }

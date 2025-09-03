@@ -10,13 +10,13 @@ enum FileStatus: string
     case ARCHIVED = 'archived';
     case DELETED = 'deleted';
     case FAILED = 'failed';
-    
+
     /**
      * Get human-readable label for the file status
      */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::UPLOADING => 'Uploading',
             self::ACTIVE => 'Active',
             self::PROCESSING => 'Processing',
@@ -25,13 +25,13 @@ enum FileStatus: string
             self::FAILED => 'Failed',
         };
     }
-    
+
     /**
      * Get color code for status display
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::UPLOADING => 'blue',
             self::ACTIVE => 'green',
             self::PROCESSING => 'yellow',
@@ -40,18 +40,18 @@ enum FileStatus: string
             self::FAILED => 'red',
         };
     }
-    
+
     /**
      * Check if file is accessible in this status
      */
     public function isAccessible(): bool
     {
-        return match($this) {
+        return match ($this) {
             self::ACTIVE, self::ARCHIVED => true,
             default => false,
         };
     }
-    
+
     /**
      * Check if file can be modified in this status
      */
@@ -59,13 +59,13 @@ enum FileStatus: string
     {
         return $this === self::ACTIVE;
     }
-    
+
     /**
      * Get next possible statuses from current status
      */
     public function nextStatuses(): array
     {
-        return match($this) {
+        return match ($this) {
             self::UPLOADING => [self::ACTIVE, self::FAILED],
             self::ACTIVE => [self::PROCESSING, self::ARCHIVED, self::DELETED],
             self::PROCESSING => [self::ACTIVE, self::FAILED],

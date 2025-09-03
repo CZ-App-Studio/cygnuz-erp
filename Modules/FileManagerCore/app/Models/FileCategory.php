@@ -2,10 +2,10 @@
 
 namespace Modules\FileManagerCore\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FileCategory extends Model
 {
@@ -20,14 +20,14 @@ class FileCategory extends Model
         'is_active',
         'sort_order',
         'max_file_size',
-        'allowed_mime_types'
+        'allowed_mime_types',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'sort_order' => 'integer',
         'max_file_size' => 'integer',
-        'allowed_mime_types' => 'array'
+        'allowed_mime_types' => 'array',
     ];
 
     /**
@@ -82,7 +82,7 @@ class FileCategory extends Model
             array_unshift($breadcrumb, [
                 'id' => $category->id,
                 'name' => $category->name,
-                'slug' => $category->slug
+                'slug' => $category->slug,
             ]);
             $category = $category->parent;
         }
@@ -107,7 +107,7 @@ class FileCategory extends Model
      */
     public function isFileSizeAllowed(int $size): bool
     {
-        if (!$this->max_file_size) {
+        if (! $this->max_file_size) {
             return true; // No size limit
         }
 
@@ -119,7 +119,7 @@ class FileCategory extends Model
      */
     public function getFormattedMaxSizeAttribute(): ?string
     {
-        if (!$this->max_file_size) {
+        if (! $this->max_file_size) {
             return null;
         }
 
@@ -132,11 +132,11 @@ class FileCategory extends Model
     private function formatBytes(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 }

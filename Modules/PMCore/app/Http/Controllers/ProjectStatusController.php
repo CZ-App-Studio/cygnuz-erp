@@ -2,6 +2,8 @@
 
 namespace Modules\PMCore\app\Http\Controllers;
 
+use App\ApiClasses\Error;
+use App\ApiClasses\Success;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -9,8 +11,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Modules\PMCore\app\Models\ProjectStatus as ProjectStatusModel;
-use App\ApiClasses\Success;
-use App\ApiClasses\Error;
 
 class ProjectStatusController extends Controller
 {
@@ -20,6 +20,7 @@ class ProjectStatusController extends Controller
     public function index()
     {
         $statuses = ProjectStatusModel::orderBy('sort_order')->get();
+
         return view('pmcore::project-statuses.index', compact('statuses'));
     }
 
@@ -33,23 +34,23 @@ class ProjectStatusController extends Controller
 
         return datatables($query)
             ->editColumn('sort_order', function ($status) {
-                return '<i class="bx bx-menu drag-handle" style="cursor: move; font-size: 1.25rem;" title="' . __('Drag to reorder') . '"></i>';
+                return '<i class="bx bx-menu drag-handle" style="cursor: move; font-size: 1.25rem;" title="'.__('Drag to reorder').'"></i>';
             })
             ->addColumn('actions', function ($status) {
                 $actions = [
                     [
                         'label' => __('Edit'),
                         'icon' => 'bx bx-edit',
-                        'onclick' => "editStatus({$status->id})"
-                    ]
+                        'onclick' => "editStatus({$status->id})",
+                    ],
                 ];
 
                 // Add set as default option if not already default
-                if (!$status->is_default) {
+                if (! $status->is_default) {
                     $actions[] = [
                         'label' => __('Set as Default'),
                         'icon' => 'bx bx-star',
-                        'onclick' => "setDefaultStatus({$status->id})"
+                        'onclick' => "setDefaultStatus({$status->id})",
                     ];
                 }
 
@@ -58,47 +59,47 @@ class ProjectStatusController extends Controller
                     'label' => $status->is_active ? __('Deactivate') : __('Activate'),
                     'icon' => $status->is_active ? 'bx bx-pause' : 'bx bx-play',
                     'onclick' => "toggleStatus({$status->id})",
-                    'class' => $status->is_active ? 'text-warning' : 'text-success'
+                    'class' => $status->is_active ? 'text-warning' : 'text-success',
                 ];
 
                 // Add delete option if not default and no projects
-                if (!$status->is_default && $status->projects_count == 0) {
+                if (! $status->is_default && $status->projects_count == 0) {
                     $actions[] = [
-                        'divider' => true
+                        'divider' => true,
                     ];
                     $actions[] = [
                         'label' => __('Delete'),
                         'icon' => 'bx bx-trash',
                         'onclick' => "deleteStatus({$status->id})",
-                        'class' => 'text-danger'
+                        'class' => 'text-danger',
                     ];
                 }
 
                 return view('components.datatable-actions', [
                     'id' => $status->id,
-                    'actions' => $actions
+                    'actions' => $actions,
                 ])->render();
             })
             ->editColumn('name', function ($status) {
-                return '<span class="badge" style="background-color: ' . $status->color . '; color: white;">' . $status->name . '</span>';
+                return '<span class="badge" style="background-color: '.$status->color.'; color: white;">'.$status->name.'</span>';
             })
             ->addColumn('projects_count', function ($status) {
-                return '<span class="badge bg-info">' . $status->projects_count . '</span>';
+                return '<span class="badge bg-info">'.$status->projects_count.'</span>';
             })
             ->editColumn('is_active', function ($status) {
-                return $status->is_active ? 
-                    '<span class="badge bg-success">' . __('Active') . '</span>' : 
-                    '<span class="badge bg-secondary">' . __('Inactive') . '</span>';
+                return $status->is_active ?
+                    '<span class="badge bg-success">'.__('Active').'</span>' :
+                    '<span class="badge bg-secondary">'.__('Inactive').'</span>';
             })
             ->editColumn('is_default', function ($status) {
-                return $status->is_default ? 
-                    '<span class="badge bg-primary">' . __('Yes') . '</span>' : 
-                    '<span class="badge bg-secondary">' . __('No') . '</span>';
+                return $status->is_default ?
+                    '<span class="badge bg-primary">'.__('Yes').'</span>' :
+                    '<span class="badge bg-secondary">'.__('No').'</span>';
             })
             ->editColumn('is_completed', function ($status) {
-                return $status->is_completed ? 
-                    '<span class="badge bg-success">' . __('Yes') . '</span>' : 
-                    '<span class="badge bg-secondary">' . __('No') . '</span>';
+                return $status->is_completed ?
+                    '<span class="badge bg-success">'.__('Yes').'</span>' :
+                    '<span class="badge bg-secondary">'.__('No').'</span>';
             })
             ->rawColumns(['sort_order', 'actions', 'name', 'projects_count', 'is_active', 'is_default', 'is_completed'])
             ->make(true);
@@ -114,7 +115,7 @@ class ProjectStatusController extends Controller
         if ($validator->fails()) {
             return Error::response([
                 'message' => __('Validation failed'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
 
@@ -144,11 +145,12 @@ class ProjectStatusController extends Controller
             });
 
             return Success::response([
-                'message' => __('Project status created successfully!')
+                'message' => __('Project status created successfully!'),
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to create project status: ' . $e->getMessage());
+            Log::error('Failed to create project status: '.$e->getMessage());
+
             return Error::response(__('Failed to create project status. Please try again.'));
         }
     }
@@ -169,7 +171,7 @@ class ProjectStatusController extends Controller
                     'is_active' => $projectStatus->is_active,
                     'is_default' => $projectStatus->is_default,
                     'is_completed' => $projectStatus->is_completed,
-                ]
+                ],
             ]);
         }
 
@@ -186,7 +188,7 @@ class ProjectStatusController extends Controller
         if ($validator->fails()) {
             return Error::response([
                 'message' => __('Validation failed'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
 
@@ -210,11 +212,12 @@ class ProjectStatusController extends Controller
             });
 
             return Success::response([
-                'message' => __('Project status updated successfully!')
+                'message' => __('Project status updated successfully!'),
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to update project status: ' . $e->getMessage());
+            Log::error('Failed to update project status: '.$e->getMessage());
+
             return Error::response(__('Failed to update project status. Please try again.'));
         }
     }
@@ -241,11 +244,12 @@ class ProjectStatusController extends Controller
             $projectStatus->delete();
 
             return Success::response([
-                'message' => __('Project status deleted successfully!')
+                'message' => __('Project status deleted successfully!'),
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to delete project status: ' . $e->getMessage());
+            Log::error('Failed to delete project status: '.$e->getMessage());
+
             return Error::response(__('Failed to delete project status. Please try again.'));
         }
     }
@@ -263,7 +267,7 @@ class ProjectStatusController extends Controller
         if ($validator->fails()) {
             return Error::response([
                 'message' => __('Invalid data provided'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
 
@@ -276,11 +280,12 @@ class ProjectStatusController extends Controller
             });
 
             return Success::response([
-                'message' => __('Sort order updated successfully!')
+                'message' => __('Sort order updated successfully!'),
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to update sort order: ' . $e->getMessage());
+            Log::error('Failed to update sort order: '.$e->getMessage());
+
             return Error::response(__('Failed to update sort order. Please try again.'));
         }
     }
@@ -292,16 +297,17 @@ class ProjectStatusController extends Controller
     {
         try {
             $projectStatus->update([
-                'is_active' => !$projectStatus->is_active
+                'is_active' => ! $projectStatus->is_active,
             ]);
 
             return Success::response([
                 'message' => __('Project status updated successfully!'),
-                'is_active' => $projectStatus->is_active
+                'is_active' => $projectStatus->is_active,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to toggle project status: ' . $e->getMessage());
+            Log::error('Failed to toggle project status: '.$e->getMessage());
+
             return Error::response(__('Failed to update project status. Please try again.'));
         }
     }
@@ -318,7 +324,7 @@ class ProjectStatusController extends Controller
         if ($validator->fails()) {
             return Error::response([
                 'message' => __('Invalid status selected'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
 
@@ -326,17 +332,18 @@ class ProjectStatusController extends Controller
             DB::transaction(function () use ($request) {
                 // Remove default from all statuses
                 ProjectStatusModel::where('is_default', true)->update(['is_default' => false]);
-                
+
                 // Set the selected status as default
                 ProjectStatusModel::find($request->id)->update(['is_default' => true]);
             });
 
             return Success::response([
-                'message' => __('Default status updated successfully!')
+                'message' => __('Default status updated successfully!'),
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to set default status: ' . $e->getMessage());
+            Log::error('Failed to set default status: '.$e->getMessage());
+
             return Error::response(__('Failed to update default status. Please try again.'));
         }
     }
@@ -347,7 +354,7 @@ class ProjectStatusController extends Controller
     protected function validateProjectStatus(Request $request, $statusId = null)
     {
         $rules = [
-            'name' => 'required|string|max:255|unique:project_statuses,name,' . $statusId,
+            'name' => 'required|string|max:255|unique:project_statuses,name,'.$statusId,
             'description' => 'nullable|string|max:1000',
             'color' => 'required|string|regex:/^#[a-fA-F0-9]{6}$/',
             'is_active' => 'boolean',

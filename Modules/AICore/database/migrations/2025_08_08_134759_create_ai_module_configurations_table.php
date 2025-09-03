@@ -27,11 +27,11 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->integer('priority')->default(0); // For ordering in UI
             $table->timestamps();
-            
+
             // Foreign keys
             $table->foreign('default_provider_id')->references('id')->on('ai_providers')->onDelete('set null');
             $table->foreign('default_model_id')->references('id')->on('ai_models')->onDelete('set null');
-            
+
             // Indexes
             $table->index('module_name');
             $table->index('is_active');

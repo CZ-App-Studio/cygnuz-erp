@@ -4,33 +4,37 @@ namespace Modules\AiChat\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Modules\AiChat\Services\GptService;
 use Modules\AiChat\Services\SchemaService;
+use Modules\AICore\Models\AIProvider;
+use Modules\AICore\Services\AIProviderService;
 use Modules\AICore\Services\AIRequestService;
 use Modules\AICore\Services\AIUsageTracker;
-use Modules\AICore\Services\AIProviderService;
-use Modules\AICore\Models\AIProvider;
 
 class AiChatController extends Controller
 {
     protected GptService $gptService;
+
     protected SchemaService $schemaService;
+
     protected ?AIRequestService $aiRequestService;
+
     protected ?AIUsageTracker $usageTracker;
+
     protected ?AIProviderService $providerService;
 
     public function __construct(
-        GptService $gptService, 
+        GptService $gptService,
         SchemaService $schemaService
     ) {
         $this->gptService = $gptService;
         $this->schemaService = $schemaService;
-        
+
         // Initialize AICore services if available
         if (class_exists('\Modules\AICore\Services\AIRequestService')) {
             $this->aiRequestService = app(AIRequestService::class);
@@ -44,10 +48,10 @@ class AiChatController extends Controller
      */
     public function chat(Request $request): JsonResponse
     {
-        if (!$this->aiRequestService) {
+        if (! $this->aiRequestService) {
             return response()->json([
                 'success' => false,
-                'message' => 'AI Core module is not available'
+                'message' => 'AI Core module is not available',
             ], 503);
         }
 
@@ -56,14 +60,14 @@ class AiChatController extends Controller
             'context' => 'array',
             'provider' => 'string|in:openai,claude,gemini',
             'max_tokens' => 'integer|min:1|max:8192',
-            'temperature' => 'numeric|min:0|max:2'
+            'temperature' => 'numeric|min:0|max:2',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 400);
         }
 
@@ -73,7 +77,7 @@ class AiChatController extends Controller
                 'module_name' => 'AiChat',
                 'max_tokens' => $request->input('max_tokens', 2048),
                 'temperature' => $request->input('temperature', 0.7),
-                'provider_type' => $request->input('provider')
+                'provider_type' => $request->input('provider'),
             ];
 
             $result = $this->aiRequestService->chat(
@@ -84,18 +88,18 @@ class AiChatController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $result
+                'data' => $result,
             ]);
 
         } catch (\Exception $e) {
             Log::error('AI Chat request failed', [
                 'error' => $e->getMessage(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'AI request failed: ' . $e->getMessage()
+                'message' => 'AI request failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -105,23 +109,23 @@ class AiChatController extends Controller
      */
     public function complete(Request $request): JsonResponse
     {
-        if (!$this->aiRequestService) {
+        if (! $this->aiRequestService) {
             return response()->json([
                 'success' => false,
-                'message' => 'AI Core module is not available'
+                'message' => 'AI Core module is not available',
             ], 503);
         }
 
         $validator = Validator::make($request->all(), [
             'prompt' => 'required|string|max:10000',
             'provider' => 'string|in:openai,claude,gemini',
-            'max_tokens' => 'integer|min:1|max:8192'
+            'max_tokens' => 'integer|min:1|max:8192',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 400);
         }
 
@@ -130,7 +134,7 @@ class AiChatController extends Controller
                 'company_id' => auth()->user()->currentCompany->id ?? null,
                 'module_name' => 'AiChat',
                 'max_tokens' => $request->input('max_tokens', 2048),
-                'provider_type' => $request->input('provider')
+                'provider_type' => $request->input('provider'),
             ];
 
             $result = $this->aiRequestService->complete(
@@ -140,13 +144,13 @@ class AiChatController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $result
+                'data' => $result,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'AI request failed: ' . $e->getMessage()
+                'message' => 'AI request failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -156,10 +160,10 @@ class AiChatController extends Controller
      */
     public function summarize(Request $request): JsonResponse
     {
-        if (!$this->aiRequestService) {
+        if (! $this->aiRequestService) {
             return response()->json([
                 'success' => false,
-                'message' => 'AI Core module is not available'
+                'message' => 'AI Core module is not available',
             ], 503);
         }
 
@@ -167,13 +171,13 @@ class AiChatController extends Controller
             'text' => 'required|string|max:50000',
             'max_length' => 'integer|min:50|max:1000',
             'style' => 'in:concise,detailed,bullet_points,executive',
-            'provider' => 'string|in:openai,claude,gemini'
+            'provider' => 'string|in:openai,claude,gemini',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 400);
         }
 
@@ -183,7 +187,7 @@ class AiChatController extends Controller
                 'module_name' => 'AiChat',
                 'max_length' => $request->input('max_length', 200),
                 'style' => $request->input('style', 'concise'),
-                'provider_type' => $request->input('provider')
+                'provider_type' => $request->input('provider'),
             ];
 
             $result = $this->aiRequestService->summarize(
@@ -193,13 +197,13 @@ class AiChatController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $result
+                'data' => $result,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Summarization failed: ' . $e->getMessage()
+                'message' => 'Summarization failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -209,10 +213,10 @@ class AiChatController extends Controller
      */
     public function extract(Request $request): JsonResponse
     {
-        if (!$this->aiRequestService) {
+        if (! $this->aiRequestService) {
             return response()->json([
                 'success' => false,
-                'message' => 'AI Core module is not available'
+                'message' => 'AI Core module is not available',
             ], 503);
         }
 
@@ -220,13 +224,13 @@ class AiChatController extends Controller
             'text' => 'required|string|max:50000',
             'fields' => 'required|array|min:1',
             'fields.*' => 'string',
-            'provider' => 'string|in:openai,claude,gemini'
+            'provider' => 'string|in:openai,claude,gemini',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 400);
         }
 
@@ -234,7 +238,7 @@ class AiChatController extends Controller
             $options = [
                 'company_id' => auth()->user()->currentCompany->id ?? null,
                 'module_name' => 'AiChat',
-                'provider_type' => $request->input('provider')
+                'provider_type' => $request->input('provider'),
             ];
 
             $result = $this->aiRequestService->extract(
@@ -245,13 +249,13 @@ class AiChatController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $result
+                'data' => $result,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data extraction failed: ' . $e->getMessage()
+                'message' => 'Data extraction failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -261,20 +265,20 @@ class AiChatController extends Controller
      */
     public function usage(Request $request): JsonResponse
     {
-        if (!$this->usageTracker) {
+        if (! $this->usageTracker) {
             return response()->json([
                 'success' => false,
-                'message' => 'Usage tracking is not available'
+                'message' => 'Usage tracking is not available',
             ], 503);
         }
 
         try {
             $companyId = auth()->user()->currentCompany->id ?? null;
-            
-            if (!$companyId) {
+
+            if (! $companyId) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Company context required'
+                    'message' => 'Company context required',
                 ], 400);
             }
 
@@ -283,13 +287,13 @@ class AiChatController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $usage
+                'data' => $usage,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to get usage data: ' . $e->getMessage()
+                'message' => 'Failed to get usage data: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -314,21 +318,21 @@ class AiChatController extends Controller
                                 'name' => $model->name,
                                 'identifier' => $model->model_identifier,
                                 'capabilities' => $model->capabilities,
-                                'max_tokens' => $model->max_tokens
+                                'max_tokens' => $model->max_tokens,
                             ];
-                        })
+                        }),
                     ];
                 });
 
             return response()->json([
                 'success' => true,
-                'data' => $providers
+                'data' => $providers,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to get providers: ' . $e->getMessage()
+                'message' => 'Failed to get providers: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -340,13 +344,13 @@ class AiChatController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'provider_id' => 'required|exists:ai_providers,id',
-            'test_message' => 'string|max:100'
+            'test_message' => 'string|max:100',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 400);
         }
 
@@ -359,7 +363,7 @@ class AiChatController extends Controller
             $response = '';
 
             if ($provider->type === 'gemini' && class_exists('\Modules\GeminiAIProvider\Services\GeminiProviderService')) {
-                $geminiService = new \Modules\GeminiAIProvider\Services\GeminiProviderService();
+                $geminiService = new \Modules\GeminiAIProvider\Services\GeminiProviderService;
                 $geminiService->setApiKey($provider->decrypted_api_key);
                 $success = $geminiService->testConnection();
                 $response = $success ? 'Gemini provider connected successfully' : 'Failed to connect to Gemini';
@@ -372,23 +376,23 @@ class AiChatController extends Controller
                         'company_id' => auth()->user()->currentCompany->id ?? null,
                         'module_name' => 'AiChat',
                         'provider_type' => $provider->type,
-                        'max_tokens' => 50
+                        'max_tokens' => 50,
                     ]
                 );
-                $success = !empty($result['response']);
+                $success = ! empty($result['response']);
                 $response = $result['response'] ?? 'No response received';
             }
 
             return response()->json([
                 'success' => $success,
                 'message' => $success ? 'Provider connection successful' : 'Provider connection failed',
-                'response' => $response
+                'response' => $response,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Test failed: ' . $e->getMessage()
+                'message' => 'Test failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -400,7 +404,7 @@ class AiChatController extends Controller
     {
         try {
             $userQuery = $request->input('query');
-            
+
             // Try to use AICore if available with Gemini
             if ($this->aiRequestService) {
                 $result = $this->aiRequestService->chat(
@@ -409,16 +413,16 @@ class AiChatController extends Controller
                     [
                         'company_id' => auth()->user()->currentCompany->id ?? null,
                         'module_name' => 'AiChat',
-                        'provider_type' => 'gemini' // Use Gemini by default for queries
+                        'provider_type' => 'gemini', // Use Gemini by default for queries
                     ]
                 );
-                
+
                 return response()->json([
                     'success' => true,
-                    'response' => $result['response'] ?? $result
+                    'response' => $result['response'] ?? $result,
                 ]);
             }
-            
+
             // Fallback to original GPT service
             $response = $this->gptService->interpretQueryV2($userQuery);
 
@@ -445,7 +449,7 @@ class AiChatController extends Controller
             'success' => true,
             'response' => $result,
             'aicore_available' => $this->aiRequestService !== null,
-            'gemini_available' => class_exists('\Modules\GeminiAIProvider\Services\GeminiProviderService')
+            'gemini_available' => class_exists('\Modules\GeminiAIProvider\Services\GeminiProviderService'),
         ]);
     }
 

@@ -13,7 +13,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Transfer extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'transfers';
 
@@ -42,7 +42,7 @@ class Transfer extends Model implements Auditable
         'cancelled_by_id',
         'cancelled_at',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -56,7 +56,7 @@ class Transfer extends Model implements Auditable
         'shipping_cost' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -157,10 +157,12 @@ class Transfer extends Model implements Auditable
         }
 
         $totalItems = $this->products->count();
-        if ($totalItems === 0)
+        if ($totalItems === 0) {
             return 0;
+        }
 
         $shippedItems = $this->products->where('is_shipped', true)->count();
+
         return ($shippedItems / $totalItems) * 100;
     }
 
@@ -174,10 +176,12 @@ class Transfer extends Model implements Auditable
         }
 
         $totalItems = $this->products->count();
-        if ($totalItems === 0)
+        if ($totalItems === 0) {
             return 0;
+        }
 
         $receivedItems = $this->products->where('is_received', true)->count();
+
         return ($receivedItems / $totalItems) * 100;
     }
 }
