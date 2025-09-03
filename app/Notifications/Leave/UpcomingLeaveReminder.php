@@ -76,7 +76,7 @@ class UpcomingLeaveReminder extends Notification implements ShouldQueue
       ->line(__('• All pending work is completed or delegated'))
       ->line(__('• Your team is informed about your absence'))
       ->line(__('• Emergency contact information is updated'))
-      ->action(__('View Leave Request'), route('hrcore.leave.show', $this->leaveRequest->id))
+      ->action(__('View Leave Request'), route('hrcore.leaves.show', $this->leaveRequest->id))
       ->line(__('Have a great time off!'));
   }
 
@@ -99,7 +99,7 @@ class UpcomingLeaveReminder extends Notification implements ShouldQueue
         'when' => $reminderText,
         'days' => $this->leaveRequest->total_days
       ]),
-      'action_url' => route('hrcore.leave.show', $this->leaveRequest->id),
+      'action_url' => route('hrcore.leaves.show', $this->leaveRequest->id),
       'metadata' => [
         'leave_request_id' => $this->leaveRequest->id,
         'leave_type' => $this->leaveRequest->leaveType->name,
@@ -139,7 +139,7 @@ class UpcomingLeaveReminder extends Notification implements ShouldQueue
         'action' => 'reminder',
         'leave_request_id' => $this->leaveRequest->id,
         'days_until' => $this->daysUntil,
-        'click_action' => route('hrcore.leave.show', $this->leaveRequest->id)
+        'click_action' => route('hrcore.leaves.show', $this->leaveRequest->id)
       ]
     ];
   }
