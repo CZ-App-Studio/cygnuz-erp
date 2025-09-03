@@ -21,6 +21,7 @@ enum FileType: string
     case ATTENDANCE_DOCUMENT = 'attendance_document';
     case PAYROLL_DOCUMENT = 'payroll_document';
     case EXPENSE_RECEIPT = 'expense_receipt';
+    case TRANSACTION_ATTACHMENT = 'transaction_attachment';
     case ASSET_IMAGE = 'asset_image';
     case ASSET_DOCUMENT = 'asset_document';
     case DIGITAL_PRODUCT = 'digital_product';
@@ -49,6 +50,7 @@ enum FileType: string
             self::ATTENDANCE_DOCUMENT => 'Attendance Document',
             self::PAYROLL_DOCUMENT => 'Payroll Document',
             self::EXPENSE_RECEIPT => 'Expense Receipt',
+            self::TRANSACTION_ATTACHMENT => 'Transaction Attachment',
             self::ASSET_IMAGE => 'Asset Image',
             self::ASSET_DOCUMENT => 'Asset Document',
             self::DIGITAL_PRODUCT => 'Digital Product File',
@@ -79,6 +81,7 @@ enum FileType: string
             self::ATTENDANCE_DOCUMENT => 'attendance/documents',
             self::PAYROLL_DOCUMENT => 'payroll/documents',
             self::EXPENSE_RECEIPT => 'expenses/receipts',
+            self::TRANSACTION_ATTACHMENT => 'accounting/transactions',
             self::ASSET_IMAGE => 'assets/images',
             self::ASSET_DOCUMENT => 'assets/documents',
             self::DIGITAL_PRODUCT => 'digital-products/files',

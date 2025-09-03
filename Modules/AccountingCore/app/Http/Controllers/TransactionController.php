@@ -224,7 +224,7 @@ class TransactionController extends Controller
 
                 $uploadRequest = FileUploadRequest::fromRequest(
                     $request->file('attachment'),
-                    FileType::EXPENSE_RECEIPT, // Using EXPENSE_RECEIPT as it's closest to transaction attachment
+                    FileType::TRANSACTION_ATTACHMENT,
                     BasicTransaction::class,
                     $transaction->id
                 )->withVisibility(FileVisibility::PRIVATE)
@@ -274,20 +274,26 @@ class TransactionController extends Controller
             $transactionData['type_badge'] = $transaction->type_badge;
             $transactionData['payment_method_badge'] = $transaction->payment_method_badge;
             $transactionData['attachment_url'] = $transaction->attachment_url;
+            
+            // Ensure transaction_date is in Y-m-d format for consistent frontend handling
+            $transactionData['transaction_date'] = $transaction->transaction_date->format('Y-m-d');
 
             // Get FileManagerCore files if any
             $files = $transaction->files()->get();
             if ($files->count() > 0) {
                 $transactionData['files'] = $files->map(function ($file) use ($transaction) {
+                    $downloadUrl = route('accountingcore.transactions.download-attachment', [
+                        'id' => $transaction->id,
+                        'fileId' => $file->id,
+                    ]);
+                    
                     return [
                         'id' => $file->id,
                         'name' => $file->original_name ?? $file->name,
                         'size' => $file->formatted_size ?? $file->size,
-                        'url' => $file->url ?? asset('storage/'.$file->path),
-                        'download_url' => route('accountingcore.transactions.download-attachment', [
-                            'id' => $transaction->id,
-                            'fileId' => $file->id,
-                        ]),
+                        // For private files, use download URL for both view and download
+                        'url' => $downloadUrl,
+                        'download_url' => $downloadUrl,
                     ];
                 })->toArray();
             }
@@ -374,7 +380,7 @@ class TransactionController extends Controller
                 // Upload new file
                 $uploadRequest = FileUploadRequest::fromRequest(
                     $request->file('attachment'),
-                    FileType::EXPENSE_RECEIPT,
+                    FileType::TRANSACTION_ATTACHMENT,
                     BasicTransaction::class,
                     $transaction->id
                 )->withVisibility(FileVisibility::PRIVATE)
@@ -482,19 +488,37 @@ class TransactionController extends Controller
             if ($fileId) {
                 $file = $transaction->files()->where('id', $fileId)->first();
                 if ($file) {
-                    return app(FileManagerService::class)->downloadFile($file);
+                    // Use FileManagerCore service for secure file download
+                    $fileManager = app(FileManagerService::class);
+                    return $fileManager->downloadFile($file);
                 }
+                
+                return response()->json(['error' => __('File not found')], 404);
             }
 
-            // Otherwise try to download legacy attachment
+            // Otherwise try to download first available FileManagerCore file
+            $file = $transaction->files()->first();
+            if ($file) {
+                $fileManager = app(FileManagerService::class);
+                return $fileManager->downloadFile($file);
+            }
+
+            // Fallback to legacy attachment if no FileManagerCore files exist
             if ($transaction->attachment_path && Storage::disk('public')->exists($transaction->attachment_path)) {
-                return Storage::disk('public')->download($transaction->attachment_path);
+                $filename = basename($transaction->attachment_path);
+                return Storage::disk('public')->download($transaction->attachment_path, $filename);
             }
 
-            return Error::response(__('Attachment not found'));
+            return response()->json(['error' => __('Attachment not found')], 404);
 
         } catch (\Exception $e) {
-            return Error::response(__('Failed to download attachment: ').$e->getMessage());
+            \Log::error('Failed to download transaction attachment: ' . $e->getMessage(), [
+                'transaction_id' => $id,
+                'file_id' => $fileId,
+                'exception' => $e
+            ]);
+            
+            return response()->json(['error' => __('Failed to download attachment: ') . $e->getMessage()], 500);
         }
     }
 }

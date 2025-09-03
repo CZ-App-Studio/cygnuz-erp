@@ -242,12 +242,21 @@ class BasicTransaction extends Model implements AuditableContract
         // Check FileManagerCore files first
         $file = $this->files()->first();
         if ($file) {
-            return $file->url ?? asset('storage/'.$file->path);
+            // Use the download route for FileManagerCore files for better security
+            return route('accountingcore.transactions.download-attachment', [
+                'id' => $this->id, 
+                'fileId' => $file->id
+            ]);
         }
 
         // Fallback to legacy attachment path for backward compatibility
-        if (! empty($this->attachment_path) && file_exists(storage_path('app/public/'.$this->attachment_path))) {
-            return asset('storage/'.$this->attachment_path);
+        if (! empty($this->attachment_path)) {
+            // Check if file exists first
+            $fullPath = storage_path('app/public/'.$this->attachment_path);
+            if (file_exists($fullPath)) {
+                // Use the download route for consistent behavior
+                return route('accountingcore.transactions.download-attachment', ['id' => $this->id]);
+            }
         }
 
         return null;
@@ -258,7 +267,7 @@ class BasicTransaction extends Model implements AuditableContract
      */
     public function getTransactionAttachments()
     {
-        return $this->files()->where('metadata->attachment_type', 'transaction')->get();
+        return $this->filesByType(\Modules\FileManagerCore\Enums\FileType::TRANSACTION_ATTACHMENT);
     }
 
     /**
