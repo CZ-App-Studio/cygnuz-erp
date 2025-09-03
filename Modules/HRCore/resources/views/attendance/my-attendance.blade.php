@@ -231,11 +231,6 @@
         <div class="d-flex gap-2">
           <input type="text" id="dateFilter" class="form-control form-control-sm flatpickr-range" 
             placeholder="{{ __('Select Date Range') }}" style="width: 200px;">
-          @can('hrcore.export-attendance')
-          <button class="btn btn-sm btn-label-primary" id="exportAttendance">
-            <i class="bx bx-download me-1"></i> {{ __('Export') }}
-          </button>
-          @endcan
         </div>
       </div>
       <div class="card-body">
@@ -314,7 +309,7 @@
                   <td>
                     @if($attendance->status == 'absent' || $attendance->status == 'late')
                       @can('hrcore.create-attendance-regularization')
-                        <a href="{{ route('hrcore.attendance.regularization') }}" 
+                        <a href="{{ route('hrcore.my.attendance.regularization') }}" 
                           class="btn btn-sm btn-label-primary" 
                           data-bs-toggle="tooltip" 
                           title="{{ __('Request Regularization') }}">

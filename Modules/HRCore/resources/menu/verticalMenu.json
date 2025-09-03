@@ -4,55 +4,67 @@
             "name": "Self Service",
             "icon": "menu-icon bx bx-user-circle",
             "slug": [
-                "hrcore.self-service.profile",
-                "hrcore.attendance.my-attendance",
-                "hrcore.attendance.regularization",
-                "hrcore.leaves.balance",
-                "hrcore.leaves.apply",
-                "hrcore.expenses.my-expenses",
-                "hrcore.holidays.my-holidays",
-                "hrcore.attendance.reports"
+                "hrcore.my.profile",
+                "hrcore.my.attendance",
+                "hrcore.my.attendance.regularization",
+                "hrcore.my.leaves",
+                "hrcore.my.leaves.balance",
+                "hrcore.my.leaves.apply",
+                "hrcore.my.expenses",
+                "hrcore.my.expenses.create",
+                "hrcore.my.holidays",
+                "hrcore.my.reports"
             ],
             "submenu": [
                 {
-                    "url": "/hrcore/self-service/profile",
+                    "url": "/hrcore/my/profile",
                     "name": "My Profile",
-                    "slug": "hrcore.self-service.profile"
+                    "slug": "hrcore.my.profile"
                 },
                 {
-                    "url": "/hrcore/attendance/my-attendance",
+                    "url": "/hrcore/my/attendance",
                     "name": "My Attendance",
-                    "slug": "hrcore.attendance.my-attendance"
+                    "slug": "hrcore.my.attendance"
                 },
                 {
-                    "url": "/hrcore/attendance/regularization",
+                    "url": "/hrcore/my/attendance/regularization",
                     "name": "My Regularization",
-                    "slug": "hrcore.attendance.regularization"
+                    "slug": "hrcore.my.attendance.regularization"
                 },
                 {
-                    "url": "/hrcore/leaves/balance",
+                    "url": "/hrcore/my/leaves",
+                    "name": "My Leave Requests",
+                    "slug": "hrcore.my.leaves"
+                },
+                {
+                    "url": "/hrcore/my/leaves/balance",
                     "name": "My Leave Balance",
-                    "slug": "hrcore.leaves.balance"
+                    "slug": "hrcore.my.leaves.balance"
                 },
                 {
-                    "url": "/hrcore/leaves/apply",
+                    "url": "/hrcore/my/leaves/apply",
                     "name": "Apply for Leave",
-                    "slug": "hrcore.leaves.apply"
+                    "slug": "hrcore.my.leaves.apply"
                 },
                 {
-                    "url": "/hrcore/expenses/my-expenses",
+                    "url": "/hrcore/my/expenses",
                     "name": "My Expenses",
-                    "slug": "hrcore.expenses.my-expenses"
+                    "slug": "hrcore.my.expenses"
                 },
                 {
-                    "url": "/hrcore/holidays/my-holidays",
+                    "url": "/hrcore/my/expenses/create",
+                    "name": "Create Expense",
+                    "slug": "hrcore.my.expenses.create"
+                },
+                {
+                    "url": "/hrcore/my/holidays",
                     "name": "My Holidays",
-                    "slug": "hrcore.holidays.my-holidays"
+                    "slug": "hrcore.my.holidays"
                 },
                 {
-                    "url": "/hrcore/attendance/reports",
+                    "url": "/hrcore/my/reports",
                     "name": "My Reports",
-                    "slug": "hrcore.attendance.reports"
+                    "slug": "hrcore.my.reports"
                 }
             ]
         },

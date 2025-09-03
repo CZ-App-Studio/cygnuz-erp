@@ -1,6 +1,6 @@
 @extends('layouts.layoutMaster')
 
-@section('title', __('My Expenses'))
+@section('title', __('My Leave Requests'))
 
 @section('vendor-style')
 @vite([
@@ -8,8 +8,7 @@
   'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
   'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss',
   'resources/assets/vendor/libs/select2/select2.scss',
-  'resources/assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.scss',
-  'resources/assets/vendor/libs/flatpickr/flatpickr.scss'
+  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
 ])
 @endsection
 
@@ -17,21 +16,18 @@
 @vite([
   'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
   'resources/assets/vendor/libs/select2/select2.js',
-  'resources/assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js',
-  'resources/assets/vendor/libs/flatpickr/flatpickr.js'
+  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
 ])
 @endsection
 
 @section('content')
 
 <x-breadcrumb
-  :title="__('My Expenses')"
+  :title="__('My Leave Requests')"
   :breadcrumbs="[
-    ['name' => __('Human Resources'), 'url' => route('hrcore.dashboard')],
-    ['name' => __('Expense Management'), 'url' => ''],
-    ['name' => __('My Expenses'), 'url' => '']
+    ['name' => __('Self Service'), 'url' => ''],
+    ['name' => __('My Leaves'), 'url' => '']
   ]"
-  :home-url="url('/')"
 />
 
 <div class="row mb-4">
@@ -41,14 +37,14 @@
       <div class="card-body">
         <div class="d-flex justify-content-between">
           <div class="card-info">
-            <p class="card-text text-muted">{{ __('Total Expenses') }}</p>
+            <p class="card-text text-muted">{{ __('Total Requests') }}</p>
             <div class="d-flex align-items-end mb-2">
-              <h4 class="card-title mb-0 me-2">{{ $statistics['total'] }}</h4>
+              <h4 class="card-title mb-0 me-2">{{ $statistics['total'] ?? 0 }}</h4>
             </div>
           </div>
           <div class="card-icon">
             <span class="badge bg-label-primary rounded p-2">
-              <i class="bx bx-receipt bx-sm"></i>
+              <i class="bx bx-calendar bx-sm"></i>
             </span>
           </div>
         </div>
@@ -63,7 +59,7 @@
           <div class="card-info">
             <p class="card-text text-muted">{{ __('Pending') }}</p>
             <div class="d-flex align-items-end mb-2">
-              <h4 class="card-title mb-0 me-2 text-warning">{{ $statistics['pending'] }}</h4>
+              <h4 class="card-title mb-0 me-2 text-warning">{{ $statistics['pending'] ?? 0 }}</h4>
             </div>
           </div>
           <div class="card-icon">
@@ -83,7 +79,7 @@
           <div class="card-info">
             <p class="card-text text-muted">{{ __('Approved') }}</p>
             <div class="d-flex align-items-end mb-2">
-              <h4 class="card-title mb-0 me-2 text-success">{{ $statistics['approved'] }}</h4>
+              <h4 class="card-title mb-0 me-2 text-success">{{ $statistics['approved'] ?? 0 }}</h4>
             </div>
           </div>
           <div class="card-icon">
@@ -103,7 +99,7 @@
           <div class="card-info">
             <p class="card-text text-muted">{{ __('Rejected') }}</p>
             <div class="d-flex align-items-end mb-2">
-              <h4 class="card-title mb-0 me-2 text-danger">{{ $statistics['rejected'] }}</h4>
+              <h4 class="card-title mb-0 me-2 text-danger">{{ $statistics['rejected'] ?? 0 }}</h4>
             </div>
           </div>
           <div class="card-icon">
@@ -115,37 +111,20 @@
       </div>
     </div>
   </div>
-
-  <div class="col-md col-sm-6 mb-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <div class="card-info">
-            <p class="card-text text-muted">{{ __('Processed') }}</p>
-            <div class="d-flex align-items-end mb-2">
-              <h4 class="card-title mb-0 me-2 text-info">{{ $statistics['processed'] }}</h4>
-            </div>
-          </div>
-          <div class="card-icon">
-            <span class="badge bg-label-info rounded p-2">
-              <i class="bx bx-dollar-circle bx-sm"></i>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <div class="card">
   <div class="card-header">
     <div class="d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">{{ __('My Expense Requests') }}</h5>
-      @can('hrcore.create-expense')
-        <button type="button" class="btn btn-primary" onclick="createExpense()">
-          <i class="bx bx-plus me-1"></i> {{ __('New Expense Request') }}
-        </button>
-      @endcan
+      <h5 class="mb-0">{{ __('My Leave Requests') }}</h5>
+      <div class="d-flex gap-2">
+        <a href="{{ route('hrcore.my.leaves.apply') }}" class="btn btn-primary">
+          <i class="bx bx-plus me-1"></i> {{ __('Apply for Leave') }}
+        </a>
+        <a href="{{ route('hrcore.my.leaves.balance') }}" class="btn btn-label-info">
+          <i class="bx bx-bar-chart-alt me-1"></i> {{ __('Leave Balance') }}
+        </a>
+      </div>
     </div>
   </div>
 
@@ -159,39 +138,39 @@
           <option value="pending">{{ __('Pending') }}</option>
           <option value="approved">{{ __('Approved') }}</option>
           <option value="rejected">{{ __('Rejected') }}</option>
-          <option value="processed">{{ __('Processed') }}</option>
+          <option value="cancelled">{{ __('Cancelled') }}</option>
         </select>
       </div>
       <div class="col-md-3">
-        <label class="form-label">{{ __('Expense Type') }}</label>
-        <select id="filterExpenseType" class="form-select">
+        <label class="form-label">{{ __('Leave Type') }}</label>
+        <select id="filterLeaveType" class="form-select">
           <option value="">{{ __('All Types') }}</option>
-          @foreach($expenseTypes as $type)
+          @foreach($leaveTypes as $type)
             <option value="{{ $type->id }}">{{ $type->name }}</option>
           @endforeach
         </select>
       </div>
       <div class="col-md-3">
         <label class="form-label">{{ __('Date From') }}</label>
-        <input type="text" id="filterDateFrom" class="form-control" placeholder="YYYY-MM-DD">
+        <input type="date" id="filterDateFrom" class="form-control">
       </div>
       <div class="col-md-3">
         <label class="form-label">{{ __('Date To') }}</label>
-        <input type="text" id="filterDateTo" class="form-control" placeholder="YYYY-MM-DD">
+        <input type="date" id="filterDateTo" class="form-control">
       </div>
     </div>
 
     <!-- DataTable -->
     <div class="table-responsive">
-      <table id="expensesTable" class="table table-bordered">
+      <table id="leavesTable" class="table table-bordered">
         <thead>
           <tr>
-            <th>{{ __('Date') }}</th>
-            <th>{{ __('Type') }}</th>
-            <th>{{ __('Description') }}</th>
-            <th>{{ __('Amount') }}</th>
+            <th>{{ __('Request Date') }}</th>
+            <th>{{ __('Leave Type') }}</th>
+            <th>{{ __('From Date') }}</th>
+            <th>{{ __('To Date') }}</th>
+            <th>{{ __('Days') }}</th>
             <th>{{ __('Status') }}</th>
-            <th>{{ __('Attachments') }}</th>
             <th>{{ __('Actions') }}</th>
           </tr>
         </thead>
@@ -200,17 +179,18 @@
   </div>
 </div>
 
-<!-- Form Offcanvas -->
-@include('hrcore::expenses._modals')
-
-<!-- Expense Details Offcanvas -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="expenseDetailsOffcanvas" aria-labelledby="expenseDetailsOffcanvasLabel">
+<!-- Offcanvas for Leave Details -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="leaveDetailsOffcanvas" aria-labelledby="leaveDetailsOffcanvasLabel">
   <div class="offcanvas-header">
-    <h5 id="expenseDetailsOffcanvasLabel" class="offcanvas-title">{{ __('Expense Request Details') }}</h5>
+    <h5 id="leaveDetailsOffcanvasLabel" class="offcanvas-title">{{ __('Leave Request Details') }}</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
-  <div class="offcanvas-body" id="expenseDetailsContent">
-    <!-- Dynamic content will be loaded here -->
+  <div class="offcanvas-body" id="leaveDetailsContent">
+    <div class="text-center">
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">{{ __('Loading...') }}</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -220,26 +200,20 @@
 <script>
 window.pageData = {
   urls: {
-    datatable: @json(route('hrcore.my.expenses.datatable')),
-    create: @json(route('hrcore.my.expenses.create')),
-    store: @json(route('hrcore.my.expenses.store')),
-    edit: @json(route('hrcore.my.expenses.edit', ['id' => '__ID__'])),
-    update: @json(route('hrcore.my.expenses.update', ['id' => '__ID__'])),
-    destroy: @json(route('hrcore.my.expenses.delete', ['id' => '__ID__'])),
-    show: @json(route('hrcore.my.expenses.show', ['id' => '__ID__']))
+    datatable: @json(route('hrcore.my.leaves.datatable')),
+    show: @json(route('hrcore.my.leaves.show', ['id' => '__ID__'])),
+    cancel: @json(route('hrcore.my.leaves.cancel', ['id' => '__ID__']))
   },
   labels: {
-    confirmDelete: @json(__('Are you sure you want to delete this expense request?')),
-    deleteTitle: @json(__('Delete Expense Request')),
-    deleteButton: @json(__('Yes, Delete')),
-    cancelButton: @json(__('Cancel')),
+    confirmCancel: @json(__('Are you sure you want to cancel this leave request?')),
+    cancelTitle: @json(__('Cancel Leave Request')),
+    cancelButton: @json(__('Yes, Cancel')),
+    cancelButtonText: @json(__('Cancel')),
     success: @json(__('Success')),
     error: @json(__('Error')),
-    deleted: @json(__('Expense request deleted successfully')),
-    saved: @json(__('Expense request saved successfully')),
-    updated: @json(__('Expense request updated successfully'))
+    cancelled: @json(__('Leave request cancelled successfully'))
   }
 };
 </script>
-@vite('Modules/HRCore/resources/assets/js/my-expenses.js')
+@vite('Modules/HRCore/resources/assets/js/my-leaves.js')
 @endsection
