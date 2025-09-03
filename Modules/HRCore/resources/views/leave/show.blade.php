@@ -40,6 +40,22 @@
       </div>
     </x-breadcrumb>
 
+    {{-- Action Buttons Row --}}
+    <div class="row mb-4" id="actionButtonsContainer" style="display: none;">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0">{{ __('Quick Actions') }}</h5>
+              <div class="d-flex gap-2 flex-wrap" id="actionButtonsWrapper">
+                {{-- Dynamic action buttons will be inserted here --}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row" id="leaveDetailsContainer">
       {{-- Loading State --}}
       <div class="col-12">
@@ -85,17 +101,17 @@
         delete: @json(__('Delete'))
       }
     };
-    
+
     // Get leave ID from URL
     const leaveId = {{ request()->route('id') ?? 'null' }};
-    
+
     // Load leave details on page load
     document.addEventListener('DOMContentLoaded', function() {
       if (leaveId) {
         loadLeaveDetails(leaveId);
       }
     });
-    
+
     function loadLeaveDetails(id) {
       fetch(pageData.urls.show.replace(':id', id), {
         headers: {
@@ -117,10 +133,76 @@
         showError('Something went wrong. Please try again.');
       });
     }
-    
-    function renderLeaveDetails(leave) {
-      const container = document.getElementById('leaveDetailsContainer');
+
+    function renderActionButtons(leave) {
+      const actionContainer = document.getElementById('actionButtonsContainer');
+      const actionWrapper = document.getElementById('actionButtonsWrapper');
       
+      // Clear any existing buttons
+      actionWrapper.innerHTML = '';
+      
+      // Build action buttons based on permissions and status
+      let hasActions = false;
+      
+      // Approve button (only for pending)
+      if (leave.can_approve && leave.status === 'pending') {
+        actionWrapper.innerHTML += `
+          <button type="button" class="btn btn-success" onclick="approveLeaveRequest(${leave.id})">
+            <i class="bx bx-check me-1"></i>{{ __('Approve') }}
+          </button>`;
+        hasActions = true;
+      }
+      
+      // Reject button (only for pending)
+      if (leave.can_reject && leave.status === 'pending') {
+        actionWrapper.innerHTML += `
+          <button type="button" class="btn btn-danger" onclick="rejectLeaveRequest(${leave.id})">
+            <i class="bx bx-x me-1"></i>{{ __('Reject') }}
+          </button>`;
+        hasActions = true;
+      }
+      
+      // Cancel button (for pending or approved)
+      if (leave.can_cancel) {
+        actionWrapper.innerHTML += `
+          <button type="button" class="btn btn-warning" onclick="cancelLeaveRequest(${leave.id})">
+            <i class="bx bx-block me-1"></i>{{ __('Cancel Request') }}
+          </button>`;
+        hasActions = true;
+      }
+      
+      // Edit button (only for pending)
+      if (leave.can_edit) {
+        actionWrapper.innerHTML += `
+          <a href="${pageData.urls.edit.replace(':id', leave.id)}" class="btn btn-primary">
+            <i class="bx bx-edit me-1"></i>{{ __('Edit') }}
+          </a>`;
+        hasActions = true;
+      }
+      
+      // Delete button (show at the end)
+      if (leave.can_delete) {
+        actionWrapper.innerHTML += `
+          <button type="button" class="btn btn-outline-danger" onclick="deleteLeaveRequest(${leave.id})">
+            <i class="bx bx-trash me-1"></i>{{ __('Delete') }}
+          </button>`;
+        hasActions = true;
+      }
+      
+      // Show/hide the action container based on whether there are actions
+      if (hasActions) {
+        actionContainer.style.display = 'block';
+      } else {
+        actionContainer.style.display = 'none';
+      }
+    }
+
+    function renderLeaveDetails(leave) {
+      // First, set up the action buttons at the top
+      renderActionButtons(leave);
+      
+      const container = document.getElementById('leaveDetailsContainer');
+
       container.innerHTML = `
         <div class="row">
           {{-- Main Content --}}
@@ -142,7 +224,7 @@
                   <div class="col-md-6 mb-4">
                     <h6 class="text-primary mb-3">{{ __('Employee Information') }}</h6>
                     <div class="d-flex align-items-center mb-3">
-                      ${leave.user.avatar 
+                      ${leave.user.avatar
                         ? `<img src="${leave.user.avatar}" alt="Avatar" class="rounded-circle me-3" width="50" height="50">`
                         : `<div class="avatar avatar-md me-3">
                              <span class="avatar-initial rounded-circle bg-label-primary">
@@ -177,7 +259,7 @@
                       <tr>
                         <td class="text-muted">{{ __('Duration') }}:</td>
                         <td>
-                          ${leave.is_half_day 
+                          ${leave.is_half_day
                             ? `<span class="badge bg-label-info">{{ __('Half Day') }} (${leave.half_day_display})</span>`
                             : `<span class="badge bg-label-info">${leave.total_days} ${leave.total_days == 1 ? 'Day' : 'Days'}</span>`
                           }
@@ -325,47 +407,6 @@
             </div>
             ` : ''}
 
-            {{-- Action Buttons --}}
-            ${leave.status === 'pending' || leave.status === 'approved' ? `
-            <div class="card">
-              <div class="card-header">
-                <h5 class="card-title">{{ __('Actions') }}</h5>
-              </div>
-              <div class="card-body">
-                <div class="d-flex gap-2 flex-wrap">
-                  ${leave.can_approve && leave.status === 'pending' ? `
-                    <button type="button" class="btn btn-success" onclick="approveLeaveRequest(${leave.id})">
-                      <i class="bx bx-check me-1"></i>{{ __('Approve') }}
-                    </button>
-                  ` : ''}
-
-                  ${leave.can_reject && leave.status === 'pending' ? `
-                    <button type="button" class="btn btn-danger" onclick="rejectLeaveRequest(${leave.id})">
-                      <i class="bx bx-x me-1"></i>{{ __('Reject') }}
-                    </button>
-                  ` : ''}
-
-                  ${leave.can_cancel ? `
-                    <button type="button" class="btn btn-warning" onclick="cancelLeaveRequest(${leave.id})">
-                      <i class="bx bx-block me-1"></i>{{ __('Cancel') }}
-                    </button>
-                  ` : ''}
-
-                  ${leave.can_edit ? `
-                    <a href="${pageData.urls.edit.replace(':id', leave.id)}" class="btn btn-primary">
-                      <i class="bx bx-edit me-1"></i>{{ __('Edit') }}
-                    </a>
-                  ` : ''}
-
-                  ${leave.can_delete ? `
-                    <button type="button" class="btn btn-outline-danger" onclick="deleteLeaveRequest(${leave.id})">
-                      <i class="bx bx-trash me-1"></i>{{ __('Delete') }}
-                    </button>
-                  ` : ''}
-                </div>
-              </div>
-            </div>
-            ` : ''}
           </div>
 
           {{-- Sidebar --}}
@@ -457,7 +498,7 @@
         </div>
       `;
     }
-    
+
     function showError(message) {
       const container = document.getElementById('leaveDetailsContainer');
       container.innerHTML = `
@@ -473,7 +514,7 @@
         </div>
       `;
     }
-    
+
     // Action functions
     function approveLeaveRequest(id) {
       Swal.fire({
@@ -495,7 +536,7 @@
         }
       });
     }
-    
+
     function rejectLeaveRequest(id) {
       Swal.fire({
         title: pageData.labels.confirmReject,
@@ -521,7 +562,7 @@
         }
       });
     }
-    
+
     function cancelLeaveRequest(id) {
       Swal.fire({
         title: pageData.labels.confirmCancel,
@@ -542,7 +583,7 @@
         }
       });
     }
-    
+
     function deleteLeaveRequest(id) {
       Swal.fire({
         title: pageData.labels.confirmDelete,
@@ -561,11 +602,11 @@
         }
       });
     }
-    
+
     function performAction(action, id, data = {}, method = 'POST') {
       const url = pageData.urls[action]?.replace(':id', id);
       if (!url) return;
-      
+
       fetch(url, {
         method: method,
         headers: {
@@ -619,5 +660,6 @@
         });
       });
     }
+
   </script>
 @endsection

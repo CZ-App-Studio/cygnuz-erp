@@ -1066,9 +1066,10 @@ class LeaveController extends Controller
                 return Error::response(__('Only pending or approved leave requests can be cancelled'));
             }
 
-            // Check if leave is in the future
-            if ($leaveRequest->from_date->isPast()) {
-                return Error::response(__('Cannot cancel leave that has already started or passed'));
+            // Only check date restriction for approved leaves that have started
+            // Pending leaves can always be cancelled regardless of date
+            if ($leaveRequest->status->value === 'approved' && $leaveRequest->from_date->isPast()) {
+                return Error::response(__('Cannot cancel approved leave that has already started or passed'));
             }
 
             DB::beginTransaction();
@@ -1095,6 +1096,48 @@ class LeaveController extends Controller
             Log::error('Leave cancellation error: '.$e->getMessage());
 
             return Error::response(__('Failed to cancel leave request'));
+        }
+    }
+
+    /**
+     * Delete a leave request
+     */
+    public function destroy($id)
+    {
+        try {
+            $leaveRequest = LeaveRequest::findOrFail($id);
+
+            // Check permissions using Gate::authorize
+            Gate::authorize('hrcore.delete-leave');
+
+            // Store some info for the response message
+            $leaveId = $leaveRequest->id;
+            $userName = $leaveRequest->user->getFullName();
+
+            DB::beginTransaction();
+
+            // Delete any associated documents if they exist
+            if ($leaveRequest->document) {
+                Storage::delete('public/uploads/leaverequestdocuments/' . $leaveRequest->document);
+            }
+
+            // Delete the leave request
+            $leaveRequest->delete();
+
+            DB::commit();
+
+            return Success::response([
+                'message' => __('Leave request #:id for :name has been deleted successfully', [
+                    'id' => $leaveId,
+                    'name' => $userName
+                ])
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error('Leave deletion error: '.$e->getMessage());
+
+            return Error::response(__('Failed to delete leave request. Please try again.'));
         }
     }
 
