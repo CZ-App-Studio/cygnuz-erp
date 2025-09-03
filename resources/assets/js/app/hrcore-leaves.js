@@ -50,10 +50,79 @@ $(function () {
       '<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
   });
 
-  // Initialize Select2
-  $('#employeeFilter, #leaveTypeFilter, #statusFilter').select2({
-    placeholder: pageData.labels.selectEmployee,
+  // Initialize Select2 for static dropdowns
+  $('#leaveTypeFilter, #statusFilter').select2({
+    placeholder: 'Select Option',
     allowClear: true
+  });
+
+  // Initialize Select2 with AJAX for employee filter
+  $('#employeeFilter').select2({
+    placeholder: 'All Employees',
+    allowClear: true,
+    ajax: {
+      url: '/hrcore/employees/search',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return {
+          q: params.term,
+          page: params.page || 1
+        };
+      },
+      processResults: function (data, params) {
+        params.page = params.page || 1;
+        return {
+          results: data.data ? data.data.map(function(employee) {
+            return {
+              id: employee.id,
+              text: employee.name + ' (' + employee.code + ')'
+            };
+          }) : [],
+          pagination: {
+            more: data.has_more || false
+          }
+        };
+      },
+      cache: true
+    },
+    minimumInputLength: 0,
+    width: '100%'
+  });
+
+  // Initialize Select2 with AJAX for employee selection in the form
+  $('#user_id').select2({
+    placeholder: pageData.labels.selectEmployee,
+    allowClear: true,
+    dropdownParent: $('#offcanvasAddLeave'),
+    ajax: {
+      url: '/hrcore/employees/search',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return {
+          q: params.term,
+          page: params.page || 1
+        };
+      },
+      processResults: function (data, params) {
+        params.page = params.page || 1;
+        return {
+          results: data.data ? data.data.map(function(employee) {
+            return {
+              id: employee.id,
+              text: employee.name + ' (' + employee.code + ')'
+            };
+          }) : [],
+          pagination: {
+            more: data.has_more || false
+          }
+        };
+      },
+      cache: true
+    },
+    minimumInputLength: 0,
+    width: '100%'
   });
 
   // Initialize Flatpickr for date filter

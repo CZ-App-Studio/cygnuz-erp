@@ -11,11 +11,8 @@
       @can('hrcore.create-leave-for-others')
       <div class="mb-6">
         <label class="form-label" for="user_id">@lang('Employee')<span class="text-danger">*</span></label>
-        <select class="form-select select2" id="user_id" name="user_id" required>
+        <select class="form-select" id="user_id" name="user_id" required style="width: 100%;">
           <option value="">@lang('Select Employee')</option>
-          @foreach($employees as $employee)
-            <option value="{{ $employee->id }}">{{ $employee->getFullName() }} ({{ $employee->code }})</option>
-          @endforeach
         </select>
       </div>
       @endcan

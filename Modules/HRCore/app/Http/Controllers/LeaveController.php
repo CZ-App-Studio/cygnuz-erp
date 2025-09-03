@@ -86,10 +86,10 @@ class LeaveController extends Controller
 
     public function index()
     {
-        $employees = User::where('status', 'active')->get();
+        // Only pass leave types, employees will be loaded via AJAX
         $leaveTypes = LeaveType::where('status', 'active')->get();
 
-        return view('hrcore::leave.index', compact('employees', 'leaveTypes'));
+        return view('hrcore::leave.index', compact('leaveTypes'));
     }
 
     /**

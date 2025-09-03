@@ -55,11 +55,8 @@
         {{-- Employee Filter --}}
         <div class="col-md-3">
           <label for="employeeFilter" class="form-label">{{ __('Filter by Employee') }}</label>
-          <select id="employeeFilter" name="employeeFilter" class="form-select">
+          <select id="employeeFilter" name="employeeFilter" class="form-select" style="width: 100%;">
             <option value="" selected>{{ __('All Employees') }}</option>
-            @foreach($employees as $employee)
-              <option value="{{ $employee->id }}">{{ $employee->getFullName() }} ({{ $employee->code }})</option>
-            @endforeach
           </select>
         </div>
 
