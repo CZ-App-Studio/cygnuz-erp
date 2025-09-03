@@ -16,7 +16,7 @@ class WarehouseZone extends Model
         'zone_type',
         'status',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     /**

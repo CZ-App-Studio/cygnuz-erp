@@ -2,16 +2,16 @@
 
 namespace Modules\WMSInventoryCore\app\Http\Controllers\Api\V1;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\WMSInventoryCore\app\Http\Controllers\Api\BaseApiController;
 use Modules\WMSInventoryCore\Models\Inventory;
 use Modules\WMSInventoryCore\Models\InventoryTransaction;
 use Modules\WMSInventoryCore\Models\Product;
-use Modules\WMSInventoryCore\Models\Warehouse;
 use Modules\WMSInventoryCore\Models\StockAlert;
+use Modules\WMSInventoryCore\Models\Warehouse;
 
 class InventoryController extends BaseApiController
 {
@@ -50,8 +50,8 @@ class InventoryController extends BaseApiController
                 $search = $request->search;
                 $query->whereHas('product', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('sku', 'like', "%{$search}%")
-                      ->orWhere('barcode', 'like', "%{$search}%");
+                        ->orWhere('sku', 'like', "%{$search}%")
+                        ->orWhere('barcode', 'like', "%{$search}%");
                 });
             }
 
@@ -72,6 +72,7 @@ class InventoryController extends BaseApiController
             return $this->paginatedResponse($inventory, 'Inventory retrieved successfully');
         } catch (\Exception $e) {
             Log::error('Error fetching inventory', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch inventory', 500);
         }
     }
@@ -92,13 +93,14 @@ class InventoryController extends BaseApiController
                 $inventory = $query->get();
             }
 
-            if (!$inventory || ($warehouseId && !$inventory)) {
+            if (! $inventory || ($warehouseId && ! $inventory)) {
                 return $this->errorResponse('Inventory not found', 404);
             }
 
             return $this->successResponse($inventory);
         } catch (\Exception $e) {
             Log::error('Error fetching inventory details', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch inventory details', 500);
         }
     }
@@ -114,14 +116,14 @@ class InventoryController extends BaseApiController
                 'reorder_quantity' => 'sometimes|numeric|min:0',
                 'max_stock' => 'sometimes|numeric|min:0',
                 'min_stock' => 'sometimes|numeric|min:0',
-                'reserved_quantity' => 'sometimes|numeric|min:0'
+                'reserved_quantity' => 'sometimes|numeric|min:0',
             ]);
 
             $inventory = Inventory::where('product_id', $productId)
                 ->where('warehouse_id', $warehouseId)
                 ->first();
 
-            if (!$inventory) {
+            if (! $inventory) {
                 return $this->errorResponse('Inventory not found', 404);
             }
 
@@ -129,7 +131,7 @@ class InventoryController extends BaseApiController
             if ($request->has('reserved_quantity')) {
                 $availableQuantity = $inventory->quantity - $inventory->reserved_quantity;
                 $newReserved = $request->reserved_quantity;
-                
+
                 if ($newReserved > $inventory->quantity) {
                     return $this->errorResponse('Reserved quantity cannot exceed total quantity', 400);
                 }
@@ -140,7 +142,7 @@ class InventoryController extends BaseApiController
                 'reorder_quantity',
                 'max_stock',
                 'min_stock',
-                'reserved_quantity'
+                'reserved_quantity',
             ]));
 
             $inventory->update(['last_updated' => now()]);
@@ -148,6 +150,7 @@ class InventoryController extends BaseApiController
             return $this->successResponse($inventory, 'Inventory settings updated successfully');
         } catch (\Exception $e) {
             Log::error('Error updating inventory', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -159,7 +162,7 @@ class InventoryController extends BaseApiController
     {
         try {
             $product = Product::find($productId);
-            if (!$product) {
+            if (! $product) {
                 return $this->errorResponse('Product not found', 404);
             }
 
@@ -174,7 +177,7 @@ class InventoryController extends BaseApiController
                         'available_quantity' => $inventory->quantity - $inventory->reserved_quantity,
                         'reorder_point' => $inventory->reorder_point,
                         'status' => $this->getStockStatus($inventory),
-                        'last_updated' => $inventory->last_updated
+                        'last_updated' => $inventory->last_updated,
                     ];
                 });
 
@@ -183,12 +186,13 @@ class InventoryController extends BaseApiController
                 'total_quantity' => $stockLevels->sum('quantity'),
                 'total_reserved' => $stockLevels->sum('reserved_quantity'),
                 'total_available' => $stockLevels->sum('available_quantity'),
-                'warehouses' => $stockLevels
+                'warehouses' => $stockLevels,
             ];
 
             return $this->successResponse($summary);
         } catch (\Exception $e) {
             Log::error('Error fetching stock levels', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch stock levels', 500);
         }
     }
@@ -246,6 +250,7 @@ class InventoryController extends BaseApiController
             return $this->paginatedResponse($transactions, 'Transactions retrieved successfully');
         } catch (\Exception $e) {
             Log::error('Error fetching transactions', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch transactions', 500);
         }
     }
@@ -272,7 +277,7 @@ class InventoryController extends BaseApiController
                     'reorder_point' => $inventory->reorder_point,
                     'reorder_quantity' => $inventory->reorder_quantity,
                     'shortage' => $inventory->reorder_point - $inventory->quantity,
-                    'estimated_value' => ($inventory->reorder_point - $inventory->quantity) * ($inventory->product->unit_cost ?? 0)
+                    'estimated_value' => ($inventory->reorder_point - $inventory->quantity) * ($inventory->product->unit_cost ?? 0),
                 ];
             });
 
@@ -280,12 +285,13 @@ class InventoryController extends BaseApiController
                 'total_items' => $lowStockItems->count(),
                 'total_shortage' => $lowStockItems->sum('shortage'),
                 'estimated_reorder_value' => $lowStockItems->sum('estimated_value'),
-                'items' => $lowStockItems
+                'items' => $lowStockItems,
             ];
 
             return $this->successResponse($summary);
         } catch (\Exception $e) {
             Log::error('Error fetching low stock items', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch low stock items', 500);
         }
     }
@@ -308,6 +314,7 @@ class InventoryController extends BaseApiController
             return $this->successResponse($outOfStockItems);
         } catch (\Exception $e) {
             Log::error('Error fetching out of stock items', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch out of stock items', 500);
         }
     }
@@ -338,7 +345,7 @@ class InventoryController extends BaseApiController
             $valuation = $inventory->map(function ($item) {
                 $unitCost = $item->product->unit_cost ?? 0;
                 $totalValue = $item->quantity * $unitCost;
-                
+
                 return [
                     'product' => $item->product->name,
                     'sku' => $item->product->sku,
@@ -346,7 +353,7 @@ class InventoryController extends BaseApiController
                     'warehouse' => $item->warehouse->name,
                     'quantity' => $item->quantity,
                     'unit_cost' => $unitCost,
-                    'total_value' => $totalValue
+                    'total_value' => $totalValue,
                 ];
             });
 
@@ -357,21 +364,22 @@ class InventoryController extends BaseApiController
                 'by_category' => $valuation->groupBy('category')->map(function ($items, $category) {
                     return [
                         'quantity' => $items->sum('quantity'),
-                        'value' => $items->sum('total_value')
+                        'value' => $items->sum('total_value'),
                     ];
                 }),
                 'by_warehouse' => $valuation->groupBy('warehouse')->map(function ($items, $warehouse) {
                     return [
                         'quantity' => $items->sum('quantity'),
-                        'value' => $items->sum('total_value')
+                        'value' => $items->sum('total_value'),
                     ];
                 }),
-                'items' => $valuation
+                'items' => $valuation,
             ];
 
             return $this->successResponse($summary);
         } catch (\Exception $e) {
             Log::error('Error calculating inventory valuation', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to calculate valuation', 500);
         }
     }
@@ -388,7 +396,7 @@ class InventoryController extends BaseApiController
                 'quantity' => 'required|numeric|min:1',
                 'reference_type' => 'required|string',
                 'reference_id' => 'required|integer',
-                'notes' => 'nullable|string'
+                'notes' => 'nullable|string',
             ]);
 
             DB::beginTransaction();
@@ -398,7 +406,7 @@ class InventoryController extends BaseApiController
                 ->lockForUpdate()
                 ->first();
 
-            if (!$inventory) {
+            if (! $inventory) {
                 throw new \Exception('Inventory not found');
             }
 
@@ -411,7 +419,7 @@ class InventoryController extends BaseApiController
             // Update reserved quantity
             $inventory->update([
                 'reserved_quantity' => $inventory->reserved_quantity + $request->quantity,
-                'last_updated' => now()
+                'last_updated' => now(),
             ]);
 
             // Create transaction record
@@ -426,7 +434,7 @@ class InventoryController extends BaseApiController
                 'reference_id' => $request->reference_id,
                 'balance_after' => $inventory->quantity,
                 'notes' => $request->notes ?? "Reserved {$request->quantity} units",
-                'performed_by_id' => auth()->id()
+                'performed_by_id' => auth()->id(),
             ]);
 
             DB::commit();
@@ -435,6 +443,7 @@ class InventoryController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error reserving inventory', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -451,7 +460,7 @@ class InventoryController extends BaseApiController
                 'quantity' => 'required|numeric|min:1',
                 'reference_type' => 'required|string',
                 'reference_id' => 'required|integer',
-                'notes' => 'nullable|string'
+                'notes' => 'nullable|string',
             ]);
 
             DB::beginTransaction();
@@ -461,7 +470,7 @@ class InventoryController extends BaseApiController
                 ->lockForUpdate()
                 ->first();
 
-            if (!$inventory) {
+            if (! $inventory) {
                 throw new \Exception('Inventory not found');
             }
 
@@ -472,7 +481,7 @@ class InventoryController extends BaseApiController
             // Update reserved quantity
             $inventory->update([
                 'reserved_quantity' => $inventory->reserved_quantity - $request->quantity,
-                'last_updated' => now()
+                'last_updated' => now(),
             ]);
 
             // Create transaction record
@@ -487,7 +496,7 @@ class InventoryController extends BaseApiController
                 'reference_id' => $request->reference_id,
                 'balance_after' => $inventory->quantity,
                 'notes' => $request->notes ?? "Released {$request->quantity} units",
-                'performed_by_id' => auth()->id()
+                'performed_by_id' => auth()->id(),
             ]);
 
             DB::commit();
@@ -496,6 +505,7 @@ class InventoryController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error releasing inventory', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -522,6 +532,7 @@ class InventoryController extends BaseApiController
             return $this->successResponse($alerts);
         } catch (\Exception $e) {
             Log::error('Error fetching stock alerts', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch alerts', 500);
         }
     }
@@ -561,13 +572,14 @@ class InventoryController extends BaseApiController
                 'stock_health' => [
                     'healthy' => $totalProducts - $lowStockCount - $outOfStockCount,
                     'low' => $lowStockCount,
-                    'out' => $outOfStockCount
-                ]
+                    'out' => $outOfStockCount,
+                ],
             ];
 
             return $this->successResponse($statistics);
         } catch (\Exception $e) {
             Log::error('Error fetching inventory statistics', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch statistics', 500);
         }
     }

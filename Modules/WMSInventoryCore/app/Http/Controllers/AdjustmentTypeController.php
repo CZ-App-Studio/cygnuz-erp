@@ -43,7 +43,8 @@ class AdjustmentTypeController extends Controller
                 $effect = strtolower($adjustmentType->effect);
                 $badgeClass = in_array($effect, ['add', 'increase']) ? 'bg-label-success' : 'bg-label-danger';
                 $icon = in_array($effect, ['add', 'increase']) ? 'bx-plus' : 'bx-minus';
-                return '<span class="badge ' . $badgeClass . '"><i class="bx ' . $icon . ' me-1"></i>' . ucfirst($adjustmentType->effect) . '</span>';
+
+                return '<span class="badge '.$badgeClass.'"><i class="bx '.$icon.' me-1"></i>'.ucfirst($adjustmentType->effect).'</span>';
             })
             ->addColumn('actions', function ($adjustmentType) {
                 $actions = [];

@@ -27,7 +27,7 @@ class LeaveBalanceAdjustment extends Model implements AuditableContract
         'balance_after',
         'created_by_id',
         'updated_by_id',
-        'tenant_id'
+        'tenant_id',
     ];
 
     protected $casts = [
@@ -35,7 +35,7 @@ class LeaveBalanceAdjustment extends Model implements AuditableContract
         'days' => 'decimal:2',
         'balance_before' => 'decimal:2',
         'balance_after' => 'decimal:2',
-        'year' => 'integer'
+        'year' => 'integer',
     ];
 
     /**
@@ -53,5 +53,4 @@ class LeaveBalanceAdjustment extends Model implements AuditableContract
     {
         return $this->belongsTo(LeaveType::class);
     }
-
 }

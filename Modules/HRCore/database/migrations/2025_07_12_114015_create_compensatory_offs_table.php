@@ -26,13 +26,13 @@ return new class extends Migration
             $table->bigInteger('approved_by_id')->nullable();
             $table->dateTime('approved_at')->nullable();
             $table->string('approval_notes', 500)->nullable();
-            
+
             // System fields
             $table->foreignId('created_by_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('tenant_id', 191)->nullable();
             $table->timestamps();
-            
+
             // Indexes
             $table->index(['user_id', 'status']);
             $table->index(['expiry_date', 'is_used']);

@@ -67,9 +67,10 @@ class CompanyController extends Controller
                     return view('components.datatable-user', [
                         'user' => $company->assignedToUser,
                         'showCode' => false,
-                        'avatarSize' => 'xs'
+                        'avatarSize' => 'xs',
                     ])->render();
                 }
+
                 return '<span class="text-muted">-</span>';
             })
             ->editColumn('is_active', function ($company) {
@@ -321,7 +322,8 @@ class CompanyController extends Controller
                 'deals' => $company->deals,
             ]);
         } catch (Exception $e) {
-            Log::error("Company Get Deals Ajax Error for ID {$company->id}: " . $e->getMessage());
+            Log::error("Company Get Deals Ajax Error for ID {$company->id}: ".$e->getMessage());
+
             return Error::response(__('Failed to fetch updated deals data'));
         }
     }

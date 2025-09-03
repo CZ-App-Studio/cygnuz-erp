@@ -2,16 +2,16 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\User;
+use Database\Seeders\ERPPermissionSeeder;
+use Database\Seeders\ERPRoleSeeder;
+use Database\Seeders\SystemSettingsSeeder;
+use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Modules\HRCore\app\Models\Designation;
 use Modules\HRCore\app\Models\Shift;
 use Modules\HRCore\app\Models\Team;
 use Modules\HRCore\database\seeders\HRCoreProductionSeeder;
-use Database\Seeders\ERPPermissionSeeder;
-use Database\Seeders\ERPRoleSeeder;
-use Database\Seeders\SystemSettingsSeeder;
 use Nwidart\Modules\Facades\Module;
 
 class ProductionSetupCommand extends Command
@@ -53,7 +53,7 @@ class ProductionSetupCommand extends Command
         }
 
         // Step 1: Seed permissions (base + module permissions)
-        if (!$this->option('skip-permissions')) {
+        if (! $this->option('skip-permissions')) {
             $this->info('Step 1: Seeding permissions and roles...');
 
             // Base permissions
@@ -91,11 +91,11 @@ class ProductionSetupCommand extends Command
 
         // Get email
         $email = $this->option('email');
-        if (!$email) {
+        if (! $email) {
             $email = $this->ask('Enter email for super admin account');
 
             // Validate email
-            while (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            while (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->error('Invalid email format. Please try again.');
                 $email = $this->ask('Enter email for super admin account');
             }
@@ -104,7 +104,7 @@ class ProductionSetupCommand extends Command
         // Check if user already exists
         if (User::where('email', $email)->exists()) {
             $this->error("User with email {$email} already exists!");
-            if (!$this->confirm('Do you want to update the existing user to super admin?')) {
+            if (! $this->confirm('Do you want to update the existing user to super admin?')) {
                 return 1;
             }
 
@@ -120,8 +120,9 @@ class ProductionSetupCommand extends Command
             $team = Team::where('code', 'TM-001')->first();
             $designation = Designation::where('code', 'DES-001')->first();
 
-            if (!$shift || !$team || !$designation) {
+            if (! $shift || ! $team || ! $designation) {
                 $this->error('Default data not found. Please check HRCore production seeder.');
+
                 return 1;
             }
 
@@ -166,8 +167,9 @@ class ProductionSetupCommand extends Command
         foreach ($essentialSeeders as $item) {
             // Check if module is enabled
             $module = Module::find($item['module']);
-            if ($module && !$module->isEnabled()) {
+            if ($module && ! $module->isEnabled()) {
                 $this->warn("  ⏩ Skipping disabled module: {$item['module']}");
+
                 continue;
             }
 
@@ -229,8 +231,9 @@ class ProductionSetupCommand extends Command
 
                 // Check if module is enabled
                 $module = Module::find($moduleName);
-                if ($module && !$module->isEnabled()) {
+                if ($module && ! $module->isEnabled()) {
                     $this->warn("  ⏩ Skipping disabled module: {$moduleName}");
+
                     continue;
                 }
 
@@ -238,7 +241,7 @@ class ProductionSetupCommand extends Command
                 try {
                     $this->call('db:seed', ['--class' => $seederClass]);
                 } catch (\Exception $e) {
-                    $this->warn("    ⚠ Could not seed {$moduleName} permissions: " . $e->getMessage());
+                    $this->warn("    ⚠ Could not seed {$moduleName} permissions: ".$e->getMessage());
                 }
             }
         }
@@ -252,6 +255,7 @@ class ProductionSetupCommand extends Command
         if (preg_match('/Modules\\\\(.+?)\\\\/', $seederClass, $matches)) {
             return $matches[1];
         }
+
         return 'Unknown';
     }
 }

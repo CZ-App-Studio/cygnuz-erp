@@ -26,22 +26,22 @@ return new class extends Migration
             $table->timestamp('last_accessed_at')->nullable();
             $table->string('checksum', 64)->nullable();
             $table->string('storage_provider', 50)->default('local');
-            
+
             // Polymorphic relations
             $table->string('attachable_type')->nullable();
             $table->unsignedBigInteger('attachable_id')->nullable();
-            
+
             // File status and versioning
             $table->enum('status', ['uploading', 'active', 'processing', 'archived', 'deleted', 'failed'])->default('active');
             $table->unsignedInteger('version')->default(1);
             $table->unsignedBigInteger('parent_file_id')->nullable();
-            
+
             // Audit fields
             $table->unsignedBigInteger('created_by_id')->nullable();
             $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index(['attachable_type', 'attachable_id']);
             $table->index('category_id');
@@ -51,7 +51,7 @@ return new class extends Migration
             $table->index('status');
             $table->index('created_at');
             $table->index('size');
-            
+
             // Foreign keys
             $table->foreign('category_id')->references('id')->on('file_categories')->onDelete('set null');
             $table->foreign('parent_file_id')->references('id')->on('files')->onDelete('set null');

@@ -2,7 +2,4 @@
 
 namespace Modules\FileManagerCore\Interfaces;
 
-interface FileRepositoryInterface
-{
-
-}
+interface FileRepositoryInterface {}

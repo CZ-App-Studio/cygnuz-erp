@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('priority')->default(1);
             $table->json('configuration')->nullable();
             $table->timestamps();
-            
+
             $table->index(['type', 'is_active']);
             $table->index('priority');
         });

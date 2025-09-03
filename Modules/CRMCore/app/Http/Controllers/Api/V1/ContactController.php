@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Modules\CRMCore\app\Http\Controllers\Api\BaseApiController;
 use Modules\CRMCore\app\Http\Resources\ContactResource;
-use Modules\CRMCore\app\Models\Contact;
 use Modules\CRMCore\app\Models\Company;
+use Modules\CRMCore\app\Models\Contact;
 
 class ContactController extends BaseApiController
 {
@@ -128,6 +128,7 @@ class ContactController extends BaseApiController
             );
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to create contact', $e->getMessage(), 500);
         }
     }
@@ -159,7 +160,7 @@ class ContactController extends BaseApiController
         $validator = Validator::make($request->all(), [
             'first_name' => 'sometimes|required|string|max:100',
             'last_name' => 'sometimes|required|string|max:100',
-            'email' => 'nullable|email|max:255|unique:contacts,email,' . $id,
+            'email' => 'nullable|email|max:255|unique:contacts,email,'.$id,
             'phone' => 'nullable|string|max:20',
             'mobile' => 'nullable|string|max:20',
             'title' => 'nullable|string|max:100',
@@ -188,7 +189,7 @@ class ContactController extends BaseApiController
             DB::beginTransaction();
 
             $contact = Contact::findOrFail($id);
-            
+
             $data = $request->all();
             $data['updated_by_id'] = Auth::id();
 
@@ -199,7 +200,7 @@ class ContactController extends BaseApiController
                     ->where('is_primary', true)
                     ->update(['is_primary' => false]);
             }
-            
+
             $contact->update($data);
             $contact->load(['company', 'createdBy']);
 
@@ -211,9 +212,11 @@ class ContactController extends BaseApiController
             );
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
+
             return $this->notFoundResponse('Contact not found');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to update contact', $e->getMessage(), 500);
         }
     }
@@ -225,7 +228,7 @@ class ContactController extends BaseApiController
     {
         try {
             $contact = Contact::findOrFail($id);
-            
+
             // Check if contact is primary
             if ($contact->is_primary) {
                 return $this->errorResponse('Cannot delete primary contact', null, 400);
@@ -248,7 +251,7 @@ class ContactController extends BaseApiController
     {
         try {
             $search = $request->input('search', '');
-            
+
             $contacts = Contact::with(['company'])
                 ->where(function ($query) use ($search) {
                     $query->where('first_name', 'like', "%{$search}%")
@@ -278,8 +281,8 @@ class ContactController extends BaseApiController
             DB::beginTransaction();
 
             $contact = Contact::findOrFail($id);
-            
-            if (!$contact->company_id) {
+
+            if (! $contact->company_id) {
                 return $this->errorResponse('Contact must belong to a company to be set as primary', null, 400);
             }
 
@@ -303,9 +306,11 @@ class ContactController extends BaseApiController
             );
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
+
             return $this->notFoundResponse('Contact not found');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to set contact as primary', $e->getMessage(), 500);
         }
     }

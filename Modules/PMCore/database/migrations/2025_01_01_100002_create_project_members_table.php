@@ -20,15 +20,15 @@ return new class extends Migration
             $table->integer('allocation_percentage')->default(100);
             $table->timestamp('joined_at')->nullable();
             $table->timestamp('left_at')->nullable();
-            
+
             // Standard audit fields
             $table->unsignedBigInteger('created_by_id')->nullable();
-            
+
             $table->timestamps();
-            
+
             // Composite unique index to prevent duplicate memberships
             $table->unique(['project_id', 'user_id'], 'project_user_unique');
-            
+
             // Indexes for performance
             $table->index(['project_id']);
             $table->index(['user_id']);

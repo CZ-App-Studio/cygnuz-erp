@@ -3,10 +3,10 @@
 namespace Modules\PMCore\app\Models;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
 
 class ResourceCapacity extends Model
 {
@@ -20,7 +20,7 @@ class ResourceCapacity extends Model
         'utilized_hours',
         'is_working_day',
         'leave_type',
-        'notes'
+        'notes',
     ];
 
     protected $casts = [
@@ -61,7 +61,7 @@ class ResourceCapacity extends Model
     public function scopeAvailable($query)
     {
         return $query->where('is_working_day', true)
-                    ->whereColumn('allocated_hours', '<', 'available_hours');
+            ->whereColumn('allocated_hours', '<', 'available_hours');
     }
 
     // Accessors
@@ -75,6 +75,7 @@ class ResourceCapacity extends Model
         if ($this->available_hours == 0) {
             return 0;
         }
+
         return round(($this->utilized_hours / $this->available_hours) * 100, 2);
     }
 
@@ -83,6 +84,7 @@ class ResourceCapacity extends Model
         if ($this->available_hours == 0) {
             return 0;
         }
+
         return round(($this->allocated_hours / $this->available_hours) * 100, 2);
     }
 
@@ -106,10 +108,10 @@ class ResourceCapacity extends Model
             // Check if capacity already exists
             $capacity = self::firstOrNew([
                 'user_id' => $userId,
-                'date' => $currentDate->format('Y-m-d')
+                'date' => $currentDate->format('Y-m-d'),
             ]);
 
-            if (!$capacity->exists) {
+            if (! $capacity->exists) {
                 $capacity->available_hours = $currentDate->isWeekday() ? 8.0 : 0;
                 $capacity->is_working_day = $currentDate->isWeekday();
                 $capacity->allocated_hours = 0;
@@ -117,7 +119,7 @@ class ResourceCapacity extends Model
 
                 // Check for holidays or leaves here if integrated with HR module
                 // This is a placeholder for holiday/leave checking
-                
+
                 $capacity->save();
             }
 
@@ -129,12 +131,12 @@ class ResourceCapacity extends Model
     {
         $capacity = self::firstOrCreate([
             'user_id' => $userId,
-            'date' => $date->format('Y-m-d')
+            'date' => $date->format('Y-m-d'),
         ], [
             'available_hours' => $date->isWeekday() ? 8.0 : 0,
             'is_working_day' => $date->isWeekday(),
             'allocated_hours' => 0,
-            'utilized_hours' => 0
+            'utilized_hours' => 0,
         ]);
 
         // Calculate total allocated hours from active allocations
@@ -159,8 +161,8 @@ class ResourceCapacity extends Model
     public static function updateUtilizedHours($userId, Carbon $date): void
     {
         $capacity = self::forUser($userId)->forDate($date)->first();
-        
-        if (!$capacity) {
+
+        if (! $capacity) {
             return;
         }
 
@@ -179,7 +181,7 @@ class ResourceCapacity extends Model
         $this->update([
             'is_working_day' => false,
             'available_hours' => 0,
-            'leave_type' => $leaveType
+            'leave_type' => $leaveType,
         ]);
     }
 
@@ -188,7 +190,7 @@ class ResourceCapacity extends Model
         $this->update([
             'is_working_day' => true,
             'available_hours' => $hours,
-            'leave_type' => null
+            'leave_type' => null,
         ]);
     }
 }

@@ -19,7 +19,7 @@ class TrackUserSession
         if ($request->hasSession() && auth()->check()) {
             $sessionId = session()->getId();
             $userId = auth()->id();
-            
+
             // Update the session with user_id if not already set
             DB::table('sessions')
                 ->where('id', $sessionId)
@@ -27,10 +27,10 @@ class TrackUserSession
                     'user_id' => $userId,
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
-                    'last_activity' => now()->timestamp
+                    'last_activity' => now()->timestamp,
                 ]);
         }
-        
+
         return $next($request);
     }
 }

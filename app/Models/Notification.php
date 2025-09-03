@@ -7,26 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
-  use UserActionsTrait;
+    use UserActionsTrait;
 
-  protected $table = 'notifications';
+    protected $table = 'notifications';
 
-  protected $fillable = [
-    'type',
-    'notifiable_id',
-    'notifiable_type',
-    'data',
-    'read_at',
-  ];
+    protected $fillable = [
+        'type',
+        'notifiable_id',
+        'notifiable_type',
+        'data',
+        'read_at',
+    ];
 
-  public function getTypeString(): string
-  {
-    return match ($this->type) {
-      'App\Notifications\Leave\NewLeaveRequest', 'App\Notifications\Leave\CancelLeaveRequest', 'App\Notifications\Expense\CancelExpenseRequest', 'App\Notifications\Expense\NewExpenseRequest' => 'Approvals',
-      'App\Notifications\Alerts\BreakAlert', 'App\Notifications\NewVisit' => 'Alerts',
-      'App\Notifications\Chat\NewChatMessage' => 'Chat',
-      'App\Notifications\Attendance\CheckInOut' => 'Attendance',
-      default => 'System Notification',
-    };
-  }
+    public function getTypeString(): string
+    {
+        return match ($this->type) {
+            'App\Notifications\Leave\NewLeaveRequest', 'App\Notifications\Leave\CancelLeaveRequest', 'App\Notifications\Expense\CancelExpenseRequest', 'App\Notifications\Expense\NewExpenseRequest' => 'Approvals',
+            'App\Notifications\Alerts\BreakAlert', 'App\Notifications\NewVisit' => 'Alerts',
+            'App\Notifications\Chat\NewChatMessage' => 'Chat',
+            'App\Notifications\Attendance\CheckInOut' => 'Attendance',
+            default => 'System Notification',
+        };
+    }
 }

@@ -7,13 +7,14 @@ use Illuminate\View\Component;
 class DatatableActions extends Component
 {
     public $id;
+
     public $actions;
 
     /**
      * Create a new component instance.
      *
-     * @param mixed $id
-     * @param array $actions
+     * @param  mixed  $id
+     * @param  array  $actions
      * @return void
      */
     public function __construct($id, $actions = [])

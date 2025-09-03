@@ -12,9 +12,7 @@ class TaskAssignedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public string $title, public string $message)
-    {
-    }
+    public function __construct(public string $title, public string $message) {}
 
     public function via(object $notifiable): array
     {

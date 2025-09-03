@@ -2,19 +2,19 @@
 
 namespace Modules\AiChat\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Traits\UserActionsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\User;
-use App\Traits\UserActionsTrait;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class AIChat extends Model implements AuditableContract
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, Auditable;
+    use Auditable, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'ai_chats';
 
@@ -31,7 +31,7 @@ class AIChat extends Model implements AuditableContract
         'total_tokens',
         'last_message_at',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -42,7 +42,7 @@ class AIChat extends Model implements AuditableContract
         'total_tokens' => 'integer',
         'last_message_at' => 'datetime',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     protected $appends = ['formatted_cost', 'formatted_last_message', 'latest_message_preview'];
@@ -96,7 +96,7 @@ class AIChat extends Model implements AuditableContract
      */
     public function getFormattedCostAttribute()
     {
-        return '$' . number_format($this->total_cost, 4);
+        return '$'.number_format($this->total_cost, 4);
     }
 
     /**
@@ -104,10 +104,10 @@ class AIChat extends Model implements AuditableContract
      */
     public function getFormattedLastMessageAttribute()
     {
-        if (!$this->last_message_at) {
+        if (! $this->last_message_at) {
             return 'No messages yet';
         }
-        
+
         return $this->last_message_at->diffForHumans();
     }
 
@@ -116,15 +116,15 @@ class AIChat extends Model implements AuditableContract
      */
     public function getLatestMessagePreviewAttribute()
     {
-        if (!$this->latestMessage) {
+        if (! $this->latestMessage) {
             return '';
         }
-        
+
         $content = $this->latestMessage->content;
-        
+
         // Strip markdown formatting
         $content = preg_replace('/\*\*(.*?)\*\*/', '$1', $content); // Bold
-        $content = preg_replace('/\*(.*?)\*/', '$1', $content); // Italic  
+        $content = preg_replace('/\*(.*?)\*/', '$1', $content); // Italic
         $content = preg_replace('/`{3}[\s\S]*?`{3}/', '[code block]', $content); // Code blocks
         $content = preg_replace('/`(.*?)`/', '$1', $content); // Inline code
         $content = preg_replace('/^#{1,6}\s+(.*)$/m', '$1', $content); // Headers
@@ -134,7 +134,7 @@ class AIChat extends Model implements AuditableContract
         $content = preg_replace('/^>\s+/m', '', $content); // Blockquotes
         $content = preg_replace('/\n{2,}/', ' ', $content); // Multiple newlines
         $content = preg_replace('/\s+/', ' ', $content); // Multiple spaces
-        
+
         return trim($content);
     }
 
@@ -146,12 +146,12 @@ class AIChat extends Model implements AuditableContract
         $stats = $this->messages()
             ->selectRaw('COUNT(*) as count, SUM(total_tokens) as tokens, SUM(cost) as cost')
             ->first();
-        
+
         $this->update([
             'message_count' => $stats->count ?? 0,
             'total_tokens' => $stats->tokens ?? 0,
             'total_cost' => $stats->cost ?? 0,
-            'last_message_at' => $this->messages()->latest()->first()?->created_at
+            'last_message_at' => $this->messages()->latest()->first()?->created_at,
         ]);
     }
 
@@ -219,10 +219,11 @@ class AIChat extends Model implements AuditableContract
                 $title .= '...';
             }
             $this->update(['title' => $title]);
+
             return $title;
         }
 
-        return 'New Chat ' . $this->created_at->format('M d, Y');
+        return 'New Chat '.$this->created_at->format('M d, Y');
     }
 
     /**
@@ -239,7 +240,7 @@ class AIChat extends Model implements AuditableContract
             ->map(function ($message) {
                 return [
                     'role' => $message->role,
-                    'content' => $message->content
+                    'content' => $message->content,
                 ];
             })
             ->values()
@@ -259,7 +260,7 @@ class AIChat extends Model implements AuditableContract
             'total_cost' => 0,
             'total_tokens' => 0,
             'last_message_at' => null,
-            'context' => null
+            'context' => null,
         ]);
     }
 }

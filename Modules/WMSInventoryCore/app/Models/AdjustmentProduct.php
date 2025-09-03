@@ -13,13 +13,13 @@ class AdjustmentProduct extends Model
         'quantity',
         'unit_cost',
         'subtotal',
-        'reason'
+        'reason',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
         'unit_cost' => 'decimal:4',
-        'subtotal' => 'decimal:2'
+        'subtotal' => 'decimal:2',
     ];
 
     /**

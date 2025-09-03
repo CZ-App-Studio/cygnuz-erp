@@ -3,7 +3,6 @@
 namespace Modules\AccountingCore\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class AccountingCoreController extends Controller
 {

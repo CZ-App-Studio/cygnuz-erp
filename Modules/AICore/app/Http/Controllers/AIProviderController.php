@@ -3,16 +3,16 @@
 namespace Modules\AICore\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\AICore\Models\AIProvider;
-use Modules\AICore\Models\AIModel;
-use Modules\AICore\Services\AIProviderService;
-use Modules\AICore\Services\AIProviderAddonService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Modules\AICore\Models\AIProvider;
+use Modules\AICore\Services\AIProviderAddonService;
+use Modules\AICore\Services\AIProviderService;
 
 class AIProviderController extends Controller
 {
     protected AIProviderService $providerService;
+
     protected AIProviderAddonService $providerAddonService;
 
     public function __construct(AIProviderService $providerService, AIProviderAddonService $providerAddonService)
@@ -26,10 +26,10 @@ class AIProviderController extends Controller
      */
     public function index()
     {
-        $providers = $this->providerAddonService->getEnabledProviders()->load(['models' => function($query) {
+        $providers = $this->providerAddonService->getEnabledProviders()->load(['models' => function ($query) {
             $query->active();
         }]);
-        
+
         $availableAddons = $this->providerAddonService->getAvailableProviderAddons();
         $disabledAddons = $this->providerAddonService->getDisabledProviderAddons();
 
@@ -42,7 +42,7 @@ class AIProviderController extends Controller
     public function create()
     {
         $enabledTypes = $this->providerAddonService->getEnabledProviderTypes();
-        
+
         $providerTypes = [];
         foreach ($enabledTypes as $type) {
             $providerTypes[$type] = $this->getProviderTypeName($type);
@@ -65,7 +65,7 @@ class AIProviderController extends Controller
             'max_tokens_per_request' => 'nullable|integer|min:1|max:32000',
             'cost_per_token' => 'nullable|numeric|min:0',
             'priority' => 'nullable|integer|min:1|max:100',
-            'is_active' => 'nullable|boolean'
+            'is_active' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -73,10 +73,10 @@ class AIProviderController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'message' => 'Validation failed',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
-            
+
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -85,22 +85,22 @@ class AIProviderController extends Controller
         try {
             // Create the provider
             $data = $request->all();
-            
+
             // Set default values if not provided
             $data['max_requests_per_minute'] = $data['max_requests_per_minute'] ?? 60;
             $data['max_tokens_per_request'] = $data['max_tokens_per_request'] ?? 4000;
             $data['cost_per_token'] = $data['cost_per_token'] ?? 0.000015;
             $data['priority'] = $data['priority'] ?? 1;
             $data['is_active'] = $request->has('is_active') ? ($request->input('is_active') == '1') : false;
-            
+
             // Encrypt API key if provided
             if ($request->filled('api_key')) {
                 $data['api_key_encrypted'] = \Illuminate\Support\Facades\Crypt::encryptString($request->input('api_key'));
             }
-            
+
             // Remove plain api_key from data
             unset($data['api_key']);
-            
+
             $provider = AIProvider::create($data);
 
             // Return JSON response for AJAX requests
@@ -109,7 +109,7 @@ class AIProviderController extends Controller
                     'success' => true,
                     'message' => 'AI Provider created successfully',
                     'redirect' => route('aicore.providers.index'),
-                    'provider' => $provider
+                    'provider' => $provider,
                 ]);
             }
 
@@ -121,12 +121,12 @@ class AIProviderController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to create provider: ' . $e->getMessage()
+                    'message' => 'Failed to create provider: '.$e->getMessage(),
                 ], 500);
             }
-            
+
             return redirect()->back()
-                ->with('error', 'Failed to create provider: ' . $e->getMessage())
+                ->with('error', 'Failed to create provider: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -136,7 +136,7 @@ class AIProviderController extends Controller
      */
     public function show(AIProvider $provider)
     {
-        $provider->load(['models', 'usageLogs' => function($query) {
+        $provider->load(['models', 'usageLogs' => function ($query) {
             $query->recent(30)->limit(100);
         }]);
 
@@ -151,7 +151,7 @@ class AIProviderController extends Controller
     public function edit(AIProvider $provider)
     {
         $enabledTypes = $this->providerAddonService->getEnabledProviderTypes();
-        
+
         $providerTypes = [];
         foreach ($enabledTypes as $type) {
             $providerTypes[$type] = $this->getProviderTypeName($type);
@@ -174,7 +174,7 @@ class AIProviderController extends Controller
             'max_tokens_per_request' => 'nullable|integer|min:1|max:32000',
             'cost_per_token' => 'nullable|numeric|min:0',
             'priority' => 'nullable|integer|min:1|max:100',
-            'is_active' => 'nullable|boolean'
+            'is_active' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -182,10 +182,10 @@ class AIProviderController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'message' => 'Validation failed',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
-            
+
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -193,22 +193,22 @@ class AIProviderController extends Controller
 
         try {
             $data = $request->all();
-            
+
             // Set default values if not provided
             $data['max_requests_per_minute'] = $data['max_requests_per_minute'] ?? 60;
             $data['max_tokens_per_request'] = $data['max_tokens_per_request'] ?? 4000;
             $data['cost_per_token'] = $data['cost_per_token'] ?? 0.000015;
             $data['priority'] = $data['priority'] ?? 1;
             $data['is_active'] = $request->has('is_active') ? ($request->input('is_active') == '1') : false;
-            
+
             // Handle API key update
             if ($request->filled('api_key')) {
                 $data['api_key_encrypted'] = \Illuminate\Support\Facades\Crypt::encryptString($request->input('api_key'));
             }
-            
+
             // Remove plain api_key from data
             unset($data['api_key']);
-            
+
             $provider->update($data);
 
             // Return JSON response for AJAX requests
@@ -217,7 +217,7 @@ class AIProviderController extends Controller
                     'success' => true,
                     'message' => 'AI Provider updated successfully',
                     'redirect' => route('aicore.providers.index'),
-                    'provider' => $provider
+                    'provider' => $provider,
                 ]);
             }
 
@@ -229,12 +229,12 @@ class AIProviderController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to update provider: ' . $e->getMessage()
+                    'message' => 'Failed to update provider: '.$e->getMessage(),
                 ], 500);
             }
-            
+
             return redirect()->back()
-                ->with('error', 'Failed to update provider: ' . $e->getMessage())
+                ->with('error', 'Failed to update provider: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -258,7 +258,7 @@ class AIProviderController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to delete provider: ' . $e->getMessage());
+                ->with('error', 'Failed to delete provider: '.$e->getMessage());
         }
     }
 
@@ -269,53 +269,53 @@ class AIProviderController extends Controller
     {
         try {
             // Basic validation
-            if (!$provider->api_key_encrypted && $provider->type !== 'local') {
+            if (! $provider->api_key_encrypted && $provider->type !== 'local') {
                 return response()->json([
                     'success' => false,
                     'message' => 'No API key configured for this provider',
-                    'response_time' => null
+                    'response_time' => null,
                 ]);
             }
 
             $startTime = microtime(true);
             $testSuccessful = false;
             $testMessage = '';
-            
+
             // Test based on provider type
             switch ($provider->type) {
                 case 'gemini':
                     // Use GeminiProviderService if available
                     if (class_exists('\Modules\GeminiAIProvider\Services\GeminiProviderService')) {
-                        $service = new \Modules\GeminiAIProvider\Services\GeminiProviderService();
+                        $service = new \Modules\GeminiAIProvider\Services\GeminiProviderService;
                         $apiKey = \Illuminate\Support\Facades\Crypt::decryptString($provider->api_key_encrypted);
                         $service->setApiKey($apiKey);
-                        
+
                         // Get first active model or use default
                         $model = $provider->models()->where('is_active', true)->first();
                         $modelId = $model ? $model->model_identifier : 'gemini-1.5-flash';
-                        
+
                         $testSuccessful = $service->testConnection($modelId);
                         $testMessage = $testSuccessful ? 'Gemini API connection successful' : 'Gemini API connection failed';
                     } else {
                         $testMessage = 'GeminiAIProvider module not installed';
                     }
                     break;
-                    
+
                 case 'openai':
                     // OpenAI test logic
                     try {
                         $apiKey = \Illuminate\Support\Facades\Crypt::decryptString($provider->api_key_encrypted);
                         $client = new \GuzzleHttp\Client(['timeout' => 10]);
-                        
+
                         // Test OpenAI API by listing models
                         $response = $client->get('https://api.openai.com/v1/models', [
                             'headers' => [
-                                'Authorization' => 'Bearer ' . $apiKey
-                            ]
+                                'Authorization' => 'Bearer '.$apiKey,
+                            ],
                         ]);
-                        
+
                         $data = json_decode($response->getBody()->getContents(), true);
-                        
+
                         if (isset($data['data']) && is_array($data['data'])) {
                             $testSuccessful = true;
                             $testMessage = 'OpenAI API connection successful';
@@ -323,24 +323,24 @@ class AIProviderController extends Controller
                             $testMessage = 'OpenAI API returned unexpected response';
                         }
                     } catch (\Exception $e) {
-                        $testMessage = 'OpenAI API connection failed: ' . $e->getMessage();
+                        $testMessage = 'OpenAI API connection failed: '.$e->getMessage();
                         \Log::error('OpenAI connection test failed', ['error' => $e->getMessage()]);
                     }
                     break;
-                    
+
                 case 'claude':
                     // Claude test logic
                     if (class_exists('\Modules\ClaudeAIProvider\Services\ClaudeProviderService')) {
                         try {
-                            $service = new \Modules\ClaudeAIProvider\Services\ClaudeProviderService();
+                            $service = new \Modules\ClaudeAIProvider\Services\ClaudeProviderService;
                             $apiKey = \Illuminate\Support\Facades\Crypt::decryptString($provider->api_key_encrypted);
                             $service->setApiKey($apiKey);
-                            
+
                             // Test connection with a simple message
                             $testSuccessful = $service->testConnection();
                             $testMessage = $testSuccessful ? 'Claude API connection successful' : 'Claude API connection failed';
                         } catch (\Exception $e) {
-                            $testMessage = 'Claude API connection failed: ' . $e->getMessage();
+                            $testMessage = 'Claude API connection failed: '.$e->getMessage();
                             \Log::error('Claude connection test failed', ['error' => $e->getMessage()]);
                         }
                     } else {
@@ -348,25 +348,25 @@ class AIProviderController extends Controller
                         try {
                             $apiKey = \Illuminate\Support\Facades\Crypt::decryptString($provider->api_key_encrypted);
                             $client = new \GuzzleHttp\Client(['timeout' => 10]);
-                            
+
                             // Test Claude API with a simple message
                             $response = $client->post('https://api.anthropic.com/v1/messages', [
                                 'headers' => [
                                     'Content-Type' => 'application/json',
                                     'x-api-key' => $apiKey,
-                                    'anthropic-version' => '2023-06-01'
+                                    'anthropic-version' => '2023-06-01',
                                 ],
                                 'json' => [
                                     'model' => 'claude-3-haiku-20240307',
                                     'messages' => [
-                                        ['role' => 'user', 'content' => 'Reply with OK']
+                                        ['role' => 'user', 'content' => 'Reply with OK'],
                                     ],
-                                    'max_tokens' => 10
-                                ]
+                                    'max_tokens' => 10,
+                                ],
                             ]);
-                            
+
                             $data = json_decode($response->getBody()->getContents(), true);
-                            
+
                             if (isset($data['content'])) {
                                 $testSuccessful = true;
                                 $testMessage = 'Claude API connection successful';
@@ -379,18 +379,18 @@ class AIProviderController extends Controller
                         }
                     }
                     break;
-                    
+
                 case 'local':
                     // Local model test logic
                     $testSuccessful = true;
                     $testMessage = 'Local provider ready';
                     break;
-                    
+
                 default:
                     $testMessage = 'Provider type not supported for testing';
                     break;
             }
-            
+
             $responseTime = round((microtime(true) - $startTime) * 1000, 2);
 
             return response()->json([
@@ -399,15 +399,15 @@ class AIProviderController extends Controller
                 'response_time' => $responseTime,
                 'provider_info' => [
                     'provider_type' => $provider->type,
-                    'endpoint' => $provider->endpoint_url
-                ]
+                    'endpoint' => $provider->endpoint_url,
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Connection test failed: ' . $e->getMessage(),
-                'response_time' => null
+                'message' => 'Connection test failed: '.$e->getMessage(),
+                'response_time' => null,
             ], 500);
         }
     }
@@ -427,7 +427,7 @@ class AIProviderController extends Controller
             'mistral' => 'Mistral AI',
             'ollama' => 'Ollama (Local)',
             'bedrock' => 'AWS Bedrock',
-            'palm' => 'Google PaLM'
+            'palm' => 'Google PaLM',
         ];
 
         return $names[$type] ?? ucfirst($type);

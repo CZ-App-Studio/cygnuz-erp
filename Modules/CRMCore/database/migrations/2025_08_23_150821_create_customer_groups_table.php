@@ -24,17 +24,17 @@ return new class extends Migration
             $table->boolean('free_shipping')->default(false);
             $table->decimal('min_order_amount', 15, 2)->default(0);
             $table->boolean('is_active')->default(true);
-            
+
             // Multi-tenancy
             $table->unsignedBigInteger('tenant_id')->nullable();
-            
+
             // User tracking
             $table->unsignedBigInteger('created_by_id')->nullable();
             $table->unsignedBigInteger('updated_by_id')->nullable();
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('tenant_id');
             $table->index('is_active');

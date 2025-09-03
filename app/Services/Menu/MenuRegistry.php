@@ -2,12 +2,12 @@
 
 namespace App\Services\Menu;
 
-use Illuminate\Support\Collection;
-
 class MenuRegistry
 {
     protected static array $registeredMenus = [];
+
     protected static array $menuPermissions = [];
+
     protected static array $menuCallbacks = [];
 
     /**
@@ -75,6 +75,7 @@ class MenuRegistry
         foreach (self::$menuPermissions as $module => $modulePermissions) {
             $permissions = array_merge($permissions, $modulePermissions);
         }
+
         return $permissions;
     }
 
@@ -147,7 +148,7 @@ class MenuRegistry
     public function mergeMenus(array ...$menus): array
     {
         $merged = [];
-        
+
         foreach ($menus as $menu) {
             foreach ($menu as $item) {
                 // Check for duplicates by slug or name
@@ -161,8 +162,8 @@ class MenuRegistry
                         break;
                     }
                 }
-                
-                if (!$exists) {
+
+                if (! $exists) {
                     $merged[] = $item;
                 }
             }

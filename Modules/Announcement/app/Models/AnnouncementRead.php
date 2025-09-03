@@ -2,9 +2,9 @@
 
 namespace Modules\Announcement\app\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class AnnouncementRead extends Model
 {
@@ -15,13 +15,13 @@ class AnnouncementRead extends Model
         'user_id',
         'read_at',
         'acknowledged',
-        'acknowledged_at'
+        'acknowledged_at',
     ];
 
     protected $casts = [
         'read_at' => 'datetime',
         'acknowledged' => 'boolean',
-        'acknowledged_at' => 'datetime'
+        'acknowledged_at' => 'datetime',
     ];
 
     /**

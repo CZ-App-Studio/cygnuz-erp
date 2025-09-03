@@ -2,8 +2,8 @@
 
 namespace Modules\AICore\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AIModuleConfiguration extends Model
@@ -25,7 +25,7 @@ class AIModuleConfiguration extends Model
         'temperature_default',
         'streaming_enabled',
         'is_active',
-        'priority'
+        'priority',
     ];
 
     protected $casts = [
@@ -36,7 +36,7 @@ class AIModuleConfiguration extends Model
         'streaming_enabled' => 'boolean',
         'is_active' => 'boolean',
         'priority' => 'integer',
-        'max_tokens_limit' => 'integer'
+        'max_tokens_limit' => 'integer',
     ];
 
     /**
@@ -63,7 +63,7 @@ class AIModuleConfiguration extends Model
         if (empty($this->allowed_providers)) {
             return AIProvider::active()->get();
         }
-        
+
         return AIProvider::whereIn('id', $this->allowed_providers)
             ->where('is_active', true)
             ->get();
@@ -77,7 +77,7 @@ class AIModuleConfiguration extends Model
         if (empty($this->allowed_models)) {
             return AIModel::active()->get();
         }
-        
+
         return AIModel::whereIn('id', $this->allowed_models)
             ->where('is_active', true)
             ->get();
@@ -91,7 +91,7 @@ class AIModuleConfiguration extends Model
         if (empty($this->allowed_providers)) {
             return true; // All providers allowed if not specified
         }
-        
+
         return in_array($providerId, $this->allowed_providers);
     }
 
@@ -103,7 +103,7 @@ class AIModuleConfiguration extends Model
         if (empty($this->allowed_models)) {
             return true; // All models allowed if not specified
         }
-        
+
         return in_array($modelId, $this->allowed_models);
     }
 

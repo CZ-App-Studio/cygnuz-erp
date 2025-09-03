@@ -2,18 +2,18 @@
 
 namespace Modules\WMSInventoryCore\app\Http\Controllers\Api\V1;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\WMSInventoryCore\app\Http\Controllers\Api\BaseApiController;
+use Modules\WMSInventoryCore\app\Http\Requests\StoreAdjustmentRequest;
+use Modules\WMSInventoryCore\app\Http\Requests\UpdateAdjustmentRequest;
 use Modules\WMSInventoryCore\Models\Adjustment;
 use Modules\WMSInventoryCore\Models\AdjustmentItem;
 use Modules\WMSInventoryCore\Models\Inventory;
 use Modules\WMSInventoryCore\Models\InventoryTransaction;
 use Modules\WMSInventoryCore\Models\Product;
-use Modules\WMSInventoryCore\app\Http\Requests\StoreAdjustmentRequest;
-use Modules\WMSInventoryCore\app\Http\Requests\UpdateAdjustmentRequest;
 
 class AdjustmentController extends BaseApiController
 {
@@ -54,8 +54,8 @@ class AdjustmentController extends BaseApiController
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('adjustment_number', 'like', "%{$search}%")
-                      ->orWhere('reference_number', 'like', "%{$search}%")
-                      ->orWhere('notes', 'like', "%{$search}%");
+                        ->orWhere('reference_number', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%");
                 });
             }
 
@@ -71,6 +71,7 @@ class AdjustmentController extends BaseApiController
             return $this->paginatedResponse($adjustments, 'Adjustments retrieved successfully');
         } catch (\Exception $e) {
             Log::error('Error fetching adjustments', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch adjustments', 500);
         }
     }
@@ -97,7 +98,7 @@ class AdjustmentController extends BaseApiController
                 'notes' => $request->notes,
                 'status' => 'draft',
                 'adjusted_by_id' => auth()->id(),
-                'total_value' => 0
+                'total_value' => 0,
             ]);
 
             $totalValue = 0;
@@ -105,7 +106,7 @@ class AdjustmentController extends BaseApiController
             // Create adjustment items
             foreach ($request->items as $item) {
                 $product = Product::find($item['product_id']);
-                if (!$product) {
+                if (! $product) {
                     throw new \Exception("Product not found: {$item['product_id']}");
                 }
 
@@ -134,7 +135,7 @@ class AdjustmentController extends BaseApiController
                     'unit_cost' => $unitCost,
                     'total_cost' => $lineTotal,
                     'reason' => $item['reason'] ?? null,
-                    'notes' => $item['notes'] ?? null
+                    'notes' => $item['notes'] ?? null,
                 ]);
 
                 $totalValue += $lineTotal;
@@ -152,6 +153,7 @@ class AdjustmentController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating adjustment', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -168,16 +170,17 @@ class AdjustmentController extends BaseApiController
                 'approvedBy',
                 'items.product',
                 'items.product.unit',
-                'items.product.category'
+                'items.product.category',
             ])->find($id);
 
-            if (!$adjustment) {
+            if (! $adjustment) {
                 return $this->errorResponse('Adjustment not found', 404);
             }
 
             return $this->successResponse($adjustment);
         } catch (\Exception $e) {
             Log::error('Error fetching adjustment', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch adjustment', 500);
         }
     }
@@ -189,7 +192,7 @@ class AdjustmentController extends BaseApiController
     {
         try {
             $adjustment = Adjustment::find($id);
-            if (!$adjustment) {
+            if (! $adjustment) {
                 return $this->errorResponse('Adjustment not found', 404);
             }
 
@@ -206,7 +209,7 @@ class AdjustmentController extends BaseApiController
                 'adjustment_date',
                 'reason',
                 'reference_number',
-                'notes'
+                'notes',
             ]));
 
             // Update items if provided
@@ -219,7 +222,7 @@ class AdjustmentController extends BaseApiController
                 // Create new items
                 foreach ($request->items as $item) {
                     $product = Product::find($item['product_id']);
-                    if (!$product) {
+                    if (! $product) {
                         throw new \Exception("Product not found: {$item['product_id']}");
                     }
 
@@ -247,7 +250,7 @@ class AdjustmentController extends BaseApiController
                         'unit_cost' => $unitCost,
                         'total_cost' => $lineTotal,
                         'reason' => $item['reason'] ?? null,
-                        'notes' => $item['notes'] ?? null
+                        'notes' => $item['notes'] ?? null,
                     ]);
 
                     $totalValue += $lineTotal;
@@ -264,6 +267,7 @@ class AdjustmentController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error updating adjustment', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -275,7 +279,7 @@ class AdjustmentController extends BaseApiController
     {
         try {
             $adjustment = Adjustment::find($id);
-            if (!$adjustment) {
+            if (! $adjustment) {
                 return $this->errorResponse('Adjustment not found', 404);
             }
 
@@ -297,6 +301,7 @@ class AdjustmentController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error deleting adjustment', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to delete adjustment', 500);
         }
     }
@@ -308,7 +313,7 @@ class AdjustmentController extends BaseApiController
     {
         try {
             $adjustment = Adjustment::find($id);
-            if (!$adjustment) {
+            if (! $adjustment) {
                 return $this->errorResponse('Adjustment not found', 404);
             }
 
@@ -322,12 +327,13 @@ class AdjustmentController extends BaseApiController
 
             $adjustment->update([
                 'status' => 'pending',
-                'submitted_at' => now()
+                'submitted_at' => now(),
             ]);
 
             return $this->successResponse($adjustment, 'Adjustment submitted for approval');
         } catch (\Exception $e) {
             Log::error('Error submitting adjustment', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to submit adjustment', 500);
         }
     }
@@ -339,7 +345,7 @@ class AdjustmentController extends BaseApiController
     {
         try {
             $adjustment = Adjustment::with('items')->find($id);
-            if (!$adjustment) {
+            if (! $adjustment) {
                 return $this->errorResponse('Adjustment not found', 404);
             }
 
@@ -354,18 +360,18 @@ class AdjustmentController extends BaseApiController
                 $inventory = Inventory::firstOrCreate(
                     [
                         'product_id' => $item->product_id,
-                        'warehouse_id' => $adjustment->warehouse_id
+                        'warehouse_id' => $adjustment->warehouse_id,
                     ],
                     [
                         'quantity' => 0,
                         'reserved_quantity' => 0,
                         'reorder_point' => 0,
-                        'reorder_quantity' => 0
+                        'reorder_quantity' => 0,
                     ]
                 );
 
-                $quantityChange = $adjustment->adjustment_type === 'increase' 
-                    ? $item->quantity_adjusted 
+                $quantityChange = $adjustment->adjustment_type === 'increase'
+                    ? $item->quantity_adjusted
                     : -$item->quantity_adjusted;
 
                 $newQuantity = $inventory->quantity + $quantityChange;
@@ -377,7 +383,7 @@ class AdjustmentController extends BaseApiController
                 // Update inventory
                 $inventory->update([
                     'quantity' => $newQuantity,
-                    'last_updated' => now()
+                    'last_updated' => now(),
                 ]);
 
                 // Create inventory transaction
@@ -394,7 +400,7 @@ class AdjustmentController extends BaseApiController
                     'total_cost' => $item->total_cost,
                     'balance_after' => $newQuantity,
                     'notes' => "Adjustment #{$adjustment->adjustment_number}: {$adjustment->reason}",
-                    'performed_by_id' => auth()->id()
+                    'performed_by_id' => auth()->id(),
                 ]);
             }
 
@@ -403,7 +409,7 @@ class AdjustmentController extends BaseApiController
                 'status' => 'approved',
                 'approved_by_id' => auth()->id(),
                 'approved_at' => now(),
-                'approval_notes' => $request->approval_notes
+                'approval_notes' => $request->approval_notes,
             ]);
 
             DB::commit();
@@ -414,6 +420,7 @@ class AdjustmentController extends BaseApiController
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error approving adjustment', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
@@ -425,7 +432,7 @@ class AdjustmentController extends BaseApiController
     {
         try {
             $adjustment = Adjustment::find($id);
-            if (!$adjustment) {
+            if (! $adjustment) {
                 return $this->errorResponse('Adjustment not found', 404);
             }
 
@@ -437,12 +444,13 @@ class AdjustmentController extends BaseApiController
                 'status' => 'rejected',
                 'rejected_by_id' => auth()->id(),
                 'rejected_at' => now(),
-                'rejection_reason' => $request->rejection_reason
+                'rejection_reason' => $request->rejection_reason,
             ]);
 
             return $this->successResponse($adjustment, 'Adjustment rejected');
         } catch (\Exception $e) {
             Log::error('Error rejecting adjustment', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to reject adjustment', 500);
         }
     }
@@ -458,7 +466,7 @@ class AdjustmentController extends BaseApiController
             $toDate = $request->to_date ?? now()->endOfDay();
 
             $query = Adjustment::whereBetween('adjustment_date', [$fromDate, $toDate]);
-            
+
             if ($warehouseId) {
                 $query->where('warehouse_id', $warehouseId);
             }
@@ -470,7 +478,7 @@ class AdjustmentController extends BaseApiController
                 'by_reason' => $query->get()->groupBy('reason')->map->count(),
                 'total_value' => [
                     'increase' => $query->where('adjustment_type', 'increase')->sum('total_value'),
-                    'decrease' => $query->where('adjustment_type', 'decrease')->sum('total_value')
+                    'decrease' => $query->where('adjustment_type', 'decrease')->sum('total_value'),
                 ],
                 'recent_adjustments' => Adjustment::with(['warehouse', 'adjustedBy'])
                     ->when($warehouseId, function ($q) use ($warehouseId) {
@@ -478,12 +486,13 @@ class AdjustmentController extends BaseApiController
                     })
                     ->latest('adjustment_date')
                     ->limit(5)
-                    ->get()
+                    ->get(),
             ];
 
             return $this->successResponse($statistics);
         } catch (\Exception $e) {
             Log::error('Error fetching adjustment statistics', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to fetch statistics', 500);
         }
     }
@@ -500,9 +509,9 @@ class AdjustmentController extends BaseApiController
                 $search = $request->q;
                 $query->where(function ($q) use ($search) {
                     $q->where('adjustment_number', 'like', "%{$search}%")
-                      ->orWhere('reference_number', 'like', "%{$search}%")
-                      ->orWhere('reason', 'like', "%{$search}%")
-                      ->orWhere('notes', 'like', "%{$search}%");
+                        ->orWhere('reference_number', 'like', "%{$search}%")
+                        ->orWhere('reason', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%");
                 });
             }
 
@@ -511,6 +520,7 @@ class AdjustmentController extends BaseApiController
             return $this->successResponse($adjustments);
         } catch (\Exception $e) {
             Log::error('Error searching adjustments', ['error' => $e->getMessage()]);
+
             return $this->errorResponse('Failed to search adjustments', 500);
         }
     }
@@ -523,7 +533,7 @@ class AdjustmentController extends BaseApiController
         $prefix = 'ADJ';
         $year = now()->format('Y');
         $month = now()->format('m');
-        
+
         $lastAdjustment = Adjustment::whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
             ->orderBy('id', 'desc')
@@ -552,7 +562,7 @@ class AdjustmentController extends BaseApiController
             'count_correction' => 'Count Correction',
             'quality_issue' => 'Quality Issue',
             'system_error' => 'System Error',
-            'other' => 'Other'
+            'other' => 'Other',
         ];
 
         return $this->successResponse($reasons);

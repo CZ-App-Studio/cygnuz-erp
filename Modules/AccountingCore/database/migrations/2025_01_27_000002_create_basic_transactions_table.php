@@ -28,13 +28,13 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index(['type', 'transaction_date']);
             $table->index('category_id');
             $table->index('transaction_date');
             $table->index('created_by_id');
-            
+
             // Foreign keys
             $table->foreign('category_id')->references('id')->on('basic_transaction_categories');
         });

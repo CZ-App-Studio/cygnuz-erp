@@ -2,16 +2,17 @@
 
 namespace Modules\FileManagerCore\app\Http\Controllers\Settings;
 
+use App\ApiClasses\Error;
+use App\ApiClasses\Success;
 use App\Http\Controllers\Controller;
 use App\Services\Settings\ModuleSettingsService;
-use Modules\FileManagerCore\app\Settings\FileManagerCoreSettings;
 use Illuminate\Http\Request;
-use App\ApiClasses\Success;
-use App\ApiClasses\Error;
+use Modules\FileManagerCore\app\Settings\FileManagerCoreSettings;
 
 class FileManagerCoreSettingsController extends Controller
 {
     protected ModuleSettingsService $settingsService;
+
     protected FileManagerCoreSettings $moduleSettings;
 
     public function __construct(
@@ -20,7 +21,7 @@ class FileManagerCoreSettingsController extends Controller
     ) {
         $this->settingsService = $settingsService;
         $this->moduleSettings = $moduleSettings;
-        
+
         // Apply permission middleware
         $this->middleware('permission:manage-filemanagercore-settings', ['only' => ['index', 'getSetting', 'update', 'resetToDefaults']]);
     }
@@ -55,8 +56,8 @@ class FileManagerCoreSettingsController extends Controller
 
             // Validate the settings
             $validation = $this->moduleSettings->validateSettings($data);
-            
-            if (!$validation['valid']) {
+
+            if (! $validation['valid']) {
                 return response()->json(
                     new Error(
                         'Validation failed',
@@ -69,8 +70,8 @@ class FileManagerCoreSettingsController extends Controller
 
             // Save the settings
             $saved = $this->moduleSettings->saveSettings($data);
-            
-            if (!$saved) {
+
+            if (! $saved) {
                 return response()->json(
                     new Error(
                         'Failed to save settings',
@@ -91,7 +92,7 @@ class FileManagerCoreSettingsController extends Controller
         } catch (\Exception $e) {
             \Log::error('FileManagerCore settings update failed', [
                 'error' => $e->getMessage(),
-                'data' => $data ?? null
+                'data' => $data ?? null,
             ]);
 
             return response()->json(
@@ -110,12 +111,12 @@ class FileManagerCoreSettingsController extends Controller
     public function getSetting(Request $request)
     {
         $request->validate([
-            'key' => 'required|string'
+            'key' => 'required|string',
         ]);
 
         try {
             $value = $this->settingsService->get('FileManagerCore', $request->key);
-            
+
             return response()->json(
                 new Success(
                     'Setting retrieved successfully',
@@ -141,7 +142,7 @@ class FileManagerCoreSettingsController extends Controller
     {
         try {
             $defaults = $this->moduleSettings->getDefaultValues();
-            
+
             foreach ($defaults as $key => $value) {
                 $this->settingsService->set('FileManagerCore', $key, $value);
             }
@@ -156,7 +157,7 @@ class FileManagerCoreSettingsController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('FileManagerCore settings reset failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json(
@@ -183,7 +184,7 @@ class FileManagerCoreSettingsController extends Controller
                 'users_count' => 0,
                 'departments_count' => 0,
                 'thumbnails_count' => 0,
-                'versions_count' => 0
+                'versions_count' => 0,
             ];
 
             return response()->json(
@@ -211,29 +212,29 @@ class FileManagerCoreSettingsController extends Controller
     {
         try {
             $tests = [];
-            
+
             // Test storage disk access
             $defaultDisk = $this->settingsService->get('FileManagerCore', 'filemanager_default_disk', 'public');
             $tests['storage_disk'] = [
                 'name' => 'Storage Disk Access',
                 'status' => \Storage::disk($defaultDisk)->exists('.') ? 'passed' : 'failed',
-                'message' => "Testing access to '{$defaultDisk}' disk"
+                'message' => "Testing access to '{$defaultDisk}' disk",
             ];
-            
+
             // Test file size limits
             $maxSize = $this->settingsService->get('FileManagerCore', 'filemanager_max_file_size', 10240);
             $tests['file_size_limit'] = [
                 'name' => 'File Size Limit',
                 'status' => is_numeric($maxSize) && $maxSize > 0 ? 'passed' : 'failed',
-                'message' => "Maximum file size: " . number_format($maxSize / 1024, 2) . " MB"
+                'message' => 'Maximum file size: '.number_format($maxSize / 1024, 2).' MB',
             ];
-            
+
             // Test thumbnail configuration
             $thumbnailEnabled = $this->settingsService->get('FileManagerCore', 'filemanager_thumbnail_enabled', true);
             $tests['thumbnail_config'] = [
                 'name' => 'Thumbnail Configuration',
                 'status' => 'passed',
-                'message' => $thumbnailEnabled ? 'Thumbnails enabled' : 'Thumbnails disabled'
+                'message' => $thumbnailEnabled ? 'Thumbnails enabled' : 'Thumbnails disabled',
             ];
 
             return response()->json(

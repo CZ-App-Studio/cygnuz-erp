@@ -20,11 +20,11 @@ return new class extends Migration
             $table->text('change_description')->nullable();
             $table->unsignedBigInteger('created_by_id');
             $table->timestamps();
-            
+
             $table->unique(['file_id', 'version_number']);
             $table->index('file_id');
             $table->index('created_by_id');
-            
+
             $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
             $table->foreign('created_by_id')->references('id')->on('users')->onDelete('cascade');
         });

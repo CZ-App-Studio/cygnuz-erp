@@ -12,7 +12,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class PriceList extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'price_lists';
 
@@ -24,7 +24,7 @@ class PriceList extends Model implements Auditable
         'end_date',
         'status',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -32,7 +32,7 @@ class PriceList extends Model implements Auditable
         'end_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -60,10 +60,10 @@ class PriceList extends Model implements Auditable
 
         return $query->where(function ($q) use ($date) {
             $q->whereNull('start_date')
-              ->orWhere('start_date', '<=', $date);
+                ->orWhere('start_date', '<=', $date);
         })->where(function ($q) use ($date) {
             $q->whereNull('end_date')
-              ->orWhere('end_date', '>=', $date);
+                ->orWhere('end_date', '>=', $date);
         });
     }
 }

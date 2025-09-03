@@ -2,16 +2,15 @@
 
 namespace Modules\WMSInventoryCore\app\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Facades\DB;
-use Modules\WMSInventoryCore\Models\Product;
-use Modules\WMSInventoryCore\Models\Warehouse;
-use Modules\WMSInventoryCore\Models\Inventory;
 use Modules\WMSInventoryCore\Models\Adjustment;
-use Modules\WMSInventoryCore\Models\Transfer;
+use Modules\WMSInventoryCore\Models\Inventory;
 use Modules\WMSInventoryCore\Models\InventoryTransaction;
+use Modules\WMSInventoryCore\Models\Product;
+use Modules\WMSInventoryCore\Models\Transfer;
+use Modules\WMSInventoryCore\Models\Warehouse;
 
 class DashboardController extends Controller
 {
@@ -46,7 +45,7 @@ class DashboardController extends Controller
             'recentTransactions' => $recentTransactions,
             'lowStockProducts' => $lowStockProducts,
             'warehouseValues' => $warehouseValues,
-            'monthlyTransactions' => $monthlyTransactions
+            'monthlyTransactions' => $monthlyTransactions,
         ]);
     }
 
@@ -75,7 +74,7 @@ class DashboardController extends Controller
             'total_stock_value' => $totalStockValue,
             'total_stock_items' => $totalStockItems,
             'pending_adjustments' => $pendingAdjustments,
-            'pending_transfers' => $pendingTransfers
+            'pending_transfers' => $pendingTransfers,
         ];
     }
 
@@ -123,7 +122,7 @@ class DashboardController extends Controller
 
         return [
             'labels' => $labels,
-            'series' => $series
+            'series' => $series,
         ];
     }
 
@@ -162,7 +161,7 @@ class DashboardController extends Controller
         return [
             'months' => $months,
             'adjustment_data' => $adjustmentData,
-            'transfer_data' => $transferData
+            'transfer_data' => $transferData,
         ];
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Modules\PMCore\database\factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\PMCore\app\Models\Timesheet;
-use Modules\PMCore\app\Models\Project;
-use Modules\PMCore\app\Enums\TimesheetStatus;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\PMCore\app\Enums\TimesheetStatus;
+use Modules\PMCore\app\Models\Project;
+use Modules\PMCore\app\Models\Timesheet;
 
 class TimesheetFactory extends Factory
 {
@@ -30,7 +30,7 @@ class TimesheetFactory extends Factory
         $isBillable = $this->faker->boolean(80); // 80% chance of being billable
         $billingRate = $isBillable ? $this->faker->numberBetween(50, 150) : null;
         $costRate = $billingRate ? round($billingRate * ($this->faker->numberBetween(40, 60) / 100), 2) : null;
-        
+
         $descriptions = [
             'Worked on implementing new features',
             'Fixed bugs and improved performance',
@@ -50,7 +50,7 @@ class TimesheetFactory extends Factory
             'task_id' => null, // Can be set explicitly when needed
             'date' => $date,
             'hours' => $hours,
-            'description' => $this->faker->randomElement($descriptions) . ' - ' . $this->faker->sentence(),
+            'description' => $this->faker->randomElement($descriptions).' - '.$this->faker->sentence(),
             'is_billable' => $isBillable,
             'billing_rate' => $billingRate,
             'cost_rate' => $costRate,

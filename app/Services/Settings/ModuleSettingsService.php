@@ -16,7 +16,7 @@ class ModuleSettingsService implements ModuleSettingsInterface
     public function get(string $module, string $key, $default = null)
     {
         $settings = $this->getModuleSettingsCached($module);
-        
+
         return data_get($settings, $key, $default);
     }
 
@@ -28,10 +28,10 @@ class ModuleSettingsService implements ModuleSettingsInterface
         $setting = ModuleSetting::where('module', $module)
             ->where('key', $key)
             ->first();
-            
+
         $oldValue = $setting?->value;
-        
-        if (!$setting) {
+
+        if (! $setting) {
             // If setting doesn't exist, create it
             $setting = ModuleSetting::create([
                 'module' => $module,
@@ -45,15 +45,15 @@ class ModuleSettingsService implements ModuleSettingsInterface
             $setting->value = $value;
             $setting->save();
         }
-        
+
         // Log the change
         if ($oldValue !== $value) {
             SettingHistory::logChange('module', $key, $oldValue, $value, $module);
         }
-        
+
         // Clear cache
         $this->clearCache($module);
-        
+
         return true;
     }
 
@@ -71,15 +71,15 @@ class ModuleSettingsService implements ModuleSettingsInterface
     public function deleteModuleSettings(string $module): bool
     {
         $settings = ModuleSetting::where('module', $module)->get();
-        
+
         foreach ($settings as $setting) {
             SettingHistory::logChange('module', $setting->key, $setting->value, null, $module);
         }
-        
+
         ModuleSetting::where('module', $module)->delete();
-        
+
         $this->clearCache($module);
-        
+
         return true;
     }
 
@@ -101,7 +101,7 @@ class ModuleSettingsService implements ModuleSettingsInterface
         foreach ($settings as $key => $value) {
             $this->set($module, $key, $value);
         }
-        
+
         return true;
     }
 
@@ -146,15 +146,15 @@ class ModuleSettingsService implements ModuleSettingsInterface
         if (is_bool($value)) {
             return 'boolean';
         }
-        
+
         if (is_int($value)) {
             return 'integer';
         }
-        
+
         if (is_array($value) || is_object($value)) {
             return 'json';
         }
-        
+
         return 'string';
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use DateTimeZone;
 use Carbon\Carbon;
+use DateTimeZone;
 
 class TimezoneHelper
 {
@@ -40,14 +40,14 @@ class TimezoneHelper
 
         return $timezones;
     }
-    
+
     /**
      * Get a user-friendly list of timezones for dropdown
      */
     public static function getTimezoneList(): array
     {
         $timezones = [];
-        
+
         // Popular timezones at the top
         $popular = [
             'UTC' => 'UTC - Coordinated Universal Time',
@@ -77,45 +77,45 @@ class TimezoneHelper
             'Australia/Melbourne' => 'Australia/Melbourne (AEDT/AEST) UTC+11/+10',
             'Pacific/Auckland' => 'Pacific/Auckland (NZDT/NZST) UTC+13/+12',
         ];
-        
+
         // Get all timezones
         $allTimezones = self::getTimezones();
-        
+
         // Start with popular ones
         $timezones['-- Popular Timezones --'] = '-- Popular Timezones --';
         foreach ($popular as $key => $value) {
             $timezones[$key] = $value;
         }
-        
+
         // Add separator
         $timezones['-- All Timezones --'] = '-- All Timezones --';
-        
+
         // Add all remaining timezones
         foreach ($allTimezones as $key => $value) {
-            if (!isset($popular[$key])) {
+            if (! isset($popular[$key])) {
                 $timezones[$key] = $value;
             }
         }
-        
+
         return $timezones;
     }
-    
+
     /**
      * Set the application timezone dynamically
      */
     public static function setApplicationTimezone(string $timezone): void
     {
         // Validate timezone
-        if (!in_array($timezone, timezone_identifiers_list())) {
+        if (! in_array($timezone, timezone_identifiers_list())) {
             throw new \InvalidArgumentException("Invalid timezone: {$timezone}");
         }
-        
+
         // Update Laravel config
         config(['app.timezone' => $timezone]);
-        
+
         // Update PHP default timezone
         date_default_timezone_set($timezone);
-        
+
         // Reset Carbon to use new timezone
         Carbon::setTestNow();
     }
@@ -128,6 +128,7 @@ class TimezoneHelper
         try {
             $tz = new DateTimeZone($timezone);
             $time = new \DateTime('now', $tz);
+
             return $time->getOffset() / 3600;
         } catch (\Exception $e) {
             return 0;
@@ -141,6 +142,7 @@ class TimezoneHelper
     {
         $datetime->setTimezone(new DateTimeZone($fromTimezone));
         $datetime->setTimezone(new DateTimeZone($toTimezone));
+
         return $datetime;
     }
 }

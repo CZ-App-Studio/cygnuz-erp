@@ -2,11 +2,10 @@
 
 namespace Modules\AICore\Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Modules\AICore\Models\AIUsageLog;
-use Modules\AICore\Models\AIModel;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Seeder;
+use Modules\AICore\Models\AIModel;
+use Modules\AICore\Models\AIUsageLog;
 
 class SampleUsageDataSeeder extends Seeder
 {
@@ -27,6 +26,7 @@ class SampleUsageDataSeeder extends Seeder
         $models = AIModel::all();
         if ($models->isEmpty()) {
             $this->command->warn('No AI models found. Please run the AI providers seeder first.');
+
             return;
         }
 
@@ -47,7 +47,7 @@ class SampleUsageDataSeeder extends Seeder
             $createdAt = Carbon::now()->subDays(rand(0, 30))->subHours(rand(0, 23))->subMinutes(rand(0, 59));
 
             // Generate realistic token counts based on operation
-            $promptTokens = match($operation) {
+            $promptTokens = match ($operation) {
                 'chat' => rand(100, 500),
                 'complete' => rand(50, 200),
                 'summarize' => rand(1000, 3000),
@@ -56,7 +56,7 @@ class SampleUsageDataSeeder extends Seeder
                 default => rand(100, 500)
             };
 
-            $completionTokens = match($operation) {
+            $completionTokens = match ($operation) {
                 'chat' => rand(50, 300),
                 'complete' => rand(100, 800),
                 'summarize' => rand(100, 500),
@@ -90,9 +90,9 @@ class SampleUsageDataSeeder extends Seeder
                 'processing_time_ms' => $processingTime,
                 'status' => $status,
                 'error_message' => $errorMessage,
-                'request_hash' => 'sample_' . md5($i . $model->id . $createdAt),
+                'request_hash' => 'sample_'.md5($i.$model->id.$createdAt),
                 'created_at' => $createdAt,
-                'updated_at' => $createdAt
+                'updated_at' => $createdAt,
             ]);
         }
 

@@ -4,11 +4,11 @@ namespace App\Enums;
 
 enum OfflineRequestStatus: string
 {
-  case PENDING = 'pending';
+    case PENDING = 'pending';
 
-  case APPROVED = 'approved';
+    case APPROVED = 'approved';
 
-  case REJECTED = 'rejected';
+    case REJECTED = 'rejected';
 
-  case  CANCELLED = 'cancelled';
+    case CANCELLED = 'cancelled';
 }

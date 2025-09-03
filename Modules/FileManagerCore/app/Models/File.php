@@ -2,15 +2,15 @@
 
 namespace Modules\FileManagerCore\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Modules\FileManagerCore\Enums\FileStatus;
 use Modules\FileManagerCore\Enums\FileVisibility;
-use Illuminate\Support\Str;
 
 class File extends Model
 {
@@ -39,7 +39,7 @@ class File extends Model
         'version',
         'parent_file_id',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -49,7 +49,7 @@ class File extends Model
         'metadata' => 'array',
         'visibility' => FileVisibility::class,
         'status' => FileStatus::class,
-        'version' => 'integer'
+        'version' => 'integer',
     ];
 
     protected static function boot()
@@ -159,11 +159,11 @@ class File extends Model
         if ($minSize !== null) {
             $query->where('size', '>=', $minSize);
         }
-        
+
         if ($maxSize !== null) {
             $query->where('size', '<=', $maxSize);
         }
-        
+
         return $query;
     }
 
@@ -172,14 +172,14 @@ class File extends Model
      */
     public function scopeSearch($query, ?string $search = null)
     {
-        if (!$search) {
+        if (! $search) {
             return $query;
         }
 
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'LIKE', "%{$search}%")
-              ->orWhere('original_name', 'LIKE', "%{$search}%")
-              ->orWhere('description', 'LIKE', "%{$search}%");
+                ->orWhere('original_name', 'LIKE', "%{$search}%")
+                ->orWhere('description', 'LIKE', "%{$search}%");
         });
     }
 
@@ -218,7 +218,7 @@ class File extends Model
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/vnd.ms-excel',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'text/plain'
+            'text/plain',
         ];
 
         return in_array($this->mime_type, $documentMimes);
@@ -248,19 +248,19 @@ class File extends Model
         if ($this->isImage()) {
             return 'fas fa-image';
         }
-        
+
         if ($this->isVideo()) {
             return 'fas fa-video';
         }
-        
+
         if ($this->isAudio()) {
             return 'fas fa-music';
         }
-        
+
         if ($this->isDocument()) {
             return 'fas fa-file-alt';
         }
-        
+
         return 'fas fa-file';
     }
 
@@ -287,12 +287,12 @@ class File extends Model
     private function formatBytes(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**

@@ -18,6 +18,7 @@ class TaskPriorityController extends Controller
     public function index()
     {
         $taskPriorities = TaskPriority::orderBy('level', 'asc')->get();
+
         return view('crmcore::task_priorities.index', compact('taskPriorities'));
     }
 

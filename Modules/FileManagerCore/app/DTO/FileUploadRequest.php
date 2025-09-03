@@ -21,12 +21,12 @@ class FileUploadRequest
         public readonly ?string $disk = null,
         public readonly ?int $userId = null
     ) {}
-    
+
     /**
      * Create from HTTP request
      */
     public static function fromRequest(
-        UploadedFile $file, 
+        UploadedFile $file,
         FileType $type,
         ?string $attachableType = null,
         ?int $attachableId = null
@@ -38,7 +38,7 @@ class FileUploadRequest
             attachableId: $attachableId
         );
     }
-    
+
     /**
      * Set custom file name
      */
@@ -58,7 +58,7 @@ class FileUploadRequest
             userId: $this->userId
         );
     }
-    
+
     /**
      * Set description
      */
@@ -78,7 +78,7 @@ class FileUploadRequest
             userId: $this->userId
         );
     }
-    
+
     /**
      * Set visibility
      */
@@ -98,7 +98,7 @@ class FileUploadRequest
             userId: $this->userId
         );
     }
-    
+
     /**
      * Set metadata
      */
@@ -118,7 +118,7 @@ class FileUploadRequest
             userId: $this->userId
         );
     }
-    
+
     /**
      * Set category
      */
@@ -138,7 +138,7 @@ class FileUploadRequest
             userId: $this->userId
         );
     }
-    
+
     /**
      * Set storage disk
      */
@@ -158,7 +158,7 @@ class FileUploadRequest
             userId: $this->userId
         );
     }
-    
+
     /**
      * Set user ID
      */
@@ -178,7 +178,7 @@ class FileUploadRequest
             userId: $userId
         );
     }
-    
+
     /**
      * Get the final file name to use
      */
@@ -186,12 +186,13 @@ class FileUploadRequest
     {
         if ($this->name) {
             $extension = $this->file->getClientOriginalExtension();
-            return $this->name . ($extension ? '.' . $extension : '');
+
+            return $this->name.($extension ? '.'.$extension : '');
         }
-        
+
         return $this->file->getClientOriginalName();
     }
-    
+
     /**
      * Get the storage path for this file
      */
@@ -199,29 +200,29 @@ class FileUploadRequest
     {
         $directory = $this->type->directory();
         $fileName = $this->getFileName();
-        
+
         // Add timestamp to prevent conflicts
         $timestamp = date('Y/m/d');
-        
+
         return "{$directory}/{$timestamp}/{$fileName}";
     }
-    
+
     /**
      * Validate the upload request
      */
     public function validate(): array
     {
         $errors = [];
-        
+
         // Check file size
         $maxSize = $this->type->maxSize();
         if ($maxSize && $this->file->getSize() > ($maxSize * 1024)) {
             $errors[] = "File size exceeds maximum allowed size of {$maxSize}KB";
         }
-        
+
         // Check MIME type if category has restrictions
         // This would be validated against category rules
-        
+
         return $errors;
     }
 }

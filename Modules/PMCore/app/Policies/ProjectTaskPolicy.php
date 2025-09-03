@@ -2,10 +2,10 @@
 
 namespace Modules\PMCore\app\Policies;
 
-use App\Models\User;
 use App\Models\Task;
-use Modules\PMCore\app\Models\Project;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Modules\PMCore\app\Models\Project;
 
 class ProjectTaskPolicy
 {
@@ -26,11 +26,12 @@ class ProjectTaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        if (!$user->can('pmcore.view-project-tasks')) {
+        if (! $user->can('pmcore.view-project-tasks')) {
             return false;
         }
 
         $project = Project::find($task->model_id);
+
         return $project && app(ProjectPolicy::class)->view($user, $project);
     }
 
@@ -49,7 +50,7 @@ class ProjectTaskPolicy
     public function update(User $user, Task $task): bool
     {
         $project = Project::find($task->model_id);
-        if (!$project) {
+        if (! $project) {
             return false;
         }
 
@@ -70,7 +71,8 @@ class ProjectTaskPolicy
     public function delete(User $user, Task $task): bool
     {
         $project = Project::find($task->model_id);
-        return $project && 
+
+        return $project &&
                $user->can('pmcore.delete-project-task') &&
                app(ProjectPolicy::class)->view($user, $project);
     }
@@ -81,7 +83,8 @@ class ProjectTaskPolicy
     public function assign(User $user, Task $task): bool
     {
         $project = Project::find($task->model_id);
-        return $project && 
+
+        return $project &&
                $user->can('pmcore.assign-project-task') &&
                app(ProjectPolicy::class)->view($user, $project);
     }
