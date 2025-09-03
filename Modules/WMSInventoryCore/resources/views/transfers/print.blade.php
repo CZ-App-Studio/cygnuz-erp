@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('Stock Transfer') }} #{{ $transfer->id }} - {{ __('Print') }}</title>
+    <title>{{ __('Stock Transfer') }} {{ $transfer->display_code }} - {{ __('Print') }}</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -179,7 +179,7 @@
     
     <div class="header">
         <h1>{{ __('Stock Transfer') }}</h1>
-        <h2>{{ __('Transfer ID') }}: #{{ $transfer->id }}</h2>
+        <h2>{{ __('Transfer ID') }}: {{ $transfer->display_code }}</h2>
     </div>
     
     <div class="transfer-info">

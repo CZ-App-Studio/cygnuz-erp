@@ -35,7 +35,7 @@
 @endphp
 
 <x-breadcrumb
-  :title="'#' . $transfer->id"
+  :title="$transfer->display_code"
   :breadcrumbs="$breadcrumbs"
   :homeUrl="route('wmsinventorycore.dashboard.index')"
 />
@@ -82,7 +82,7 @@
           <div class="col-md-6">
             <div class="mb-3">
               <h6 class="fw-semibold">{{ __('Transfer ID') }}</h6>
-              <p>#{{ $transfer->id }}</p>
+              <p>{{ $transfer->display_code }}</p>
             </div>
             <div class="mb-3">
               <h6 class="fw-semibold">{{ __('Date') }}</h6>

@@ -184,4 +184,25 @@ class Transfer extends Model implements Auditable
 
         return ($receivedItems / $totalItems) * 100;
     }
+
+    /**
+     * Get the formatted display code with prefix.
+     */
+    public function getDisplayCodeAttribute()
+    {
+        $settingsService = app(\App\Services\Settings\ModuleSettingsService::class);
+        $prefix = $settingsService->get('WMSInventoryCore', 'transfer_prefix') ?: 'TRN-';
+        
+        if (!empty($this->code)) {
+            // If code already has the prefix, return as is
+            if (str_starts_with($this->code, $prefix)) {
+                return $this->code;
+            }
+            // Otherwise add prefix
+            return "{$prefix}{$this->code}";
+        }
+        
+        // Fallback to ID with prefix if no code is set
+        return "{$prefix}" . str_pad($this->id, 4, '0', STR_PAD_LEFT);
+    }
 }
