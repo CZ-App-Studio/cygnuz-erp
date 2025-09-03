@@ -16,12 +16,35 @@ $(function () {
         order: [[1, 'asc']]
     });
 
+    // Handle tax type change
+    $('#type').on('change', function() {
+        const selectedType = $(this).val();
+        const rateInput = $('#rate');
+        const rateLabel = $('#rate-label');
+        const percentageHelp = $('#percentage-help');
+        const fixedHelp = $('#fixed-help');
+        
+        if (selectedType === 'fixed') {
+            rateLabel.text('Fixed Amount');
+            rateInput.attr('max', '999999.99');
+            percentageHelp.hide();
+            fixedHelp.show();
+        } else {
+            rateLabel.text('Rate (%)');
+            rateInput.attr('max', '100');
+            percentageHelp.show();
+            fixedHelp.hide();
+        }
+    });
+
     // Create tax rate
     window.createTaxRate = function() {
         $('#taxRateOffcanvasLabel').text(pageData.labels.addTaxRate);
         $('#taxRateForm')[0].reset();
         $('#taxRateId').val('');
         $('#is_active').prop('checked', true);
+        $('#type').val('percentage'); // Set default to percentage
+        $('#type').trigger('change'); // Trigger the change event to update UI
         $('.invalid-feedback').text('');
         $('.form-control').removeClass('is-invalid');
         
@@ -37,6 +60,7 @@ $(function () {
             $('#name').val(taxRate.name);
             $('#rate').val(taxRate.rate);
             $('#type').val(taxRate.type);
+            $('#type').trigger('change'); // Update UI based on tax type
             $('#tax_authority').val(taxRate.tax_authority);
             $('#description').val(taxRate.description);
             $('#is_default').prop('checked', taxRate.is_default);

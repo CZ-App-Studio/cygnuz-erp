@@ -69,10 +69,14 @@ class TaxRate extends Model
     }
 
     /**
-     * Format the rate as percentage.
+     * Format the rate based on type.
      */
     public function getFormattedRateAttribute()
     {
+        if ($this->type === 'fixed') {
+            return number_format($this->rate, 2);
+        }
+
         return number_format($this->rate, 2).'%';
     }
 

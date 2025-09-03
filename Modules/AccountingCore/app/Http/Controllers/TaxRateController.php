@@ -23,7 +23,7 @@ class TaxRateController extends Controller
         $this->middleware('permission:accountingcore.tax-rates.store')->only(['store']);
         $this->middleware('permission:accountingcore.tax-rates.update')->only(['update']);
         $this->middleware('permission:accountingcore.tax-rates.destroy')->only(['destroy']);
-        $this->middleware('permission:accountingcore.tax-rates.active')->only(['getActiveTaxRates']);
+        $this->middleware('permission:accountingcore.tax-rates.active')->only(['getActiveTaxRates', 'getDefaultTaxRate']);
     }
 
     public function index()
@@ -36,7 +36,13 @@ class TaxRateController extends Controller
         $query = TaxRate::query()->orderBy('rate', 'asc');
 
         return DataTables::of($query)
-            ->addColumn('rate_formatted', fn ($tax) => $tax->rate.'%')
+            ->addColumn('rate_formatted', function ($tax) {
+                if ($tax->type === 'fixed') {
+                    return number_format($tax->rate, 2);
+                }
+
+                return number_format($tax->rate, 2).'%';
+            })
             ->addColumn('is_default_display', function ($tax) {
                 return $tax->is_default ? '<span class="badge bg-label-success">'.__('Yes').'</span>' : '<span class="badge bg-label-secondary">'.__('No').'</span>';
             })
@@ -88,7 +94,12 @@ class TaxRateController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:tax_rates,name',
-            'rate' => 'required|numeric|min:0|max:100',
+            'rate' => [
+                'required',
+                'numeric',
+                'min:0',
+                $request->input('type') === 'percentage' ? 'max:100' : 'max:999999.99',
+            ],
             'type' => 'required|in:percentage,fixed',
             'description' => 'nullable|string|max:500',
             'tax_authority' => 'nullable|string|max:255',
@@ -134,7 +145,12 @@ class TaxRateController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:tax_rates,name,'.$taxRate->id,
-            'rate' => 'required|numeric|min:0|max:100',
+            'rate' => [
+                'required',
+                'numeric',
+                'min:0',
+                $request->input('type') === 'percentage' ? 'max:100' : 'max:999999.99',
+            ],
             'type' => 'required|in:percentage,fixed',
             'description' => 'nullable|string|max:500',
             'tax_authority' => 'nullable|string|max:255',
@@ -213,14 +229,50 @@ class TaxRateController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function ($taxRate) {
+                $displayRate = $taxRate->type === 'fixed'
+                    ? number_format($taxRate->rate, 2)
+                    : number_format($taxRate->rate, 2).'%';
+
                 return [
                     'id' => $taxRate->id,
-                    'text' => $taxRate->name.' ('.$taxRate->rate.'%)',
+                    'text' => $taxRate->name.' ('.$displayRate.')',
                     'rate' => $taxRate->rate,
                     'type' => $taxRate->type,
                 ];
             });
 
         return response()->json($taxRates);
+    }
+
+    /**
+     * Get the default tax rate for other modules to use
+     */
+    public function getDefaultTaxRate(Request $request)
+    {
+        $defaultTaxRate = TaxRate::getDefault();
+
+        if (! $defaultTaxRate) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No default tax rate is configured',
+            ], 404);
+        }
+
+        $displayRate = $defaultTaxRate->type === 'fixed'
+            ? number_format($defaultTaxRate->rate, 2)
+            : number_format($defaultTaxRate->rate, 2).'%';
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $defaultTaxRate->id,
+                'name' => $defaultTaxRate->name,
+                'rate' => $defaultTaxRate->rate,
+                'type' => $defaultTaxRate->type,
+                'display_rate' => $displayRate,
+                'description' => $defaultTaxRate->description,
+                'tax_authority' => $defaultTaxRate->tax_authority,
+            ],
+        ]);
     }
 }
