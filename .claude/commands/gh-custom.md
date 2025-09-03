@@ -19,21 +19,24 @@ Complete workflow for GitHub issue $ARGUMENTS:
   - Service class behavior
 - If UI is affected, use Playwright MCP to test the live application directly
 
-**Step 5: Run all tests**
+**Step 5: Run all tests and verify implementation**
 - `php artisan test` to verify all tests pass
 - Use Playwright MCP to verify UI functionality works correctly in live application
+- **STOP HERE** - Inform user that implementation and testing is complete
+- Wait for user confirmation before proceeding to commit and PR creation
 
-**Step 6: Clean up before commit**
+**Step 6: After user confirmation - Clean up before commit**
 - Remove any unnecessary test files, factories, or seeders created during development
 - Remove any issue-specific test cases that are not needed for the core fix
-- Keep only essential test coverage
+- Remove the entire issue-specific test file `tests/Feature/Issues/Issue$ARGUMENTSTest.php` if it was created
+- Keep only essential test coverage that validates the general functionality
 
-**Step 7: Format and commit**
+**Step 7: After user confirmation - Format and commit**
 - Run `./vendor/bin/pint` to format code
 - Commit changes with proper message
 - Push to GitHub with `git push -u origin fix/issue-$ARGUMENTS`
 
-**Step 8: Create pull request using gh CLI**
+**Step 8: After user confirmation - Create pull request using gh CLI**
 - First, get the issue details to extract the creator's username
 - Use `gh pr create` to create pull request with the issue creator as reviewer:
   - `gh pr create --title "fix: Issue title (issue #$ARGUMENTS)" --body "PR description" --reviewer <issue_creator_username>`
