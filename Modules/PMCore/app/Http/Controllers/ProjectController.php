@@ -308,8 +308,28 @@ class ProjectController extends Controller
 
         // Get filter data for edit form dropdowns
         $filters = $this->getFilterData();
+      
+        // Update project manager membership
+        if ($request->project_manager_id) {
+          // Remove old project manager from members if changed
+          if ($oldProjectManagerId && $oldProjectManagerId != $request->project_manager_id) {
+            $oldManager = $project->members()
+              ->where('user_id', $oldProjectManagerId)
+              ->whereNull('left_at')
+              ->first();
+            
+            if ($oldManager) {
+              $oldManager->update(['left_at' => now()]);
+            }
+          }
 
-        return view('pmcore::projects.show', compact('project', 'stats', 'filters', 'recent_timesheets'));
+          // Add or update new project manager in members
+          $existingManager = $project->members()
+            ->where('user_id', $request->project_manager_id)
+            ->whereNull('left_at')
+            ->first();
+          
+           return view('pmcore::projects.show', compact('project', 'stats', 'filters', 'recent_timesheets'));
     }
 
     /**
@@ -338,6 +358,84 @@ class ProjectController extends Controller
             ]);
         }
 
+      if ($request->ajax()) {
+        return \App\ApiClasses\Success::response([
+          'message' => 'Project updated successfully',
+          'project' => $project
+        ]);
+      }
+
+      return redirect()->route('pmcore.projects.edit', $project)
+        ->with('success', 'Project updated successfully.');
+
+    } catch (\Exception $e) {
+      Log::error('Failed to update project: ' . $e->getMessage(), [
+        'project_id' => $project->id,
+        'request_data' => $request->all(),
+        'exception' => $e
+      ]);
+
+      if ($request->ajax()) {
+        return \App\ApiClasses\Error::response('Failed to update project: ' . $e->getMessage());
+      }
+      return redirect()->back()
+        ->with('error', 'Failed to update project.')
+        ->withInput();
+    }
+  }
+
+  /**
+   * Remove the specified project.
+   */
+  public function destroy(Project $project)
+  {
+    try {
+      DB::transaction(function () use ($project) {
+        // Remove all project members
+        $project->members()->delete();
+
+        // If TaskSystem is available, handle task cleanup
+        // Tasks would be soft deleted or reassigned
+        // This depends on the TaskSystem implementation
+
+        // Soft delete the project
+        $project->delete();
+      });
+
+      if (request()->ajax()) {
+        return \App\ApiClasses\Success::response('Project deleted successfully');
+      }
+
+      return redirect()->route('pmcore.projects.index')
+        ->with('success', 'Project deleted successfully.');
+
+    } catch (\Exception $e) {
+      if (request()->ajax()) {
+        return \App\ApiClasses\Error::response('Failed to delete project');
+      }
+      return redirect()->back()
+        ->with('error', 'Failed to delete project.');
+    }
+  }
+
+  /**
+   * Add member to project.
+   */
+  public function addMember(Request $request, Project $project)
+  {
+    $this->authorize('addMember', $project);
+    $validator = Validator::make($request->all(), [
+      'user_id' => 'required|exists:users,id',
+      'role' => 'required|string|in:member,lead,coordinator,manager',
+      'hourly_rate' => 'nullable|numeric|min:0',
+      'allocation_percentage' => 'nullable|integer|min:0|max:100',
+    ]);
+
+    if ($validator->fails()) {
+      if ($request->ajax()) {
+        return \App\ApiClasses\Error::response($validator->errors()->first());
+      }
+      return redirect()->back()->withErrors($validator)->withInput();
         // For full-page requests, return the edit view
         return view('pmcore::projects.edit', compact('project'));
     }
