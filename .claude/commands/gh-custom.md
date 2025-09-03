@@ -1,5 +1,7 @@
 Complete workflow for GitHub issue $ARGUMENTS:
 
+Repository: https://github.com/CZ-App-Studio/cygnuz-erp.git
+
 **Step 1: Fetch issue details from GitHub**
 - Use GitHub MCP to get issue description, labels, and context
 
