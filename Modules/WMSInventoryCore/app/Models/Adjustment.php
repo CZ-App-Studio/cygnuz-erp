@@ -2,17 +2,17 @@
 
 namespace Modules\WMSInventoryCore\Models;
 
+use App\Traits\UserActionsTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\UserActionsTrait;
 use OwenIt\Auditing\Auditable;
 
 class Adjustment extends Model implements \OwenIt\Auditing\Contracts\Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, Auditable;
+    use Auditable, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'adjustments';
 
@@ -29,13 +29,13 @@ class Adjustment extends Model implements \OwenIt\Auditing\Contracts\Auditable
         'approved_by_id',
         'approved_at',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
         'date' => 'date',
         'approved_at' => 'datetime',
-        'total_amount' => 'decimal:2'
+        'total_amount' => 'decimal:2',
     ];
 
     /**

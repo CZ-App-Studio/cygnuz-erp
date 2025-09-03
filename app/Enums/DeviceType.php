@@ -2,20 +2,20 @@
 
 namespace App\Enums;
 
-enum DeviceType : string
+enum DeviceType: string
 {
-    Case ANDROID = 'android';
+    case ANDROID = 'android';
 
-    Case IOS = 'ios';
+    case IOS = 'ios';
 
-    Case WEB = 'web';
+    case WEB = 'web';
 
-    Case LINUX = 'linux';
+    case LINUX = 'linux';
 
-    Case WINDOWS = 'windows';
+    case WINDOWS = 'windows';
 
-    Case MAC = 'mac';
+    case MAC = 'mac';
 
-    Case OTHER = 'other';
+    case OTHER = 'other';
 
 }

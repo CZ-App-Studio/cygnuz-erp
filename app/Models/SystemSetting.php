@@ -48,6 +48,7 @@ class SystemSetting extends Model implements AuditableContract
     {
         if (is_null($value)) {
             $this->attributes['value'] = null;
+
             return;
         }
 
@@ -64,12 +65,12 @@ class SystemSetting extends Model implements AuditableContract
     protected static function boot()
     {
         parent::boot();
-        
+
         static::saved(function () {
             Cache::forget('system_settings');
             Cache::forget('global_settings');
         });
-        
+
         static::deleted(function () {
             Cache::forget('system_settings');
             Cache::forget('global_settings');

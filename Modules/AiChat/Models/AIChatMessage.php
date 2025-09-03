@@ -2,11 +2,11 @@
 
 namespace Modules\AiChat\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\User;
 use Modules\AICore\Models\AIModel;
 use Modules\AICore\Models\AIProvider;
 
@@ -34,7 +34,7 @@ class AIChatMessage extends Model
         'error_message',
         'is_pinned',
         'is_favorite',
-        'edited_at'
+        'edited_at',
     ];
 
     protected $casts = [
@@ -48,7 +48,7 @@ class AIChatMessage extends Model
         'is_favorite' => 'boolean',
         'edited_at' => 'datetime',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     protected $appends = ['formatted_time', 'formatted_cost', 'is_ai'];
@@ -98,10 +98,11 @@ class AIChatMessage extends Model
      */
     public function getFormattedCostAttribute()
     {
-        if (!$this->cost) {
+        if (! $this->cost) {
             return null;
         }
-        return '$' . number_format($this->cost, 6);
+
+        return '$'.number_format($this->cost, 6);
     }
 
     /**
@@ -151,7 +152,7 @@ class AIChatMessage extends Model
      */
     public function togglePin()
     {
-        $this->update(['is_pinned' => !$this->is_pinned]);
+        $this->update(['is_pinned' => ! $this->is_pinned]);
     }
 
     /**
@@ -159,7 +160,7 @@ class AIChatMessage extends Model
      */
     public function toggleFavorite()
     {
-        $this->update(['is_favorite' => !$this->is_favorite]);
+        $this->update(['is_favorite' => ! $this->is_favorite]);
     }
 
     /**
@@ -169,7 +170,7 @@ class AIChatMessage extends Model
     {
         $this->update([
             'content' => $newContent,
-            'edited_at' => now()
+            'edited_at' => now(),
         ]);
     }
 
@@ -213,8 +214,8 @@ class AIChatMessage extends Model
         if (strlen($this->content) <= $length) {
             return $this->content;
         }
-        
-        return substr($this->content, 0, $length) . '...';
+
+        return substr($this->content, 0, $length).'...';
     }
 
     /**
@@ -231,7 +232,7 @@ class AIChatMessage extends Model
             'provider' => $this->provider ? $this->provider->name : null,
             'tokens' => $this->total_tokens,
             'cost' => $this->cost,
-            'processing_time_ms' => $this->processing_time_ms
+            'processing_time_ms' => $this->processing_time_ms,
         ];
     }
 }

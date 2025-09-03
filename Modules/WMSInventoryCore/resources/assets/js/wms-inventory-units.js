@@ -20,7 +20,7 @@ $(function () {
         { data: 'name' },
         { data: 'code' },
         { data: 'description' },
-        { data: 'products_count' },
+        { data: 'products_count', searchable: false },
         { data: 'actions', orderable: false, searchable: false }
       ],
       order: [[0, 'desc']],

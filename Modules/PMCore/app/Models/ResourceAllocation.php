@@ -4,11 +4,11 @@ namespace Modules\PMCore\app\Models;
 
 use App\Models\User;
 use App\Traits\UserActionsTrait;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ResourceAllocation extends Model
 {
@@ -29,7 +29,7 @@ class ResourceAllocation extends Model
         'is_confirmed',
         'status',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -57,6 +57,7 @@ class ResourceAllocation extends Model
         if (class_exists('\\Modules\\CRMCore\\app\\Models\\Task')) {
             return $this->belongsTo('\\Modules\\CRMCore\\app\\Models\\Task', 'task_id');
         }
+
         return $this->belongsTo(Project::class, 'task_id')->whereRaw('1=0'); // Empty relation
     }
 
@@ -123,36 +124,38 @@ class ResourceAllocation extends Model
     public function getIsActiveAttribute()
     {
         $today = now()->startOfDay();
-        return $this->start_date <= $today && 
+
+        return $this->start_date <= $today &&
                ($this->end_date === null || $this->end_date >= $today) &&
                $this->status === 'active';
     }
 
     public function getDurationInDaysAttribute()
     {
-        if (!$this->end_date) {
+        if (! $this->end_date) {
             return null;
         }
+
         return $this->start_date->diffInDays($this->end_date) + 1;
     }
 
     public function getTotalAllocatedHoursAttribute()
     {
-        if (!$this->duration_in_days) {
+        if (! $this->duration_in_days) {
             return null;
         }
-        
+
         // Calculate working days between dates
         $workingDays = 0;
         $currentDate = $this->start_date->copy();
-        
+
         while ($currentDate <= $this->end_date) {
             if ($currentDate->isWeekday()) {
                 $workingDays++;
             }
             $currentDate->addDay();
         }
-        
+
         return $workingDays * $this->daily_allocated_hours;
     }
 
@@ -173,7 +176,7 @@ class ResourceAllocation extends Model
 
     public function getOverlapPercentage(ResourceAllocation $other): float
     {
-        if (!$this->isOverlapping($other)) {
+        if (! $this->isOverlapping($other)) {
             return 0;
         }
 
@@ -183,7 +186,7 @@ class ResourceAllocation extends Model
     public function canBeEditedBy(User $user): bool
     {
         // Resource can edit their own future allocations if not confirmed
-        if ($this->user_id === $user->id && !$this->is_confirmed && $this->status === 'planned') {
+        if ($this->user_id === $user->id && ! $this->is_confirmed && $this->status === 'planned') {
             return true;
         }
 
@@ -204,7 +207,7 @@ class ResourceAllocation extends Model
 
         $this->update([
             'is_confirmed' => true,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         return true;
@@ -217,13 +220,14 @@ class ResourceAllocation extends Model
         }
 
         $this->update(['status' => 'cancelled']);
+
         return true;
     }
 
     public function checkCapacityConflicts(): array
     {
         $conflicts = [];
-        
+
         // Get overlapping allocations for the same user
         $overlapping = self::where('user_id', $this->user_id)
             ->where('id', '!=', $this->id)
@@ -241,7 +245,7 @@ class ResourceAllocation extends Model
                     'overlap_end' => min(
                         $this->end_date ?? Carbon::parse('2099-12-31'),
                         $allocation->end_date ?? Carbon::parse('2099-12-31')
-                    )
+                    ),
                 ];
             }
         }

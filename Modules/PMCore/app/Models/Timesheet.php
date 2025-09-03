@@ -2,19 +2,19 @@
 
 namespace Modules\PMCore\app\Models;
 
+use App\Models\User;
+use App\Traits\UserActionsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use OwenIt\Auditing\Contracts\Auditable;
-use OwenIt\Auditing\Auditable as AuditableTrait;
-use App\Models\User;
-use App\Traits\UserActionsTrait;
 use Modules\PMCore\app\Enums\TimesheetStatus;
+use OwenIt\Auditing\Auditable as AuditableTrait;
+use OwenIt\Auditing\Contracts\Auditable;
 
 class Timesheet extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, AuditableTrait, UserActionsTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'timesheets';
 
@@ -62,6 +62,25 @@ class Timesheet extends Model implements Auditable
         static::updating(function ($timesheet) {
             $timesheet->calculateAmounts();
         });
+
+        // Update project financials after timesheet is saved
+        static::created(function ($timesheet) {
+            if ($timesheet->project_id) {
+                $timesheet->updateProjectFinancials();
+            }
+        });
+
+        static::updated(function ($timesheet) {
+            if ($timesheet->project_id) {
+                $timesheet->updateProjectFinancials();
+            }
+        });
+
+        static::deleted(function ($timesheet) {
+            if ($timesheet->project_id) {
+                $timesheet->updateProjectFinancials();
+            }
+        });
     }
 
     /**
@@ -71,12 +90,54 @@ class Timesheet extends Model implements Auditable
     {
         // Calculate cost amount
         $this->cost_amount = $this->hours * ($this->cost_rate ?: 0);
-        
+
         // Calculate billable amount
         if ($this->is_billable) {
             $this->billable_amount = $this->hours * ($this->billing_rate ?: 0);
         } else {
             $this->billable_amount = 0;
+        }
+    }
+
+    /**
+     * Update project financial values based on timesheets
+     */
+    protected function updateProjectFinancials(): void
+    {
+        try {
+            if (! $this->project_id) {
+                return;
+            }
+
+            $project = $this->project()->first();
+            if (! $project) {
+                return;
+            }
+
+            // Calculate total cost from approved/submitted timesheets
+            $totalCost = $project->timesheets()
+                ->whereIn('status', ['approved', 'submitted'])
+                ->sum(\Illuminate\Support\Facades\DB::raw('hours * COALESCE(cost_rate, 0)'));
+
+            // Calculate total revenue from approved/submitted billable timesheets
+            $totalRevenue = $project->timesheets()
+                ->whereIn('status', ['approved', 'submitted'])
+                ->where('is_billable', true)
+                ->sum(\Illuminate\Support\Facades\DB::raw('hours * COALESCE(billing_rate, 0)'));
+
+            // Update project without triggering events to avoid infinite loops
+            $project->timestamps = false;
+            $project->update([
+                'actual_cost' => $totalCost,
+                'actual_revenue' => $totalRevenue,
+            ]);
+            $project->timestamps = true;
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to update project financials: '.$e->getMessage(), [
+                'timesheet_id' => $this->id,
+                'project_id' => $this->project_id,
+            ]);
         }
     }
 
@@ -97,7 +158,7 @@ class Timesheet extends Model implements Auditable
         if (class_exists('\Modules\CRMCore\app\Models\Task')) {
             return $this->belongsTo(\Modules\CRMCore\app\Models\Task::class);
         }
-        
+
         // Return empty relationship if CRMCore is not available
         return $this->belongsTo(User::class, 'task_id', 'non_existent_column')
             ->whereRaw('1 = 0');
@@ -162,7 +223,7 @@ class Timesheet extends Model implements Auditable
     // Accessors
     public function getFormattedHoursAttribute()
     {
-        return number_format($this->hours, 2) . ' hrs';
+        return number_format($this->hours, 2).' hrs';
     }
 
     public function getTotalAmountAttribute()
@@ -182,12 +243,12 @@ class Timesheet extends Model implements Auditable
             'submitted' => 'warning',
             'approved' => 'success',
             'rejected' => 'danger',
-            'invoiced' => 'info'
+            'invoiced' => 'info',
         ];
 
         $color = $statusColors[$this->status->value] ?? 'secondary';
-        
-        return '<span class="badge bg-' . $color . '">' . ucfirst($this->status->value) . '</span>';
+
+        return '<span class="badge bg-'.$color.'">'.ucfirst($this->status->value).'</span>';
     }
 
     // Methods
@@ -213,8 +274,9 @@ class Timesheet extends Model implements Auditable
         if ($this->user_id === $user->id) {
             \Illuminate\Support\Facades\Log::debug('Timesheet approval denied: User trying to approve own timesheet', [
                 'timesheet_id' => $this->id,
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]);
+
             return false;
         }
 
@@ -223,8 +285,9 @@ class Timesheet extends Model implements Auditable
             \Illuminate\Support\Facades\Log::debug('Timesheet approval denied: Wrong status', [
                 'timesheet_id' => $this->id,
                 'status' => $this->status->value,
-                'expected' => TimesheetStatus::SUBMITTED->value
+                'expected' => TimesheetStatus::SUBMITTED->value,
             ]);
+
             return false;
         }
 
@@ -241,26 +304,26 @@ class Timesheet extends Model implements Auditable
                 return true;
             }
         }
-        
+
         // Also check if user has any role containing 'admin'
         foreach ($user->getRoleNames() as $roleName) {
             if (stripos($roleName, 'admin') !== false) {
                 return true;
             }
         }
-        
+
         \Illuminate\Support\Facades\Log::debug('Timesheet approval denied: User lacks admin role', [
             'timesheet_id' => $this->id,
             'user_id' => $user->id,
-            'user_roles' => $user->getRoleNames()->toArray()
+            'user_roles' => $user->getRoleNames()->toArray(),
         ]);
-        
+
         return false;
     }
 
     public function approve(User $approver): bool
     {
-        if (!$this->canBeApprovedBy($approver)) {
+        if (! $this->canBeApprovedBy($approver)) {
             return false;
         }
 
@@ -275,7 +338,7 @@ class Timesheet extends Model implements Auditable
 
     public function reject(User $approver): bool
     {
-        if (!$this->canBeApprovedBy($approver)) {
+        if (! $this->canBeApprovedBy($approver)) {
             return false;
         }
 
@@ -295,6 +358,7 @@ class Timesheet extends Model implements Auditable
         }
 
         $this->update(['status' => TimesheetStatus::SUBMITTED]);
+
         return true;
     }
 }

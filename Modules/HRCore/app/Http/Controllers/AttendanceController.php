@@ -6,13 +6,13 @@ use App\Enums\UserAccountStatus;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\HRNotificationService;
+use App\Services\Settings\ModuleSettingsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Modules\HRCore\app\Models\Attendance;
 use Modules\HRCore\app\Models\AttendanceLog;
 use Yajra\DataTables\Facades\DataTables;
-use App\Services\Settings\ModuleSettingsService;
 
 class AttendanceController extends Controller
 {
@@ -86,6 +86,7 @@ class AttendanceController extends Controller
                 }
                 // Fallback to logs if not in attendance table
                 $checkInAt = $attendance->attendanceLogs->where('type', 'check_in')->first();
+
                 return $checkInAt ? $checkInAt->created_at->format('h:i A') : 'N/A';
             })
             ->editColumn('check_out_time', function ($attendance) {
@@ -94,6 +95,7 @@ class AttendanceController extends Controller
                 }
                 // Fallback to logs if not in attendance table
                 $checkOutAt = $attendance->attendanceLogs->where('type', 'check_out')->last();
+
                 return $checkOutAt ? $checkOutAt->created_at->format('h:i A') : 'N/A';
             })
             ->addColumn('shift', function ($attendance) {
@@ -206,7 +208,7 @@ class AttendanceController extends Controller
     public function regularization()
     {
         $user = auth()->user();
-        
+
         // Get regularization requests for the logged-in employee only
         $regularizationRequests = \Illuminate\Support\Facades\DB::table('attendance_regularizations')
             ->where('user_id', $user->id)
@@ -220,6 +222,7 @@ class AttendanceController extends Controller
             if (is_string($item->attachments)) {
                 $item->attachments = json_decode($item->attachments, true);
             }
+
             return $item;
         });
 
@@ -314,7 +317,7 @@ class AttendanceController extends Controller
             // Get check-in and check-out times from attendance record or logs
             $checkInTime = null;
             $checkOutTime = null;
-            
+
             // Log attendance record data for debugging
             Log::info('Attendance Record Data:', [
                 'attendance_id' => $attendance->id,
@@ -325,13 +328,13 @@ class AttendanceController extends Controller
                 'checkInLog_created_at' => $checkInLog ? $checkInLog->created_at->toISOString() : null,
                 'checkOutLog_created_at' => $checkOutLog ? $checkOutLog->created_at->toISOString() : null,
             ]);
-            
+
             if ($attendance->check_in_time) {
                 // Check if check_in_time is already a full datetime or just time
                 $checkInTimeStr = $attendance->check_in_time;
                 if (strpos($checkInTimeStr, ':') !== false && strlen($checkInTimeStr) <= 8) {
                     // It's just a time (HH:MM:SS format), add today's date
-                    $checkInTime = Carbon::parse($today->format('Y-m-d') . ' ' . $checkInTimeStr)->toISOString();
+                    $checkInTime = Carbon::parse($today->format('Y-m-d').' '.$checkInTimeStr)->toISOString();
                     Log::info('Parsed check-in time as time only:', ['original' => $checkInTimeStr, 'parsed' => $checkInTime]);
                 } else {
                     // It's already a full datetime
@@ -343,13 +346,13 @@ class AttendanceController extends Controller
                 $checkInTime = $checkInLog->created_at->toISOString();
                 Log::info('Using check-in log created_at:', ['checkInTime' => $checkInTime]);
             }
-            
+
             if ($attendance->check_out_time) {
                 // Check if check_out_time is already a full datetime or just time
                 $checkOutTimeStr = $attendance->check_out_time;
                 if (strpos($checkOutTimeStr, ':') !== false && strlen($checkOutTimeStr) <= 8) {
                     // It's just a time (HH:MM:SS format), add today's date
-                    $checkOutTime = Carbon::parse($today->format('Y-m-d') . ' ' . $checkOutTimeStr)->toISOString();
+                    $checkOutTime = Carbon::parse($today->format('Y-m-d').' '.$checkOutTimeStr)->toISOString();
                     Log::info('Parsed check-out time as time only:', ['original' => $checkOutTimeStr, 'parsed' => $checkOutTime]);
                 } else {
                     // It's already a full datetime
@@ -365,8 +368,8 @@ class AttendanceController extends Controller
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'hasCheckedIn' => (bool) $checkInLog || !empty($attendance->check_in_time),
-                    'hasCheckedOut' => (bool) $checkOutLog || !empty($attendance->check_out_time),
+                    'hasCheckedIn' => (bool) $checkInLog || ! empty($attendance->check_in_time),
+                    'hasCheckedOut' => (bool) $checkOutLog || ! empty($attendance->check_out_time),
                     'checkInTime' => $checkInTime,
                     'checkOutTime' => $checkOutTime,
                     'logs' => $logs,
@@ -506,12 +509,12 @@ class AttendanceController extends Controller
         // Check settings first
         $settingsService = app(ModuleSettingsService::class);
         $isEnabled = $settingsService->get('HRCore', 'is_multiple_check_in_enabled', true);
-        
+
         // If setting is disabled, return false regardless of permission
-        if (!$isEnabled) {
+        if (! $isEnabled) {
             return false;
         }
-        
+
         // If enabled in settings, check user permission
         return auth()->user()->can('hrcore.multiple-check-in');
     }
@@ -543,7 +546,7 @@ class AttendanceController extends Controller
 
             $isMultipleCheckInEnabled = $this->isMultipleCheckInEnabled();
             $lastLog = $attendance->attendanceLogs->sortByDesc('created_at')->first();
-            
+
             // Determine if user is currently checked in
             $isCurrentlyCheckedIn = false;
             if ($isMultipleCheckInEnabled) {
@@ -558,22 +561,22 @@ class AttendanceController extends Controller
                 'checkInTime' => null,
                 'workingHours' => null,
             ];
-            
+
             // Use the attendance table's check_in_time for calculation
             if ($attendance->check_in_time) {
                 // Parse the check_in_time properly (it's in UTC format)
                 $checkInTime = Carbon::parse($attendance->check_in_time);
                 $response['checkInTime'] = $checkInTime->format('h:i A');
-                
+
                 // Calculate working hours if currently checked in
                 if ($isCurrentlyCheckedIn) {
                     $now = Carbon::now();
-                    
+
                     // Calculate total minutes difference
                     $totalMinutes = abs($now->diffInMinutes($checkInTime));
                     $hours = floor($totalMinutes / 60);
                     $minutes = $totalMinutes % 60;
-                    
+
                     // Format as "HH:MM" for display in utilities panel
                     $response['workingHours'] = sprintf('%02d:%02d', $hours, $minutes);
                 }
@@ -662,7 +665,7 @@ class AttendanceController extends Controller
         // Get times from attendance table first, fallback to logs
         $checkInTime = '';
         $checkOutTime = '';
-        
+
         if ($attendance->check_in_time) {
             $checkInTime = Carbon::parse($attendance->check_in_time)->format('H:i');
         } else {
@@ -670,7 +673,7 @@ class AttendanceController extends Controller
             $checkIn = $attendance->attendanceLogs->where('type', 'check_in')->first();
             $checkInTime = $checkIn ? $checkIn->created_at->format('H:i') : '';
         }
-        
+
         if ($attendance->check_out_time) {
             $checkOutTime = Carbon::parse($attendance->check_out_time)->format('H:i');
         } else {
@@ -704,10 +707,10 @@ class AttendanceController extends Controller
 
         try {
             $attendance = Attendance::findOrFail($id);
-            
+
             // Parse the times with the attendance date
             $checkInDateTime = Carbon::parse($attendance->date->format('Y-m-d').' '.$request->check_in_time);
-            $checkOutDateTime = $request->filled('check_out_time') 
+            $checkOutDateTime = $request->filled('check_out_time')
                 ? Carbon::parse($attendance->date->format('Y-m-d').' '.$request->check_out_time)
                 : null;
 
@@ -718,7 +721,7 @@ class AttendanceController extends Controller
                 'status' => $request->status,
                 'notes' => $request->notes,
             ];
-            
+
             // Calculate hours if both check-in and check-out are present
             if ($checkInDateTime && $checkOutDateTime) {
                 $attendance->check_in_time = $checkInDateTime;
@@ -733,7 +736,7 @@ class AttendanceController extends Controller
                 $lateMinutes = $attendance->getLateMinutesAttribute();
                 $updateData['late_hours'] = round($lateMinutes / 60, 2);
             }
-            
+
             $attendance->update($updateData);
 
             // Update check-in log
@@ -795,7 +798,7 @@ class AttendanceController extends Controller
 
             return response()->json([
                 'status' => 'failed',
-                'data' => __('Failed to update attendance: ' . $e->getMessage()),
+                'data' => __('Failed to update attendance: '.$e->getMessage()),
             ], 500);
         }
     }

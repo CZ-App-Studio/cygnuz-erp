@@ -25,13 +25,13 @@ enum FileType: string
     case ASSET_DOCUMENT = 'asset_document';
     case DIGITAL_PRODUCT = 'digital_product';
     case GENERAL = 'general';
-    
+
     /**
      * Get human-readable label for the file type
      */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::EMPLOYEE_PROFILE_PICTURE => 'Employee Profile Picture',
             self::EMPLOYEE_DOCUMENT => 'Employee Document',
             self::LEAVE_DOCUMENT => 'Leave Document',
@@ -55,13 +55,13 @@ enum FileType: string
             self::GENERAL => 'General File',
         };
     }
-    
+
     /**
      * Get the storage directory for this file type
      */
     public function directory(): string
     {
-        return match($this) {
+        return match ($this) {
             self::EMPLOYEE_PROFILE_PICTURE => 'employees/profiles',
             self::EMPLOYEE_DOCUMENT => 'employees/documents',
             self::LEAVE_DOCUMENT => 'leave/documents',
@@ -85,27 +85,27 @@ enum FileType: string
             self::GENERAL => 'general',
         };
     }
-    
+
     /**
      * Check if this file type allows public access
      */
     public function isPublicByDefault(): bool
     {
-        return match($this) {
-            self::COMPANY_LOGO, 
+        return match ($this) {
+            self::COMPANY_LOGO,
             self::PRODUCT_IMAGE => true,
             default => false,
         };
     }
-    
+
     /**
      * Get maximum file size for this type in KB
      */
     public function maxSize(): ?int
     {
-        return match($this) {
-            self::EMPLOYEE_PROFILE_PICTURE, 
-            self::COMPANY_LOGO, 
+        return match ($this) {
+            self::EMPLOYEE_PROFILE_PICTURE,
+            self::COMPANY_LOGO,
             self::PRODUCT_IMAGE,
             self::ASSET_IMAGE => 5120, // 5MB for images
             self::DESKTOP_SCREENSHOT => 2048, // 2MB for screenshots

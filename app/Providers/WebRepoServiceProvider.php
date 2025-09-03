@@ -14,37 +14,37 @@ use Illuminate\Support\ServiceProvider;
 
 class WebRepoServiceProvider extends ServiceProvider
 {
-  /**
-   * Register services.
-   */
-  public function register(): void
-  {
-    //
-  }
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        //
+    }
 
-  /**
-   * Bootstrap services.
-   */
-  public function boot(): void
-  {
-    $this->app->bind(
-      INotificationService::class,
-      NotificationService::class
-    );
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        $this->app->bind(
+            INotificationService::class,
+            NotificationService::class
+        );
 
-    $this->app->bind(
-      ISubscriptionService::class,
-      SubscriptionService::class
-    );
+        $this->app->bind(
+            ISubscriptionService::class,
+            SubscriptionService::class
+        );
 
-    $this->app->bind(
-      IAddonService::class,
-      AddonService::class
-    );
+        $this->app->bind(
+            IAddonService::class,
+            AddonService::class
+        );
 
-    $this->app->bind(
-      IActivationService::class,
-      ActivationService::class
-    );
-  }
+        $this->app->bind(
+            IActivationService::class,
+            ActivationService::class
+        );
+    }
 }

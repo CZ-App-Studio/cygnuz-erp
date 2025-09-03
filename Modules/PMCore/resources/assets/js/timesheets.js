@@ -36,15 +36,15 @@ $(function () {
                 }
             },
             columns: [
-                { data: 'user', name: 'user.name' },
+                { data: 'user', name: 'user.name', orderable: false },
                 { data: 'project_name', name: 'project.name' },
-                { data: 'task_name', name: 'task.title' },
+                { data: 'task_name', name: 'task.title', orderable: false, searchable: false },
                 { data: 'formatted_date', name: 'date' },
                 { data: 'formatted_hours', name: 'hours', className: 'text-end' },
                 { data: 'description', name: 'description' },
-                { data: 'billing_amount', name: 'billing_amount', className: 'text-end' },
+                { data: 'billing_amount', name: 'billing_amount', className: 'text-end', orderable: false, searchable: false },
                 { data: 'status_badge', name: 'status', className: 'text-center' },
-                { data: 'approved_by', name: 'approved_by.name' },
+                { data: 'approved_by', name: 'approved_by.name', orderable: false, searchable: false },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-center' }
             ],
             order: [[3, 'desc']],
@@ -53,7 +53,7 @@ $(function () {
             language: {
                 sLengthMenu: '_MENU_',
                 search: '',
-                searchPlaceholder: pageData.labels.searchTimesheets || 'Search Timesheets'
+                searchPlaceholder: 'Search Timesheets'
             }
         });
     }
@@ -67,7 +67,7 @@ $(function () {
             placeholder: pageData.labels.allUsers || 'All Users',
             allowClear: true,
             ajax: {
-                url: '/users/search',
+                url: pageData.urls.usersSearchUrl,
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
@@ -95,7 +95,7 @@ $(function () {
             placeholder: pageData.labels.allProjects || 'All Projects',
             allowClear: true,
             ajax: {
-                url: '/projects/clients/search',
+                url: pageData.urls.projectsSearchUrl,
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {

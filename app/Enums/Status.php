@@ -13,7 +13,7 @@ enum Status: string
      */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ACTIVE => __('Active'),
             self::INACTIVE => __('Inactive'),
             self::DELETED => __('Deleted'),
@@ -25,7 +25,7 @@ enum Status: string
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ACTIVE => 'success',
             self::INACTIVE => 'warning',
             self::DELETED => 'danger',
@@ -37,6 +37,6 @@ enum Status: string
      */
     public function badge(): string
     {
-        return '<span class="badge bg-label-' . $this->color() . '">' . $this->label() . '</span>';
+        return '<span class="badge bg-label-'.$this->color().'">'.$this->label().'</span>';
     }
 }

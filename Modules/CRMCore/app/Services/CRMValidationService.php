@@ -43,7 +43,7 @@ class CRMValidationService
         // TODO: Clean up duplicate contacts before re-enabling unique validation
         $rules['email_primary'] = 'nullable|email|max:255';
         $rules['email_secondary'] = 'nullable|email|max:255';
-        
+
         /* Temporarily disabled due to existing duplicates in database
         $emailUniqueRule = Rule::unique('contacts', 'email_primary');
         if ($contactId) {
@@ -55,7 +55,7 @@ class CRMValidationService
         // Phone validation - temporarily disable unique constraint due to existing duplicates
         // TODO: Clean up duplicate contacts before re-enabling unique validation
         $rules['phone_primary'] = 'nullable|string|max:50';
-        
+
         /* Temporarily disabled due to existing duplicates in database
         if ($this->settingsService->get('CRMCore', 'enable_contact_duplicate_detection', true)) {
             $detectionFields = $this->settingsService->get('CRMCore', 'duplicate_detection_fields', 'email_and_phone');

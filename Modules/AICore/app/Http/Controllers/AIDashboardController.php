@@ -3,16 +3,17 @@
 namespace Modules\AICore\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\AICore\Models\AIProvider;
-use Modules\AICore\Models\AIModel;
-use Modules\AICore\Models\AIUsageLog;
-use Modules\AICore\Services\AIUsageTracker;
-use Modules\AICore\Services\AIProviderService;
 use Illuminate\Http\Request;
+use Modules\AICore\Models\AIModel;
+use Modules\AICore\Models\AIProvider;
+use Modules\AICore\Models\AIUsageLog;
+use Modules\AICore\Services\AIProviderService;
+use Modules\AICore\Services\AIUsageTracker;
 
 class AIDashboardController extends Controller
 {
     protected AIUsageTracker $usageTracker;
+
     protected AIProviderService $providerService;
 
     public function __construct(AIUsageTracker $usageTracker, AIProviderService $providerService)
@@ -28,22 +29,22 @@ class AIDashboardController extends Controller
     {
         // Get overview statistics
         $overviewStats = $this->getOverviewStatistics();
-        
+
         // Get provider status
         $providerStatus = $this->getProviderStatus();
-        
+
         // Get recent usage
         $recentUsage = $this->getRecentUsage();
-        
+
         // Get cost trends
         $costTrends = $this->usageTracker->getCostTrends(null, 30);
-        
+
         // Get top models
         $topModels = $this->usageTracker->getTopModels(null, 30, 5);
 
         return view('aicore::dashboard.index', compact(
             'overviewStats',
-            'providerStatus', 
+            'providerStatus',
             'recentUsage',
             'costTrends',
             'topModels'
@@ -58,7 +59,7 @@ class AIDashboardController extends Controller
         // Total providers and models
         $totalProviders = AIProvider::active()->count();
         $totalModels = AIModel::active()->count();
-        
+
         // Usage statistics for different periods
         $todayUsage = $this->usageTracker->getCurrentUsage(null, null, 'daily');
         $weekUsage = $this->usageTracker->getCurrentUsage(null, null, 'weekly');
@@ -91,7 +92,7 @@ class AIDashboardController extends Controller
                 'is_connected' => $provider->api_key_encrypted ? true : false,
                 'response_time' => 'N/A',
                 'error_message' => $provider->api_key_encrypted ? null : 'No API key configured',
-                'models_count' => $provider->models()->count()
+                'models_count' => $provider->models()->count(),
             ];
         }
 
@@ -136,30 +137,30 @@ class AIDashboardController extends Controller
             case 'overview':
                 $data = $this->getOverviewStatistics();
                 break;
-                
+
             case 'providers':
                 $data = $this->getProviderStatus();
                 break;
-                
+
             case 'usage':
                 $data = $this->getRecentUsage();
                 break;
-                
+
             case 'trends':
                 $days = $request->input('days', 30);
                 $data = $this->usageTracker->getCostTrends(null, $days);
                 break;
-                
+
             default:
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid data type requested'
+                    'message' => 'Invalid data type requested',
                 ], 400);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\Menu\MenuAggregator;
 use App\Services\Menu\MenuRegistry;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
 class MenuCacheCommand extends Command
@@ -27,6 +27,7 @@ class MenuCacheCommand extends Command
     protected $description = 'Manage menu cache - refresh, clear, status, or search';
 
     protected MenuAggregator $menuAggregator;
+
     protected MenuRegistry $menuRegistry;
 
     /**
@@ -70,11 +71,11 @@ class MenuCacheCommand extends Command
         $horizontalMenu = $this->menuAggregator->getMenu('horizontal', true);
 
         $this->info('✓ Menu cache refreshed successfully');
-        
+
         // Show statistics
         $verticalCount = count($verticalMenu['menu'] ?? []);
         $horizontalCount = count($horizontalMenu['menu'] ?? []);
-        
+
         $this->table(
             ['Menu Type', 'Items Count'],
             [
@@ -92,14 +93,14 @@ class MenuCacheCommand extends Command
     protected function clearCache(): int
     {
         $this->info('Clearing menu cache...');
-        
+
         $this->menuAggregator->clearCache();
-        
+
         // Also clear any database cached menus if using database
         Cache::tags(['menus'])->flush();
-        
+
         $this->info('✓ Menu cache cleared successfully');
-        
+
         return 0;
     }
 
@@ -139,29 +140,31 @@ class MenuCacheCommand extends Command
     protected function searchMenu(): int
     {
         $searchTerm = $this->option('search');
-        
-        if (!$searchTerm) {
+
+        if (! $searchTerm) {
             $searchTerm = $this->ask('Enter search term');
         }
 
         $this->info("Searching for: {$searchTerm}");
-        
+
         $results = $this->menuAggregator->searchMenu($searchTerm);
-        
+
         if ($results->isEmpty()) {
             $this->warn('No menu items found matching your search.');
+
             return 0;
         }
 
         $this->info("Found {$results->count()} menu item(s):");
-        
+
         $tableData = $results->map(function ($item) {
             $slug = isset($item['slug']) ? (is_array($item['slug']) ? $item['slug'][0] : $item['slug']) : 'N/A';
+
             return [
                 $item['name'] ?? 'N/A',
                 $item['url'] ?? 'N/A',
                 $item['module'] ?? $item['addon'] ?? 'Core',
-                $slug
+                $slug,
             ];
         })->toArray();
 
@@ -182,9 +185,10 @@ class MenuCacheCommand extends Command
         $this->info('-------------------');
 
         $moduleMenu = $this->menuAggregator->getModuleMenu($module);
-        
+
         if (empty($moduleMenu)) {
             $this->warn("No menu items found for module: {$module}");
+
             return;
         }
 
@@ -220,13 +224,13 @@ class MenuCacheCommand extends Command
                 if ($module === '.' || $module === '..') {
                     continue;
                 }
-                
+
                 $menuPath = "{$modulesPath}/{$module}/resources/menu/verticalMenu.json";
                 if (file_exists($menuPath)) {
                     $modules[] = [
                         $module,
                         file_exists($menuPath) ? '✓' : '✗',
-                        $this->getModuleMenuCount($module)
+                        $this->getModuleMenuCount($module),
                     ];
                 }
             }
@@ -234,6 +238,7 @@ class MenuCacheCommand extends Command
 
         if (empty($modules)) {
             $this->warn('No modules with menu items found.');
+
             return;
         }
 
@@ -249,8 +254,9 @@ class MenuCacheCommand extends Command
     protected function getModuleMenuCount(string $module): int
     {
         $moduleMenu = $this->menuAggregator->getModuleMenu($module);
+
         return count(array_filter($moduleMenu, function ($item) {
-            return !isset($item['menuHeader']);
+            return ! isset($item['menuHeader']);
         }));
     }
 }

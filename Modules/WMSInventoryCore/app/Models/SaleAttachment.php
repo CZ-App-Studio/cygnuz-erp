@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class SaleAttachment extends Model
 {
     use SoftDeletes, UserActionsTrait;
-    
+
     protected $fillable = [
         'sale_id',
         'file_path',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     /**

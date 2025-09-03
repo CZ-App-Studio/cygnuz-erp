@@ -137,10 +137,10 @@ class ExpenseController extends Controller
                     ];
 
                     // Get the actual status value
-                    $statusValue = $model->status instanceof ExpenseRequestStatus 
-                        ? $model->status->value 
+                    $statusValue = $model->status instanceof ExpenseRequestStatus
+                        ? $model->status->value
                         : $model->status;
-                    
+
                     // Edit action only for pending expenses
                     if ($statusValue === 'pending' || $statusValue === ExpenseRequestStatus::PENDING->value) {
                         if (auth()->user()->can('hrcore.edit-expense')) {
@@ -802,20 +802,20 @@ class ExpenseController extends Controller
                     'attachments' => $expense->files->map(function ($file) {
                         return [
                             'name' => $file->original_name,
-                            'url' => route('file.download', $file->id)
+                            'url' => route('file.download', $file->id),
                         ];
-                    })
+                    }),
                 ];
 
                 return Success::response([
-                    'expense' => $expenseData
+                    'expense' => $expenseData,
                 ]);
             }
 
             return view('hrcore::expenses.my-show', compact('expense'));
         } catch (\Exception $e) {
             if (request()->ajax()) {
-                return Error::response('Failed to load expense details: ' . $e->getMessage());
+                return Error::response('Failed to load expense details: '.$e->getMessage());
             }
             throw $e;
         }
@@ -831,7 +831,7 @@ class ExpenseController extends Controller
             ExpenseRequestStatus::PROCESSED->value => 'bg-label-info',
         ];
         $statusClass = $statusColors[$statusValue] ?? 'bg-label-secondary';
-        
+
         return '<span class="badge '.$statusClass.'">'.ucfirst($statusValue).'</span>';
     }
 

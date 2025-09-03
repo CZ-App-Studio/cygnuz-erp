@@ -2,11 +2,10 @@
 
 namespace Modules\PMCore\app\Services;
 
-use Nwidart\Modules\Facades\Module;
-use Modules\CRMCore\app\Models\Contact;
 use Modules\CRMCore\app\Models\Company;
+use Modules\CRMCore\app\Models\Contact;
 use Modules\TaskSystem\app\Models\Task;
-use Modules\AccountingCore\app\Models\Account;
+use Nwidart\Modules\Facades\Module;
 
 class PMIntegrationService
 {
@@ -47,7 +46,7 @@ class PMIntegrationService
      */
     public function getAvailableClients()
     {
-        if (!$this->isCRMCoreAvailable()) {
+        if (! $this->isCRMCoreAvailable()) {
             return collect();
         }
 
@@ -62,7 +61,7 @@ class PMIntegrationService
      */
     public function getAvailableCompanies()
     {
-        if (!$this->isCRMCoreAvailable()) {
+        if (! $this->isCRMCoreAvailable()) {
             return collect();
         }
 
@@ -102,7 +101,7 @@ class PMIntegrationService
      */
     public function getProjectTasksCount($projectId): int
     {
-        if (!$this->isTaskSystemAvailable()) {
+        if (! $this->isTaskSystemAvailable()) {
             return 0;
         }
 
@@ -114,7 +113,7 @@ class PMIntegrationService
      */
     public function getProjectCompletedTasksCount($projectId): int
     {
-        if (!$this->isTaskSystemAvailable()) {
+        if (! $this->isTaskSystemAvailable()) {
             return 0;
         }
 
@@ -134,6 +133,7 @@ class PMIntegrationService
         }
 
         $completedTasks = $this->getProjectCompletedTasksCount($projectId);
+
         return round(($completedTasks / $totalTasks) * 100, 2);
     }
 
@@ -142,7 +142,7 @@ class PMIntegrationService
      */
     public function getProjectBudgetInfo($projectId)
     {
-        if (!$this->isAccountingCoreAvailable()) {
+        if (! $this->isAccountingCoreAvailable()) {
             return [
                 'total_budget' => 0,
                 'spent_amount' => 0,
@@ -169,6 +169,7 @@ class PMIntegrationService
         if ($this->isMultiCurrencyAvailable()) {
             // Get default currency from MultiCurrency module
             $defaultCurrency = \Modules\MultiCurrency\app\Models\Currency::where('is_default', true)->first();
+
             return $defaultCurrency ? $defaultCurrency->symbol : '$';
         }
 
@@ -183,11 +184,11 @@ class PMIntegrationService
         if ($this->isMultiCurrencyAvailable() && $currencyId) {
             $currency = \Modules\MultiCurrency\app\Models\Currency::find($currencyId);
             if ($currency) {
-                return $currency->symbol . number_format($amount, 2);
+                return $currency->symbol.number_format($amount, 2);
             }
         }
 
-        return $this->getCurrencySymbol() . number_format($amount, 2);
+        return $this->getCurrencySymbol().number_format($amount, 2);
     }
 
     /**
@@ -196,8 +197,8 @@ class PMIntegrationService
     public function canManageProjects($user = null): bool
     {
         $user = $user ?: auth()->user();
-        
-        return $user->hasRole(['admin', 'project_manager']) || 
+
+        return $user->hasRole(['admin', 'project_manager']) ||
                $user->hasPermissionTo('manage_projects');
     }
 
@@ -207,7 +208,7 @@ class PMIntegrationService
     public function canViewProject($projectId, $user = null): bool
     {
         $user = $user ?: auth()->user();
-        
+
         if ($this->canManageProjects($user)) {
             return true;
         }

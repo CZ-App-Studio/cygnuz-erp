@@ -5,7 +5,6 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
 use Modules\Announcement\app\Models\Announcement;
 
@@ -14,6 +13,7 @@ class AnnouncementPublished extends Notification implements ShouldQueue
     use Queueable;
 
     protected $announcement;
+
     protected $notificationType;
 
     /**
@@ -31,17 +31,17 @@ class AnnouncementPublished extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         $channels = ['database'];
-        
+
         // Add mail channel if announcement requires email
         if ($this->announcement->send_email) {
             $channels[] = 'mail';
         }
-        
+
         // Could add other channels like SMS, Slack, etc.
         // if ($this->announcement->send_sms) {
         //     $channels[] = 'sms';
         // }
-        
+
         return $channels;
     }
 
@@ -50,16 +50,16 @@ class AnnouncementPublished extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $subject = match($this->notificationType) {
-            'urgent' => '🚨 Urgent: ' . $this->announcement->title,
-            'reminder' => '🔔 Reminder: ' . $this->announcement->title,
-            'expiring' => '⏰ Expiring Soon: ' . $this->announcement->title,
-            default => '📢 ' . $this->announcement->title
+        $subject = match ($this->notificationType) {
+            'urgent' => '🚨 Urgent: '.$this->announcement->title,
+            'reminder' => '🔔 Reminder: '.$this->announcement->title,
+            'expiring' => '⏰ Expiring Soon: '.$this->announcement->title,
+            default => '📢 '.$this->announcement->title
         };
 
         return (new MailMessage)
             ->subject($subject)
-            ->greeting('Hello ' . $notifiable->first_name . '!')
+            ->greeting('Hello '.$notifiable->first_name.'!')
             ->line($this->announcement->description)
             ->when($this->announcement->priority === 'urgent', function ($message) {
                 return $message->error('This is an urgent announcement requiring immediate attention.');
@@ -72,7 +72,7 @@ class AnnouncementPublished extends Notification implements ShouldQueue
                 return $message->line('⚠️ This announcement requires your acknowledgment.');
             })
             ->when($this->announcement->expiry_date, function ($message) {
-                return $message->line('Valid until: ' . $this->announcement->expiry_date->format('M d, Y'));
+                return $message->line('Valid until: '.$this->announcement->expiry_date->format('M d, Y'));
             })
             ->line('Thank you for your attention.');
     }
@@ -106,8 +106,8 @@ class AnnouncementPublished extends Notification implements ShouldQueue
         if ($this->announcement->priority === 'urgent') {
             return 'bx-error-circle';
         }
-        
-        return match($this->announcement->type) {
+
+        return match ($this->announcement->type) {
             'important' => 'bx-info-circle',
             'event' => 'bx-calendar-event',
             'policy' => 'bx-file',
@@ -121,7 +121,7 @@ class AnnouncementPublished extends Notification implements ShouldQueue
      */
     protected function getColor()
     {
-        return match($this->announcement->priority) {
+        return match ($this->announcement->priority) {
             'urgent' => 'danger',
             'high' => 'warning',
             'normal' => 'primary',
@@ -137,9 +137,9 @@ class AnnouncementPublished extends Notification implements ShouldQueue
     {
         // Don't send if user has already read the announcement
         if ($this->notificationType === 'new') {
-            return !$this->announcement->isReadBy($notifiable);
+            return ! $this->announcement->isReadBy($notifiable);
         }
-        
+
         return true;
     }
 }

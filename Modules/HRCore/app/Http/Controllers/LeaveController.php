@@ -1206,13 +1206,14 @@ class LeaveController extends Controller
                 return $leave->total_days;
             })
             ->addColumn('status', function ($leave) {
-                $badgeClass = match($leave->status->value) {
+                $badgeClass = match ($leave->status->value) {
                     'pending' => 'bg-label-warning',
                     'approved' => 'bg-label-success',
                     'rejected' => 'bg-label-danger',
                     'cancelled' => 'bg-label-secondary',
                     default => 'bg-label-primary'
                 };
+
                 return '<span class="badge '.$badgeClass.'">'.ucfirst($leave->status->value).'</span>';
             })
             ->addColumn('approved_by', function ($leave) {
@@ -1298,7 +1299,7 @@ class LeaveController extends Controller
                 ->first();
 
             if ($leaveBalance && $leaveBalance->available_leaves < $totalDays) {
-                return Error::response(__('Insufficient leave balance. You have ' . $leaveBalance->available_leaves . ' days available.'));
+                return Error::response(__('Insufficient leave balance. You have '.$leaveBalance->available_leaves.' days available.'));
             }
 
             // Handle file upload

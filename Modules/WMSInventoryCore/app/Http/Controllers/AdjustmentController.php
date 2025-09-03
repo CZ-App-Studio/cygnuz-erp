@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\WMSInventoryCore\app\Services\WMSInventoryCoreSettingsService;
 use Modules\WMSInventoryCore\Models\Adjustment;
 use Modules\WMSInventoryCore\Models\AdjustmentProduct;
 use Modules\WMSInventoryCore\Models\AdjustmentType;
@@ -17,7 +18,6 @@ use Modules\WMSInventoryCore\Models\Inventory;
 use Modules\WMSInventoryCore\Models\InventoryTransaction;
 use Modules\WMSInventoryCore\Models\Product;
 use Modules\WMSInventoryCore\Models\Warehouse;
-use Modules\WMSInventoryCore\app\Services\WMSInventoryCoreSettingsService;
 use Yajra\DataTables\Facades\DataTables;
 
 class AdjustmentController extends Controller
@@ -442,7 +442,7 @@ class AdjustmentController extends Controller
                         }
 
                         // Check if negative stock is allowed
-                        if (!WMSInventoryCoreSettingsService::allowNegativeStock()) {
+                        if (! WMSInventoryCoreSettingsService::allowNegativeStock()) {
                             $newStockLevel = $inventory->stock_level - $quantity;
                             if ($newStockLevel < 0) {
                                 throw new \Exception("This adjustment would result in negative stock for product {$product->name} in {$warehouse->name} and is not allowed by system settings");

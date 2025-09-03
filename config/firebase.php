@@ -3,24 +3,24 @@
 declare(strict_types=1);
 
 return [
-  /*
+    /*
    * ------------------------------------------------------------------------
    * Default Firebase project
    * ------------------------------------------------------------------------
    */
 
-  'default' => env('FIREBASE_PROJECT', 'app'),
+    'default' => env('FIREBASE_PROJECT', 'app'),
 
-  /*
+    /*
    * ------------------------------------------------------------------------
    * Firebase project configurations
    * ------------------------------------------------------------------------
    */
 
-  'projects' => [
-    'app' => [
+    'projects' => [
+        'app' => [
 
-      /*
+            /*
        * ------------------------------------------------------------------------
        * Credentials / Service Account
        * ------------------------------------------------------------------------
@@ -50,30 +50,30 @@ return [
        *
        */
 
-      'credentials' => [
-        'file' => env('FIREBASE_CREDENTIALS', base_path('firebase_credentials.json')),
-        'auto_discovery' => false,
-      ],
+            'credentials' => [
+                'file' => env('FIREBASE_CREDENTIALS', base_path('firebase_credentials.json')),
+                'auto_discovery' => false,
+            ],
 
-      /*
+            /*
        * ------------------------------------------------------------------------
        * Firebase Auth Component
        * ------------------------------------------------------------------------
        */
 
-      'auth' => [
-        'tenant_id' => env('FIREBASE_AUTH_TENANT_ID'),
-      ],
+            'auth' => [
+                'tenant_id' => env('FIREBASE_AUTH_TENANT_ID'),
+            ],
 
-      /*
+            /*
        * ------------------------------------------------------------------------
        * Firestore Component
        * ------------------------------------------------------------------------
        */
 
-      'firestore' => [
+            'firestore' => [
 
-        /*
+                /*
          * If you want to access a Firestore database other than the default database,
          * enter its name here.
          *
@@ -82,18 +82,18 @@ return [
          * https://firebase.google.com/docs/firestore/manage-databases
          */
 
-        // 'database' => env('FIREBASE_FIRESTORE_DATABASE'),
-      ],
+                // 'database' => env('FIREBASE_FIRESTORE_DATABASE'),
+            ],
 
-      /*
+            /*
        * ------------------------------------------------------------------------
        * Firebase Realtime Database
        * ------------------------------------------------------------------------
        */
 
-      'database' => [
+            'database' => [
 
-        /*
+                /*
          * In most of the cases the project ID defined in the credentials file
          * determines the URL of your project's Realtime Database. If the
          * connection to the Realtime Database fails, you can override
@@ -105,9 +105,9 @@ return [
          * https://my-project-id.firebaseio.com
          */
 
-        'url' => env('FIREBASE_DATABASE_URL'),
+                'url' => env('FIREBASE_DATABASE_URL'),
 
-        /*
+                /*
          * As a best practice, a service should have access to only the resources it needs.
          * To get more fine-grained control over the resources a Firebase app instance can access,
          * use a unique identifier in your Security Rules to represent your service.
@@ -115,15 +115,15 @@ return [
          * https://firebase.google.com/docs/database/admin/start#authenticate-with-limited-privileges
          */
 
-        // 'auth_variable_override' => [
-        //     'uid' => 'my-service-worker'
-        // ],
+                // 'auth_variable_override' => [
+                //     'uid' => 'my-service-worker'
+                // ],
 
-      ],
+            ],
 
-      'dynamic_links' => [
+            'dynamic_links' => [
 
-        /*
+                /*
          * Dynamic links can be built with any URL prefix registered on
          *
          * https://console.firebase.google.com/u/1/project/_/durablelinks/links/
@@ -135,29 +135,29 @@ return [
          * https://example.page.link
          */
 
-        'default_domain' => env('FIREBASE_DYNAMIC_LINKS_DEFAULT_DOMAIN'),
-      ],
+                'default_domain' => env('FIREBASE_DYNAMIC_LINKS_DEFAULT_DOMAIN'),
+            ],
 
-      /*
+            /*
        * ------------------------------------------------------------------------
        * Firebase Cloud Storage
        * ------------------------------------------------------------------------
        */
 
-      'storage' => [
+            'storage' => [
 
-        /*
+                /*
          * Your project's default storage bucket usually uses the project ID
          * as its name. If you have multiple storage buckets and want to
          * use another one as the default for your application, you can
          * override it here.
          */
 
-        'default_bucket' => env('FIREBASE_STORAGE_DEFAULT_BUCKET'),
+                'default_bucket' => env('FIREBASE_STORAGE_DEFAULT_BUCKET'),
 
-      ],
+            ],
 
-      /*
+            /*
        * ------------------------------------------------------------------------
        * Caching
        * ------------------------------------------------------------------------
@@ -167,9 +167,9 @@ return [
        *
        */
 
-      'cache_store' => env('FIREBASE_CACHE_STORE', 'file'),
+            'cache_store' => env('FIREBASE_CACHE_STORE', 'file'),
 
-      /*
+            /*
        * ------------------------------------------------------------------------
        * Logging
        * ------------------------------------------------------------------------
@@ -185,12 +185,12 @@ return [
        * two entries per request and response.
        */
 
-      'logging' => [
-        'http_log_channel' => env('FIREBASE_HTTP_LOG_CHANNEL'),
-        'http_debug_log_channel' => env('FIREBASE_HTTP_DEBUG_LOG_CHANNEL'),
-      ],
+            'logging' => [
+                'http_log_channel' => env('FIREBASE_HTTP_LOG_CHANNEL'),
+                'http_debug_log_channel' => env('FIREBASE_HTTP_DEBUG_LOG_CHANNEL'),
+            ],
 
-      /*
+            /*
        * ------------------------------------------------------------------------
        * HTTP Client Options
        * ------------------------------------------------------------------------
@@ -198,16 +198,16 @@ return [
        * Behavior of the HTTP Client performing the API requests
        */
 
-      'http_client_options' => [
+            'http_client_options' => [
 
-        /*
+                /*
          * Use a proxy that all API requests should be passed through.
          * (default: none)
          */
 
-        'proxy' => env('FIREBASE_HTTP_CLIENT_PROXY'),
+                'proxy' => env('FIREBASE_HTTP_CLIENT_PROXY'),
 
-        /*
+                /*
          * Set the maximum amount of seconds (float) that can pass before
          * a request is considered timed out
          *
@@ -215,10 +215,10 @@ return [
          * https://github.com/kreait/firebase-php/blob/6.x/src/Firebase/Http/HttpClientOptions.php
          */
 
-        'timeout' => env('FIREBASE_HTTP_CLIENT_TIMEOUT'),
+                'timeout' => env('FIREBASE_HTTP_CLIENT_TIMEOUT'),
 
-        'guzzle_middlewares' => [],
-      ],
+                'guzzle_middlewares' => [],
+            ],
+        ],
     ],
-  ],
 ];

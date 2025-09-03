@@ -23,24 +23,24 @@ class UpdateTimesheetAmounts extends Command
     public function handle()
     {
         $this->info('Updating timesheet amounts...');
-        
+
         $timesheets = Timesheet::all();
         $count = 0;
-        
+
         foreach ($timesheets as $timesheet) {
             $costAmount = $timesheet->hours * ($timesheet->cost_rate ?: 0);
             $billableAmount = $timesheet->is_billable ? ($timesheet->hours * ($timesheet->billing_rate ?: 0)) : 0;
-            
+
             $timesheet->update([
                 'cost_amount' => $costAmount,
-                'billable_amount' => $billableAmount
+                'billable_amount' => $billableAmount,
             ]);
-            
+
             $count++;
         }
-        
+
         $this->info("Updated {$count} timesheets successfully!");
-        
+
         return Command::SUCCESS;
     }
 }

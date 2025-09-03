@@ -7,12 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Modules\WMSInventoryCore\app\Http\Controllers\Api\BaseApiController;
-use Modules\WMSInventoryCore\Models\Warehouse;
-use Modules\WMSInventoryCore\Models\WarehouseZone;
 use Modules\WMSInventoryCore\Models\BinLocation;
 use Modules\WMSInventoryCore\Models\Inventory;
-use Modules\WMSInventoryCore\Models\Transfer;
 use Modules\WMSInventoryCore\Models\InventoryTransaction;
+use Modules\WMSInventoryCore\Models\Transfer;
+use Modules\WMSInventoryCore\Models\Warehouse;
+use Modules\WMSInventoryCore\Models\WarehouseZone;
 
 class WarehouseController extends BaseApiController
 {
@@ -36,11 +36,11 @@ class WarehouseController extends BaseApiController
 
             // Filter by location
             if ($request->has('city')) {
-                $query->where('city', 'LIKE', '%' . $request->city . '%');
+                $query->where('city', 'LIKE', '%'.$request->city.'%');
             }
 
             if ($request->has('state')) {
-                $query->where('state', 'LIKE', '%' . $request->state . '%');
+                $query->where('state', 'LIKE', '%'.$request->state.'%');
             }
 
             if ($request->has('country')) {
@@ -52,8 +52,8 @@ class WarehouseController extends BaseApiController
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('code', 'LIKE', "%{$search}%")
-                      ->orWhere('email', 'LIKE', "%{$search}%");
+                        ->orWhere('code', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
                 });
             }
 
@@ -134,6 +134,7 @@ class WarehouseController extends BaseApiController
             return $this->successResponse($warehouse, 'Warehouse created successfully', 201);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to create warehouse', $e->getMessage(), 500);
         }
     }
@@ -177,8 +178,8 @@ class WarehouseController extends BaseApiController
     public function update(Request $request, $id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255|unique:warehouses,name,' . $id,
-            'code' => 'sometimes|required|string|max:50|unique:warehouses,code,' . $id,
+            'name' => 'sometimes|required|string|max:255|unique:warehouses,name,'.$id,
+            'code' => 'sometimes|required|string|max:50|unique:warehouses,code,'.$id,
             'type' => 'sometimes|required|in:main,branch,distribution,retail,cold_storage,bonded',
             'status' => 'sometimes|required|in:active,inactive,maintenance',
             'address' => 'sometimes|required|string',
@@ -233,9 +234,9 @@ class WarehouseController extends BaseApiController
 
             // Check for pending transfers
             $pendingTransfers = Transfer::where(function ($q) use ($id) {
-                    $q->where('from_warehouse_id', $id)
-                      ->orWhere('to_warehouse_id', $id);
-                })
+                $q->where('from_warehouse_id', $id)
+                    ->orWhere('to_warehouse_id', $id);
+            })
                 ->whereNotIn('status', ['completed', 'cancelled'])
                 ->exists();
 
@@ -290,8 +291,8 @@ class WarehouseController extends BaseApiController
                 $search = $request->search;
                 $query->whereHas('product', function ($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('sku', 'LIKE', "%{$search}%")
-                      ->orWhere('barcode', 'LIKE', "%{$search}%");
+                        ->orWhere('sku', 'LIKE', "%{$search}%")
+                        ->orWhere('barcode', 'LIKE', "%{$search}%");
                 });
             }
 
@@ -331,7 +332,7 @@ class WarehouseController extends BaseApiController
                         'has_more_pages' => $inventory->hasMorePages(),
                         'from' => $inventory->firstItem(),
                         'to' => $inventory->lastItem(),
-                    ]
+                    ],
                 ], 200);
             }
 
@@ -366,10 +367,10 @@ class WarehouseController extends BaseApiController
             // Include capacity info
             if ($request->boolean('with_capacity')) {
                 $query->withCount('binLocations')
-                      ->with(['binLocations' => function ($q) {
-                          $q->selectRaw('zone_id, COUNT(*) as total, SUM(CASE WHEN is_occupied = 1 THEN 1 ELSE 0 END) as occupied')
+                    ->with(['binLocations' => function ($q) {
+                        $q->selectRaw('zone_id, COUNT(*) as total, SUM(CASE WHEN is_occupied = 1 THEN 1 ELSE 0 END) as occupied')
                             ->groupBy('zone_id');
-                      }]);
+                    }]);
             }
 
             $zones = $query->get();
@@ -403,7 +404,7 @@ class WarehouseController extends BaseApiController
                     'total_capacity' => $warehouse->total_capacity,
                     'capacity_unit' => $warehouse->capacity_unit,
                 ],
-                
+
                 'inventory' => [
                     'total_products' => $warehouse->inventory()->count(),
                     'total_quantity' => $warehouse->inventory()->sum('quantity'),
@@ -418,14 +419,14 @@ class WarehouseController extends BaseApiController
                         ->groupBy('categories.id', 'categories.name')
                         ->get(),
                 ],
-                
+
                 'stock_status' => [
                     'in_stock' => $warehouse->inventory()->where('quantity', '>', 0)->count(),
                     'out_of_stock' => $warehouse->inventory()->where('quantity', '<=', 0)->count(),
                     'low_stock' => $warehouse->inventory()->whereRaw('quantity <= reorder_point')->count(),
                     'overstock' => $warehouse->inventory()->whereRaw('quantity > maximum_stock')->count(),
                 ],
-                
+
                 'movements' => [
                     'period' => "{$fromDate} to {$toDate}",
                     'total_inbound' => InventoryTransaction::where('warehouse_id', $id)
@@ -440,7 +441,7 @@ class WarehouseController extends BaseApiController
                         ->whereBetween('created_at', [$fromDate, $toDate])
                         ->count(),
                 ],
-                
+
                 'zones' => [
                     'total_zones' => $warehouse->zones()->count(),
                     'total_bin_locations' => BinLocation::whereHas('zone', function ($q) use ($id) {
@@ -454,7 +455,7 @@ class WarehouseController extends BaseApiController
                         ->groupBy('type')
                         ->get(),
                 ],
-                
+
                 'performance' => [
                     'avg_daily_transactions' => InventoryTransaction::where('warehouse_id', $id)
                         ->whereBetween('created_at', [$fromDate, $toDate])
@@ -510,8 +511,8 @@ class WarehouseController extends BaseApiController
                 'total_cost_value' => $valuation->sum('cost_value'),
                 'total_retail_value' => $valuation->sum('retail_value'),
                 'potential_profit' => $valuation->sum('potential_profit'),
-                'profit_margin' => $valuation->sum('cost_value') > 0 
-                    ? ($valuation->sum('potential_profit') / $valuation->sum('cost_value')) * 100 
+                'profit_margin' => $valuation->sum('cost_value') > 0
+                    ? ($valuation->sum('potential_profit') / $valuation->sum('cost_value')) * 100
                     : 0,
                 'categories' => $valuation,
             ];
@@ -534,7 +535,7 @@ class WarehouseController extends BaseApiController
 
             $query = Transfer::where(function ($q) use ($id) {
                 $q->where('from_warehouse_id', $id)
-                  ->orWhere('to_warehouse_id', $id);
+                    ->orWhere('to_warehouse_id', $id);
             })->with(['fromWarehouse', 'toWarehouse', 'transferProducts.product']);
 
             // Filter by status
@@ -605,10 +606,19 @@ class WarehouseController extends BaseApiController
      */
     private function getUtilizationStatus($percent): string
     {
-        if ($percent >= 95) return 'critical';
-        if ($percent >= 85) return 'high';
-        if ($percent >= 70) return 'optimal';
-        if ($percent >= 40) return 'moderate';
+        if ($percent >= 95) {
+            return 'critical';
+        }
+        if ($percent >= 85) {
+            return 'high';
+        }
+        if ($percent >= 70) {
+            return 'optimal';
+        }
+        if ($percent >= 40) {
+            return 'moderate';
+        }
+
         return 'low';
     }
 }

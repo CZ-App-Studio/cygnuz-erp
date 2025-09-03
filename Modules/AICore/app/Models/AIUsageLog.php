@@ -2,10 +2,10 @@
 
 namespace Modules\AICore\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AIUsageLog extends Model
 {
@@ -26,7 +26,7 @@ class AIUsageLog extends Model
         'processing_time_ms',
         'status',
         'error_message',
-        'request_hash'
+        'request_hash',
     ];
 
     protected $casts = [
@@ -36,7 +36,7 @@ class AIUsageLog extends Model
         'cost' => 'decimal:6',
         'processing_time_ms' => 'integer',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     /**
@@ -60,10 +60,10 @@ class AIUsageLog extends Model
      */
     public function getTokensPerSecondAttribute(): float
     {
-        if (!$this->processing_time_ms || $this->processing_time_ms == 0) {
+        if (! $this->processing_time_ms || $this->processing_time_ms == 0) {
             return 0;
         }
-        
+
         return round($this->total_tokens / ($this->processing_time_ms / 1000), 2);
     }
 
@@ -72,10 +72,10 @@ class AIUsageLog extends Model
      */
     public function getCostPerTokenAttribute(): float
     {
-        if (!$this->total_tokens || $this->total_tokens == 0) {
+        if (! $this->total_tokens || $this->total_tokens == 0) {
             return 0;
         }
-        
+
         return round($this->cost / $this->total_tokens, 8);
     }
 
@@ -141,19 +141,19 @@ class AIUsageLog extends Model
     public static function getStats(array $filters = []): array
     {
         $query = static::query();
-        
+
         if (isset($filters['company_id'])) {
             $query->forCompany($filters['company_id']);
         }
-        
+
         if (isset($filters['module_name'])) {
             $query->forModule($filters['module_name']);
         }
-        
+
         if (isset($filters['days'])) {
             $query->recent($filters['days']);
         }
-        
+
         $stats = $query->selectRaw('
             COUNT(*) as total_requests,
             SUM(total_tokens) as total_tokens,
@@ -161,16 +161,16 @@ class AIUsageLog extends Model
             AVG(processing_time_ms) as avg_processing_time,
             SUM(CASE WHEN status = "success" THEN 1 ELSE 0 END) as successful_requests
         ')->first();
-        
+
         return [
             'total_requests' => $stats->total_requests ?? 0,
             'total_tokens' => $stats->total_tokens ?? 0,
             'total_cost' => round($stats->total_cost ?? 0, 2),
             'avg_processing_time' => round($stats->avg_processing_time ?? 0, 2),
             'successful_requests' => $stats->successful_requests ?? 0,
-            'success_rate' => $stats->total_requests > 0 
-                ? round(($stats->successful_requests / $stats->total_requests) * 100, 2) 
-                : 0
+            'success_rate' => $stats->total_requests > 0
+                ? round(($stats->successful_requests / $stats->total_requests) * 100, 2)
+                : 0,
         ];
     }
 }

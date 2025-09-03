@@ -13,7 +13,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Sale extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'sales';
 
@@ -49,7 +49,7 @@ class Sale extends Model implements Auditable
         'total_cost',
         'total_profit',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -69,7 +69,7 @@ class Sale extends Model implements Auditable
         'total_profit' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -142,7 +142,7 @@ class Sale extends Model implements Auditable
     public function isFullyFulfilled()
     {
         foreach ($this->products as $saleProduct) {
-            if (!$saleProduct->is_fully_fulfilled) {
+            if (! $saleProduct->is_fully_fulfilled) {
                 return false;
             }
         }
@@ -156,9 +156,12 @@ class Sale extends Model implements Auditable
     public function getFulfillmentProgressAttribute()
     {
         $totalItems = $this->products->count();
-        if ($totalItems === 0) return 0;
+        if ($totalItems === 0) {
+            return 0;
+        }
 
         $fulfilledItems = $this->products->where('is_fully_fulfilled', true)->count();
+
         return ($fulfilledItems / $totalItems) * 100;
     }
 }

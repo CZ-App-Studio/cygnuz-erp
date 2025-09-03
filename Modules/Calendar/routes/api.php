@@ -15,23 +15,23 @@ use Modules\Calendar\app\Http\Controllers\Api\EventApiController;
 */
 
 Route::middleware([
-  'api',
+    'api',
 ])->group(function () {
-  Route::middleware('auth:api')->group(function () {
-    Route::group(['prefix' => 'V1'], function () {
-      Route::group([
-        'middleware' => 'api',
-        'as' => 'api.',
-      ], function () {
+    Route::middleware('auth:api')->group(function () {
+        Route::group(['prefix' => 'V1'], function () {
+            Route::group([
+                'middleware' => 'api',
+                'as' => 'api.',
+            ], function () {
 
-        Route::prefix('events')->name('api.events.')->group(function () {
-          Route::get('/', [EventApiController::class, 'getAll'])->name('getAll');
-          Route::post('/', [EventApiController::class, 'create'])->name('create');
-          Route::post('update/{id}', [EventApiController::class, 'update'])->name('update'); // Standard REST uses PUT/PATCH
-          Route::post('/{id}', [EventApiController::class, 'delete'])->name('delete');
-          // Add GET /{id} if needed to fetch a single event detail via API
+                Route::prefix('events')->name('api.events.')->group(function () {
+                    Route::get('/', [EventApiController::class, 'getAll'])->name('getAll');
+                    Route::post('/', [EventApiController::class, 'create'])->name('create');
+                    Route::post('update/{id}', [EventApiController::class, 'update'])->name('update'); // Standard REST uses PUT/PATCH
+                    Route::post('/{id}', [EventApiController::class, 'delete'])->name('delete');
+                    // Add GET /{id} if needed to fetch a single event detail via API
+                });
+            });
         });
-      });
     });
-  });
 });

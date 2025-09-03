@@ -89,7 +89,7 @@
                     <label for="type" class="form-label">{{ __('Type') }} <span class="text-danger">*</span></label>
                     <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required>
                         @foreach(\Modules\PMCore\app\Enums\ProjectType::cases() as $type)
-                            <option value="{{ $type->value }}" {{ old('type', $project->type ?? 'client') == $type->value ? 'selected' : '' }}>
+                            <option value="{{ $type->value }}" {{ old('type', isset($project) ? $project->type->value : 'client') == $type->value ? 'selected' : '' }}>
                                 {{ $type->label() }}
                             </option>
                         @endforeach
@@ -104,7 +104,7 @@
                     <label for="status" class="form-label">{{ __('Status') }} <span class="text-danger">*</span></label>
                     <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
                         @foreach(\Modules\PMCore\app\Enums\ProjectStatus::cases() as $status)
-                            <option value="{{ $status->value }}" {{ old('status', $project->status ?? 'planning') == $status->value ? 'selected' : '' }}>
+                            <option value="{{ $status->value }}" {{ old('status', isset($project) ? $project->status->value : 'planning') == $status->value ? 'selected' : '' }}>
                                 {{ $status->label() }}
                             </option>
                         @endforeach
@@ -119,7 +119,7 @@
                     <label for="priority" class="form-label">{{ __('Priority') }} <span class="text-danger">*</span></label>
                     <select class="form-select @error('priority') is-invalid @enderror" id="priority" name="priority" required>
                         @foreach(\Modules\PMCore\app\Enums\ProjectPriority::cases() as $priority)
-                            <option value="{{ $priority->value }}" {{ old('priority', $project->priority ?? 'medium') == $priority->value ? 'selected' : '' }}>
+                            <option value="{{ $priority->value }}" {{ old('priority', isset($project) ? $project->priority->value : 'medium') == $priority->value ? 'selected' : '' }}>
                                 {{ $priority->label() }}
                             </option>
                         @endforeach

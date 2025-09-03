@@ -2,16 +2,16 @@
 
 namespace Modules\WMSInventoryCore\Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Modules\WMSInventoryCore\Models\Vendor;
-use Modules\WMSInventoryCore\Models\Purchase;
-use Modules\WMSInventoryCore\Models\PurchaseProduct;
-use Modules\WMSInventoryCore\Models\Product;
-use Modules\WMSInventoryCore\Models\Warehouse;
-use Modules\WMSInventoryCore\Models\Unit;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Modules\WMSInventoryCore\Models\Product;
+use Modules\WMSInventoryCore\Models\Purchase;
+use Modules\WMSInventoryCore\Models\PurchaseProduct;
+use Modules\WMSInventoryCore\Models\Unit;
+use Modules\WMSInventoryCore\Models\Vendor;
+use Modules\WMSInventoryCore\Models\Warehouse;
 
 class WMSInventoryCoreDemoSeeder extends Seeder
 {
@@ -22,34 +22,35 @@ class WMSInventoryCoreDemoSeeder extends Seeder
     {
         DB::transaction(function () {
             $this->command->info('Seeding WMSInventoryCore demo data...');
-            
+
             // Get first user for created_by fields
             $adminUser = User::first();
-            
-            if (!$adminUser) {
+
+            if (! $adminUser) {
                 $this->command->error('No users found in database. Please run user seeders first.');
+
                 return;
             }
-            
+
             $userId = $adminUser->id;
-            
+
             // Seed Vendors
             $this->seedVendors($userId);
-            
+
             // Seed Purchases
             $this->seedPurchases($userId);
-            
+
             $this->command->info('WMSInventoryCore demo data seeded successfully!');
         });
     }
-    
+
     /**
      * Seed vendor demo data
      */
     private function seedVendors($userId): void
     {
         $this->command->info('Creating demo vendors...');
-        
+
         $vendors = [
             [
                 'name' => 'TechSupply Pro',
@@ -252,83 +253,87 @@ class WMSInventoryCoreDemoSeeder extends Seeder
                 'updated_by_id' => $userId,
             ],
         ];
-        
+
         foreach ($vendors as $vendorData) {
             Vendor::firstOrCreate(
                 ['email' => $vendorData['email']],
                 $vendorData
             );
         }
-        
-        $this->command->info('Created ' . count($vendors) . ' demo vendors.');
+
+        $this->command->info('Created '.count($vendors).' demo vendors.');
     }
-    
+
     /**
      * Seed purchase orders demo data
      */
     private function seedPurchases($userId): void
     {
         $this->command->info('Creating demo purchase orders...');
-        
+
         // Get vendors
         $vendors = Vendor::where('status', 'active')->take(5)->get();
-        
+
         if ($vendors->isEmpty()) {
             $this->command->warn('No vendors found. Skipping purchase orders.');
+
             return;
         }
-        
+
         // Get warehouses
         $warehouses = Warehouse::take(3)->get();
-        
+
         if ($warehouses->isEmpty()) {
             $this->command->warn('No warehouses found. Skipping purchase orders.');
+
             return;
         }
-        
+
         // Get products
         $products = Product::take(10)->get();
-        
+
         if ($products->isEmpty()) {
             $this->command->warn('No products found. Skipping purchase orders.');
+
             return;
         }
-        
+
         // Get units
         $units = Unit::take(3)->get();
-        
+
         if ($units->isEmpty()) {
             $this->command->warn('No units found. Skipping purchase orders.');
+
             return;
         }
-        
+
         $purchaseCounter = 1;
-        
+
         foreach ($vendors as $vendor) {
             // Create 2-3 purchase orders per vendor
             $numOrders = rand(2, 3);
-            
+
             for ($i = 0; $i < $numOrders; $i++) {
                 $status = $this->getRandomStatus();
                 $paymentStatus = $this->getRandomPaymentStatus($status);
                 $approvalStatus = $this->getRandomApprovalStatus($status);
-                
+
                 $purchaseDate = Carbon::now()->subDays(rand(1, 60));
                 $expectedDeliveryDate = $purchaseDate->copy()->addDays(rand($vendor->lead_time_days, $vendor->lead_time_days + 7));
                 $actualDeliveryDate = null;
-                
+
                 if (in_array($status, ['received', 'completed'])) {
                     $actualDeliveryDate = $expectedDeliveryDate->copy()->addDays(rand(-2, 3));
                 }
-                
+
                 $subtotal = 0;
                 $taxRate = rand(5, 15); // 5-15% tax
                 $discountRate = rand(0, 10); // 0-10% discount
-                
+
                 // Calculate subtotal first (we'll create products after)
                 $numProducts = rand(3, 8);
                 $productSubtotals = [];
-                
+
                 for ($p = 0; $p < $numProducts; $p++) {
                     $quantity = rand(10, 100);
                     $unitCost = rand(10, 500) + (rand(0, 99) / 100);
@@ -336,24 +341,24 @@ class WMSInventoryCoreDemoSeeder extends Seeder
                     $productSubtotals[] = $productSubtotal;
                     $subtotal += $productSubtotal;
                 }
-                
+
                 $taxAmount = $subtotal * ($taxRate / 100);
                 $discountAmount = $subtotal * ($discountRate / 100);
                 $shippingCost = rand(10, 100) + (rand(0, 99) / 100);
                 $totalAmount = $subtotal + $taxAmount - $discountAmount + $shippingCost;
-                
+
                 $paidAmount = 0;
                 if ($paymentStatus === 'paid') {
                     $paidAmount = $totalAmount;
                 } elseif ($paymentStatus === 'partial') {
                     $paidAmount = $totalAmount * (rand(30, 70) / 100);
                 }
-                
+
                 $purchase = Purchase::create([
                     'date' => $purchaseDate,
-                    'code' => 'PO-' . date('Y') . '-' . str_pad($purchaseCounter++, 5, '0', STR_PAD_LEFT),
-                    'reference_no' => 'REF-' . strtoupper(uniqid()),
-                    'invoice_no' => rand(0, 1) ? 'INV-' . rand(10000, 99999) : null,
+                    'code' => 'PO-'.date('Y').'-'.str_pad($purchaseCounter++, 5, '0', STR_PAD_LEFT),
+                    'reference_no' => 'REF-'.strtoupper(uniqid()),
+                    'invoice_no' => rand(0, 1) ? 'INV-'.rand(10000, 99999) : null,
                     'vendor_id' => $vendor->id,
                     'warehouse_id' => $warehouses->random()->id,
                     'subtotal' => $subtotal,
@@ -370,7 +375,7 @@ class WMSInventoryCoreDemoSeeder extends Seeder
                     'expected_delivery_date' => $expectedDeliveryDate,
                     'actual_delivery_date' => $actualDeliveryDate,
                     'shipping_method' => $this->getRandomShippingMethod(),
-                    'tracking_number' => rand(0, 1) ? 'TRK' . rand(100000000, 999999999) : null,
+                    'tracking_number' => rand(0, 1) ? 'TRK'.rand(100000000, 999999999) : null,
                     'approval_status' => $approvalStatus,
                     'approved_by_id' => $approvalStatus === 'approved' ? $userId : null,
                     'approved_at' => $approvalStatus === 'approved' ? $purchaseDate->copy()->addHours(rand(1, 24)) : null,
@@ -381,22 +386,22 @@ class WMSInventoryCoreDemoSeeder extends Seeder
                     'created_at' => $purchaseDate,
                     'updated_at' => $purchaseDate,
                 ]);
-                
+
                 // Create purchase products
                 for ($p = 0; $p < $numProducts; $p++) {
                     $product = $products->random();
                     $unit = $units->random();
                     $quantity = rand(10, 100);
                     $unitCost = $productSubtotals[$p] / $quantity;
-                    
+
                     $productTaxAmount = $unitCost * $quantity * ($taxRate / 100);
                     $productDiscountAmount = $unitCost * $quantity * ($discountRate / 100);
-                    
+
                     $receivedQuantity = 0;
                     $acceptedQuantity = 0;
                     $rejectedQuantity = 0;
                     $isFullyReceived = false;
-                    
+
                     if (in_array($status, ['received', 'completed'])) {
                         $receivedQuantity = $quantity;
                         $acceptedQuantity = rand($quantity * 0.95, $quantity);
@@ -406,7 +411,7 @@ class WMSInventoryCoreDemoSeeder extends Seeder
                         $receivedQuantity = rand($quantity * 0.3, $quantity * 0.7);
                         $acceptedQuantity = $receivedQuantity;
                     }
-                    
+
                     PurchaseProduct::create([
                         'purchase_id' => $purchase->id,
                         'product_id' => $product->id,
@@ -432,20 +437,21 @@ class WMSInventoryCoreDemoSeeder extends Seeder
                 }
             }
         }
-        
+
         $totalPurchases = Purchase::count();
-        $this->command->info('Created ' . $totalPurchases . ' demo purchase orders with products.');
+        $this->command->info('Created '.$totalPurchases.' demo purchase orders with products.');
     }
-    
+
     /**
      * Get random purchase status
      */
     private function getRandomStatus(): string
     {
         $statuses = ['draft', 'pending', 'approved', 'ordered', 'partial', 'received', 'completed', 'cancelled'];
+
         return $statuses[array_rand($statuses)];
     }
-    
+
     /**
      * Get random payment status based on order status
      */
@@ -454,16 +460,16 @@ class WMSInventoryCoreDemoSeeder extends Seeder
         if ($status === 'cancelled') {
             return 'pending';
         }
-        
+
         if (in_array($status, ['completed', 'received'])) {
             $paymentStatuses = ['paid', 'paid', 'partial']; // More likely to be paid
         } else {
             $paymentStatuses = ['pending', 'pending', 'partial', 'paid'];
         }
-        
+
         return $paymentStatuses[array_rand($paymentStatuses)];
     }
-    
+
     /**
      * Get random approval status based on order status
      */
@@ -472,24 +478,26 @@ class WMSInventoryCoreDemoSeeder extends Seeder
         if (in_array($status, ['draft', 'cancelled'])) {
             return 'pending';
         }
-        
+
         if (in_array($status, ['approved', 'ordered', 'partial', 'received', 'completed'])) {
             return 'approved';
         }
-        
+
         $approvalStatuses = ['pending', 'approved', 'rejected'];
+
         return $approvalStatuses[array_rand($approvalStatuses)];
     }
-    
+
     /**
      * Get random shipping method
      */
     private function getRandomShippingMethod(): string
     {
         $methods = ['Standard Ground', 'Express Delivery', 'Next Day Air', 'Freight', 'Local Pickup', '2-Day Shipping'];
+
         return $methods[array_rand($methods)];
     }
-    
+
     /**
      * Get random notes for purchase order
      */
@@ -507,10 +515,10 @@ class WMSInventoryCoreDemoSeeder extends Seeder
             null,
             null, // Some orders without notes
         ];
-        
+
         return $notes[array_rand($notes)];
     }
-    
+
     /**
      * Get random rejection reason
      */
@@ -523,7 +531,7 @@ class WMSInventoryCoreDemoSeeder extends Seeder
             'Expired products',
             'Packaging damaged',
         ];
-        
+
         return $reasons[array_rand($reasons)];
     }
 }

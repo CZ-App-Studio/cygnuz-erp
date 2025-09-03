@@ -15,12 +15,12 @@ return new class extends Migration
             // Basic budget tracking fields
             $table->decimal('actual_cost', 15, 2)->default(0)->after('budget');
             $table->decimal('actual_revenue', 15, 2)->default(0)->after('actual_cost');
-            
+
             // Progress tracking
             $table->integer('completion_percentage')->default(0)->after('actual_revenue');
             $table->timestamp('completed_at')->nullable()->after('completion_percentage');
             $table->boolean('is_archived')->default(false)->after('completed_at');
-            
+
             // Add indexes for reporting
             $table->index(['is_archived', 'status']);
             $table->index('completed_at');
@@ -38,9 +38,9 @@ return new class extends Migration
                 'actual_revenue',
                 'completion_percentage',
                 'completed_at',
-                'is_archived'
+                'is_archived',
             ]);
-            
+
             $table->dropIndex(['is_archived', 'status']);
             $table->dropIndex(['completed_at']);
         });

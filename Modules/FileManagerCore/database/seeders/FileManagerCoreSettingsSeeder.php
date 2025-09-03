@@ -21,7 +21,7 @@ class FileManagerCoreSettingsSeeder extends Seeder
 
             // File Types - 2 settings kept (working)
             'filemanager_allowed_image_types' => [
-                'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'
+                'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
             ],
             'filemanager_allowed_document_types' => [
                 'application/pdf',
@@ -30,7 +30,7 @@ class FileManagerCoreSettingsSeeder extends Seeder
                 'application/vnd.ms-excel',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'text/plain',
-                'text/csv'
+                'text/csv',
             ],
 
             // Thumbnails & Processing - All 5 settings kept (working)
@@ -58,7 +58,7 @@ class FileManagerCoreSettingsSeeder extends Seeder
         }
 
         $this->command->info('✅ FileManagerCore settings seeded successfully');
-        $this->command->info('Total settings seeded: ' . count($settings));
+        $this->command->info('Total settings seeded: '.count($settings));
     }
 
     /**
@@ -70,10 +70,10 @@ class FileManagerCoreSettingsSeeder extends Seeder
             return 'boolean';
         } elseif (is_array($value)) {
             return 'json';
-        } elseif (is_numeric($value) && !str_contains($value, '.')) {
+        } elseif (is_numeric($value) && ! str_contains($value, '.')) {
             return 'integer';
         }
-        
+
         return 'string';
     }
 
@@ -101,6 +101,6 @@ class FileManagerCoreSettingsSeeder extends Seeder
             'filemanager_thumbnail_disk' => 'Storage disk for thumbnail files',
         ];
 
-        return $descriptions[$key] ?? 'Setting for ' . str_replace(['filemanager_', '_'], ['', ' '], $key);
+        return $descriptions[$key] ?? 'Setting for '.str_replace(['filemanager_', '_'], ['', ' '], $key);
     }
 }

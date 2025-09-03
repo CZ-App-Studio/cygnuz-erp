@@ -3,16 +3,12 @@
 namespace Modules\AICore\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Modules\AICore\Services\AIUsageTracker;
-use Modules\AICore\Models\AIUsageLog;
-use Modules\AICore\Models\AIModel;
-use Modules\AICore\Models\AIProvider;
-use Modules\AICore\Models\AIModuleConfiguration;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Modules\AICore\Models\AIModuleConfiguration;
+use Modules\AICore\Models\AIProvider;
+use Modules\AICore\Models\AIUsageLog;
+use Modules\AICore\Services\AIUsageTracker;
 
 class AIUsageController extends Controller
 {
@@ -34,7 +30,7 @@ class AIUsageController extends Controller
 
         // Get all active providers for the filter dropdown
         $providers = AIProvider::active()->orderBy('name')->get();
-        
+
         // Get all AI modules for the filter dropdown
         $modules = AIModuleConfiguration::active()
             ->ordered()
@@ -42,19 +38,19 @@ class AIUsageController extends Controller
 
         // Get summary statistics
         $summary = $this->getSummaryStats($period, $providerId, $moduleName);
-        
+
         // Get top models by usage
         $topModels = $this->getTopModels($period, $providerId, $moduleName);
-        
+
         // Get chart data for trends
         $chartData = $this->getChartData($period, $providerId, $moduleName);
-        
+
         // Get recent logs for the table
         $recentLogs = $this->getRecentLogs($period, $providerId, $moduleName);
 
         return view('aicore::usage.index', compact(
             'summary',
-            'topModels', 
+            'topModels',
             'chartData',
             'recentLogs',
             'providers',
@@ -71,19 +67,19 @@ class AIUsageController extends Controller
     public function show($id)
     {
         $log = AIUsageLog::with(['model.provider', 'user'])->findOrFail($id);
-        
+
         // Calculate additional metrics
         $metrics = [
             'tokens_per_second' => $log->tokens_per_second,
             'cost_per_token' => $log->cost_per_token,
-            'prompt_percentage' => $log->total_tokens > 0 
-                ? round(($log->prompt_tokens / $log->total_tokens) * 100, 1) 
+            'prompt_percentage' => $log->total_tokens > 0
+                ? round(($log->prompt_tokens / $log->total_tokens) * 100, 1)
                 : 0,
-            'completion_percentage' => $log->total_tokens > 0 
-                ? round(($log->completion_tokens / $log->total_tokens) * 100, 1) 
-                : 0
+            'completion_percentage' => $log->total_tokens > 0
+                ? round(($log->completion_tokens / $log->total_tokens) * 100, 1)
+                : 0,
         ];
-        
+
         // Get related logs (same module and operation in the last 24 hours)
         $relatedLogs = AIUsageLog::where('module_name', $log->module_name)
             ->where('operation_type', $log->operation_type)
@@ -92,7 +88,7 @@ class AIUsageController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
-        
+
         // Get statistics for comparison
         $comparisonStats = AIUsageLog::where('module_name', $log->module_name)
             ->where('operation_type', $log->operation_type)
@@ -105,16 +101,16 @@ class AIUsageController extends Controller
                 MAX(processing_time_ms) as max_processing_time
             ')
             ->first();
-        
+
         if (request()->ajax()) {
             return response()->json([
                 'log' => $log,
                 'metrics' => $metrics,
                 'relatedLogs' => $relatedLogs,
-                'comparisonStats' => $comparisonStats
+                'comparisonStats' => $comparisonStats,
             ]);
         }
-        
+
         return view('aicore::usage.show', compact('log', 'metrics', 'relatedLogs', 'comparisonStats'));
     }
 
@@ -125,21 +121,21 @@ class AIUsageController extends Controller
     {
         $period = $request->get('period', 30);
         $providerId = $request->get('provider', '');
-        
+
         $startDate = Carbon::now()->subDays($period)->startOfDay();
         $endDate = Carbon::now()->endOfDay();
 
         // Generate comprehensive usage report
         $report = $this->usageTracker->generateUsageReport(
-            null, 
-            $startDate->toDateString(), 
+            null,
+            $startDate->toDateString(),
             $endDate->toDateString()
         );
 
-        $fileName = 'ai-usage-report-' . $startDate->format('Y-m-d') . '-to-' . $endDate->format('Y-m-d') . '.json';
+        $fileName = 'ai-usage-report-'.$startDate->format('Y-m-d').'-to-'.$endDate->format('Y-m-d').'.json';
 
         return response()->json($report)
-            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"')
             ->header('Content-Type', 'application/json');
     }
 
@@ -152,9 +148,9 @@ class AIUsageController extends Controller
 
         if ($providerId) {
             $query->join('ai_models', 'ai_usage_logs.model_id', '=', 'ai_models.id')
-                  ->where('ai_models.provider_id', $providerId);
+                ->where('ai_models.provider_id', $providerId);
         }
-        
+
         if ($moduleName) {
             $query->where('ai_usage_logs.module_name', $moduleName);
         }
@@ -172,9 +168,9 @@ class AIUsageController extends Controller
             'total_tokens' => $stats->total_tokens ?? 0,
             'total_cost' => round($stats->total_cost ?? 0, 2),
             'avg_response_time' => round($stats->avg_response_time ?? 0, 0),
-            'success_rate' => $stats->total_requests > 0 
-                ? round(($stats->successful_requests / $stats->total_requests) * 100, 1) 
-                : 0
+            'success_rate' => $stats->total_requests > 0
+                ? round(($stats->successful_requests / $stats->total_requests) * 100, 1)
+                : 0,
         ];
     }
 
@@ -190,7 +186,7 @@ class AIUsageController extends Controller
         if ($providerId) {
             $query->where('ai_providers.id', $providerId);
         }
-        
+
         if ($moduleName) {
             $query->where('ai_usage_logs.module_name', $moduleName);
         }
@@ -202,11 +198,11 @@ class AIUsageController extends Controller
             SUM(ai_usage_logs.cost) as total_cost,
             SUM(ai_usage_logs.total_tokens) as total_tokens
         ')
-        ->groupBy('ai_models.id', 'ai_models.name', 'ai_providers.name')
-        ->orderByDesc('total_requests')
-        ->limit(10)
-        ->get()
-        ->toArray();
+            ->groupBy('ai_models.id', 'ai_models.name', 'ai_providers.name')
+            ->orderByDesc('total_requests')
+            ->limit(10)
+            ->get()
+            ->toArray();
     }
 
     /**
@@ -216,17 +212,17 @@ class AIUsageController extends Controller
     {
         // Usage trends over time
         $usageTrends = $this->getUsageTrends($period, $providerId, $moduleName);
-        
+
         // Module usage breakdown
         $moduleUsage = $this->getModuleUsage($period, $providerId, $moduleName);
-        
+
         // Provider cost breakdown
         $providerCost = $this->getProviderCost($period, $providerId, $moduleName);
 
         return [
             'usage_trends' => $usageTrends,
             'module_usage' => $moduleUsage,
-            'provider_cost' => $providerCost
+            'provider_cost' => $providerCost,
         ];
     }
 
@@ -239,9 +235,9 @@ class AIUsageController extends Controller
 
         if ($providerId) {
             $query->join('ai_models', 'ai_usage_logs.model_id', '=', 'ai_models.id')
-                  ->where('ai_models.provider_id', $providerId);
+                ->where('ai_models.provider_id', $providerId);
         }
-        
+
         if ($moduleName) {
             $query->where('ai_usage_logs.module_name', $moduleName);
         }
@@ -253,9 +249,9 @@ class AIUsageController extends Controller
             SUM(cost) as cost,
             AVG(processing_time_ms) as avg_response_time
         ')
-        ->groupBy('date')
-        ->orderBy('date')
-        ->get();
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
 
         return $trends->map(function ($trend) {
             return [
@@ -263,7 +259,7 @@ class AIUsageController extends Controller
                 'requests' => $trend->requests,
                 'tokens' => $trend->tokens,
                 'cost' => round($trend->cost, 2),
-                'response_time' => round($trend->avg_response_time, 0)
+                'response_time' => round($trend->avg_response_time, 0),
             ];
         })->toArray();
     }
@@ -277,9 +273,9 @@ class AIUsageController extends Controller
 
         if ($providerId) {
             $query->join('ai_models', 'ai_usage_logs.model_id', '=', 'ai_models.id')
-                  ->where('ai_models.provider_id', $providerId);
+                ->where('ai_models.provider_id', $providerId);
         }
-        
+
         if ($moduleName) {
             $query->where('ai_usage_logs.module_name', $moduleName);
         }
@@ -289,17 +285,17 @@ class AIUsageController extends Controller
             COUNT(*) as total_requests,
             SUM(cost) as total_cost
         ')
-        ->groupBy('module_name')
-        ->orderByDesc('total_requests')
-        ->get()
-        ->map(function ($usage) {
-            return [
-                'module' => $usage->module_name,
-                'requests' => $usage->total_requests,
-                'cost' => round($usage->total_cost, 2)
-            ];
-        })
-        ->toArray();
+            ->groupBy('module_name')
+            ->orderByDesc('total_requests')
+            ->get()
+            ->map(function ($usage) {
+                return [
+                    'module' => $usage->module_name,
+                    'requests' => $usage->total_requests,
+                    'cost' => round($usage->total_cost, 2),
+                ];
+            })
+            ->toArray();
     }
 
     /**
@@ -314,7 +310,7 @@ class AIUsageController extends Controller
         if ($providerId) {
             $query->where('ai_providers.id', $providerId);
         }
-        
+
         if ($moduleName) {
             $query->where('ai_usage_logs.module_name', $moduleName);
         }
@@ -324,17 +320,17 @@ class AIUsageController extends Controller
             COUNT(*) as total_requests,
             SUM(ai_usage_logs.cost) as total_cost
         ')
-        ->groupBy('ai_providers.id', 'ai_providers.name')
-        ->orderByDesc('total_cost')
-        ->get()
-        ->map(function ($provider) {
-            return [
-                'provider' => $provider->provider_name,
-                'requests' => $provider->total_requests,
-                'cost' => round($provider->total_cost, 2)
-            ];
-        })
-        ->toArray();
+            ->groupBy('ai_providers.id', 'ai_providers.name')
+            ->orderByDesc('total_cost')
+            ->get()
+            ->map(function ($provider) {
+                return [
+                    'provider' => $provider->provider_name,
+                    'requests' => $provider->total_requests,
+                    'cost' => round($provider->total_cost, 2),
+                ];
+            })
+            ->toArray();
     }
 
     /**
@@ -349,7 +345,7 @@ class AIUsageController extends Controller
         if ($providerId) {
             $query->where('ai_providers.id', $providerId);
         }
-        
+
         if ($moduleName) {
             $query->where('ai_usage_logs.module_name', $moduleName);
         }
@@ -364,11 +360,11 @@ class AIUsageController extends Controller
             'ai_usage_logs.processing_time_ms',
             'ai_usage_logs.status',
             'ai_models.name as model_name',
-            'ai_providers.name as provider_name'
+            'ai_providers.name as provider_name',
         ])
-        ->orderByDesc('ai_usage_logs.created_at')
-        ->limit(50)
-        ->get();
+            ->orderByDesc('ai_usage_logs.created_at')
+            ->limit(50)
+            ->get();
 
         // Convert to array while preserving Carbon instances
         return $results->map(function ($log) {
@@ -382,7 +378,7 @@ class AIUsageController extends Controller
                 'processing_time_ms' => $log->processing_time_ms,
                 'status' => $log->status,
                 'model_name' => $log->model_name,
-                'provider_name' => $log->provider_name
+                'provider_name' => $log->provider_name,
             ];
         })->toArray();
     }

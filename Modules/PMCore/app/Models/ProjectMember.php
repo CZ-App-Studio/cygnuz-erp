@@ -11,7 +11,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class ProjectMember extends Model implements AuditableContract
 {
-    use HasFactory, UserActionsTrait, Auditable;
+    use Auditable, HasFactory, UserActionsTrait;
 
     protected $fillable = [
         'project_id',
@@ -148,6 +148,7 @@ class ProjectMember extends Model implements AuditableContract
     public function getWeeklyCapacityHours(): float
     {
         $standardWeeklyHours = 40; // This could be configurable
+
         return ($this->allocation_percentage / 100) * $standardWeeklyHours;
     }
 

@@ -4,14 +4,14 @@ namespace App\Enums;
 
 enum OrderType: string
 {
-  case PLAN = 'plan';
+    case PLAN = 'plan';
 
-  case ADDITIONAL_USER = 'additional_user';
+    case ADDITIONAL_USER = 'additional_user';
 
-  case RENEWAL = 'renewal';
+    case RENEWAL = 'renewal';
 
-  case UPGRADE = 'upgrade';
+    case UPGRADE = 'upgrade';
 
-  case DOWNGRADE = 'downgrade';
+    case DOWNGRADE = 'downgrade';
 
 }

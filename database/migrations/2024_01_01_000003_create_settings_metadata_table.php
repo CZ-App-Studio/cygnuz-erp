@@ -25,7 +25,7 @@ return new class extends Migration
             $table->boolean('is_required')->default(false);
             $table->text('default_value')->nullable();
             $table->timestamps();
-            
+
             $table->index(['category', 'sort_order']);
         });
     }

@@ -12,7 +12,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Warehouse extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'warehouses';
 
@@ -51,7 +51,7 @@ class Warehouse extends Model implements Auditable
         'status',
         'is_active',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -73,7 +73,7 @@ class Warehouse extends Model implements Auditable
         'requires_approval' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -131,14 +131,18 @@ class Warehouse extends Model implements Auditable
     {
         $parts = [$this->address];
 
-        if ($this->city)
+        if ($this->city) {
             $parts[] = $this->city;
-        if ($this->state)
+        }
+        if ($this->state) {
             $parts[] = $this->state;
-        if ($this->postal_code)
+        }
+        if ($this->postal_code) {
             $parts[] = $this->postal_code;
-        if ($this->country)
+        }
+        if ($this->country) {
             $parts[] = $this->country;
+        }
 
         return implode(', ', $parts);
     }
@@ -157,7 +161,7 @@ class Warehouse extends Model implements Auditable
         }
 
         $currentDayOfWeek = now()->dayOfWeek;
-        if (!in_array($currentDayOfWeek, $this->operating_days)) {
+        if (! in_array($currentDayOfWeek, $this->operating_days)) {
             return false;
         }
 

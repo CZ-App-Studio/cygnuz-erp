@@ -2,17 +2,16 @@
 
 namespace App\Enums;
 
-enum UserShiftStatus : string
+enum UserShiftStatus: string
 {
-    Case SCHEDULED = 'scheduled';
+    case SCHEDULED = 'scheduled';
 
-    Case ONGOING = 'ongoing';
+    case ONGOING = 'ongoing';
 
-    Case COMPLETED = 'completed';
+    case COMPLETED = 'completed';
 
-    Case CANCELLED = 'cancelled';
+    case CANCELLED = 'cancelled';
 
-    Case MISSED = 'missed';
-
+    case MISSED = 'missed';
 
 }

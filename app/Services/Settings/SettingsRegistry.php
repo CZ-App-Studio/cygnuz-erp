@@ -90,6 +90,7 @@ class SettingsRegistry
     public function getModuleHandler(string $module): ?string
     {
         $config = $this->getModuleConfig($module);
+
         return $config['handler'] ?? null;
     }
 
@@ -99,6 +100,7 @@ class SettingsRegistry
     public function getModulePermissions(string $module): array
     {
         $config = $this->getModuleConfig($module);
+
         return $config['permissions'] ?? [];
     }
 

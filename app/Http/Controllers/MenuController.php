@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Responses\Success;
 use App\Http\Responses\Error;
+use App\Http\Responses\Success;
 use App\Services\Menu\MenuAggregator;
 use App\Services\Menu\MenuRegistry;
-use App\Models\UserMenuPreference;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 class MenuController extends Controller
 {
     protected MenuAggregator $menuAggregator;
+
     protected MenuRegistry $menuRegistry;
 
     public function __construct(MenuAggregator $menuAggregator, MenuRegistry $menuRegistry)
@@ -53,9 +53,9 @@ class MenuController extends Controller
     public function getFavorites(): JsonResponse
     {
         $userId = Auth::id();
-        
+
         // This would fetch from the user_menu_favorites table once it's implemented
-        $favorites = Cache::remember("user.{$userId}.menu.favorites", 3600, function () use ($userId) {
+        $favorites = Cache::remember("user.{$userId}.menu.favorites", 3600, function () {
             // Placeholder - would fetch from database
             return [];
         });
@@ -79,7 +79,7 @@ class MenuController extends Controller
         // This would save to user_menu_favorites table
         // For now, using the existing preferences table
         $userId = Auth::id();
-        
+
         // Clear cache
         Cache::forget("user.{$userId}.menu.favorites");
 
@@ -94,8 +94,8 @@ class MenuController extends Controller
     public function getRecent(): JsonResponse
     {
         $userId = Auth::id();
-        
-        $recent = Cache::remember("user.{$userId}.menu.recent", 3600, function () use ($userId) {
+
+        $recent = Cache::remember("user.{$userId}.menu.recent", 3600, function () {
             // Placeholder - would fetch from user_recent_menus table
             return [];
         });
@@ -132,7 +132,7 @@ class MenuController extends Controller
     public function getProfiles(): JsonResponse
     {
         $userId = Auth::id();
-        
+
         // Placeholder - would fetch from menu_profiles table
         $profiles = [
             [
@@ -158,7 +158,7 @@ class MenuController extends Controller
         ]);
 
         // This would update the active profile in database
-        
+
         return Success::response([
             'message' => 'Profile switched successfully',
         ]);
@@ -169,12 +169,12 @@ class MenuController extends Controller
      */
     public function refreshCache(): JsonResponse
     {
-        if (!Auth::user()->can('manage-system')) {
+        if (! Auth::user()->can('manage-system')) {
             return Error::response('Unauthorized to refresh menu cache');
         }
 
         $this->menuAggregator->clearCache();
-        
+
         // Pre-warm cache
         $this->menuAggregator->getMenu('vertical', true);
         $this->menuAggregator->getMenu('horizontal', true);
@@ -189,7 +189,7 @@ class MenuController extends Controller
      */
     public function getStatistics(): JsonResponse
     {
-        if (!Auth::user()->can('manage-system')) {
+        if (! Auth::user()->can('manage-system')) {
             return Error::response('Unauthorized to view menu statistics');
         }
 
@@ -216,7 +216,7 @@ class MenuController extends Controller
     {
         // Could be used for analytics or improving search
         Cache::increment('menu.search.count');
-        
+
         // Track popular searches
         $popularSearches = Cache::get('menu.search.popular', []);
         $popularSearches[$query] = ($popularSearches[$query] ?? 0) + 1;
@@ -236,7 +236,7 @@ class MenuController extends Controller
                 if ($module === '.' || $module === '..') {
                     continue;
                 }
-                
+
                 $menuPath = "{$modulesPath}/{$module}/resources/menu/verticalMenu.json";
                 if (file_exists($menuPath)) {
                     $modules[] = $module;

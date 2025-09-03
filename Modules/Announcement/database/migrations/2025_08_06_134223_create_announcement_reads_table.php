@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('acknowledged')->default(false);
             $table->datetime('acknowledged_at')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['announcement_id', 'user_id']);
             $table->index(['user_id', 'read_at']);
         });

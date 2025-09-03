@@ -123,12 +123,12 @@ $(function () {
         $.ajax({
           url: pageData.urls.productsDelete.replace('__PRODUCT_ID__', id),
           type: 'DELETE',
-          success: function () {
+          success: function (response) {
             dt_products.draw();
             Swal.fire({
               icon: 'success',
               title: 'Deleted!',
-              text: 'Product has been deleted.',
+              text: response.data.message || 'Product has been deleted successfully.',
               customClass: {
                 confirmButton: 'btn btn-success'
               }
@@ -137,7 +137,7 @@ $(function () {
           error: function (error) {
             Swal.fire({
               title: 'Error!',
-              text: error.responseJSON.message || 'Could not delete product.',
+              text: error.responseJSON.data?.message || error.responseJSON.message || 'Could not delete product.',
               icon: 'error',
               customClass: {
                 confirmButton: 'btn btn-primary'

@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->json('configuration')->nullable();
             $table->timestamps();
-            
+
             $table->index(['provider_id', 'is_active']);
             $table->index('type');
         });
