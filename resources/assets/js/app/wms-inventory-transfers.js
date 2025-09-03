@@ -424,4 +424,44 @@ $(function () {
       }
     });
   };
+
+  // Event handlers for ship, cancel, and print buttons
+  $(document).on('click', '.ship-record', function(e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    if (typeof window.shipRecord === 'function') {
+      window.shipRecord(id);
+    }
+  });
+
+  $(document).on('click', '.cancel-record', function(e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    if (typeof window.cancelRecord === 'function') {
+      window.cancelRecord(id);
+    }
+  });
+
+  $(document).on('click', '.receive-record', function(e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    if (typeof window.receiveRecord === 'function') {
+      window.receiveRecord(id);
+    }
+  });
+
+  // Print button handler
+  $(document).on('click', '#print-transfer', function(e) {
+    e.preventDefault();
+    const transferId = $(this).data('id');
+    
+    if (pageData.urls.transfersPrint) {
+      const printUrl = pageData.urls.transfersPrint.replace('__TRANSFER_ID__', transferId);
+      // Open print page in new window
+      window.open(printUrl, '_blank', 'width=800,height=600,scrollbars=yes');
+    } else {
+      // Fallback: use browser print for current page
+      window.print();
+    }
+  });
 });

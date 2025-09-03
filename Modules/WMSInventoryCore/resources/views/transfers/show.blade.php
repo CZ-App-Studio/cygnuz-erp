@@ -18,7 +18,8 @@
         transfersShip: @json(route('wmsinventorycore.transfers.ship', ['transfer' => $transfer->id])),
         transfersReceive: @json(route('wmsinventorycore.transfers.receive', ['transfer' => $transfer->id])),
         transfersCancel: @json(route('wmsinventorycore.transfers.cancel', ['transfer' => $transfer->id])),
-        transfersDelete: @json(route('wmsinventorycore.transfers.destroy', ['transfer' => $transfer->id]))
+        transfersDelete: @json(route('wmsinventorycore.transfers.destroy', ['transfer' => $transfer->id])),
+        transfersPrint: @json(route('wmsinventorycore.transfers.print', ['transfer' => $transfer->id]))
       }
     };
   </script>

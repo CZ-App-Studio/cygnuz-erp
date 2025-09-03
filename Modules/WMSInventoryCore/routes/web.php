@@ -194,6 +194,7 @@ Route::middleware(['auth', 'verified'])->prefix('inventory')->name('wmsinventory
         Route::get('/transfers/data', [TransferController::class, 'getDataAjax'])->name('transfers.data');
         Route::get('/transfers/warehouse-products', [TransferController::class, 'getWarehouseProducts'])->name('transfers.warehouse-products');
         Route::get('/transfers/{transfer}', [TransferController::class, 'show'])->name('transfers.show');
+        Route::get('/transfers/{transfer}/print', [TransferController::class, 'print'])->name('transfers.print');
     });
 
     Route::middleware(['permission:wmsinventory.edit-transfer'])->group(function () {
