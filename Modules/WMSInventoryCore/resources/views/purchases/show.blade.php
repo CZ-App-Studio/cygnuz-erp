@@ -23,6 +23,7 @@
         receive: @json(route('wmsinventorycore.purchases.receive', $purchase->id)),
         printPdf: @json(route('wmsinventorycore.purchases.pdf', $purchase->id)),
         delete: @json(route('wmsinventorycore.purchases.destroy', $purchase->id)),
+        updatePaymentStatus: @json(route('wmsinventorycore.purchases.update-payment-status', $purchase->id)),
         index: @json(route('wmsinventorycore.purchases.index'))
       },
       labels: {
@@ -211,21 +212,30 @@
             <div class="row mt-2">
               <div class="col-sm-4"><strong>{{ __('Payment Status') }}:</strong></div>
               <div class="col-sm-8">
-                @switch($purchase->payment_status)
-                  @case('unpaid')
-                    <span class="badge bg-danger">{{ __('Unpaid') }}</span>
-                    @break
-                  @case('partial')
-                    <span class="badge bg-warning">{{ __('Partially Paid') }}</span>
-                    @break
-                  @case('paid')
-                    <span class="badge bg-success">{{ __('Paid') }}</span>
-                    @break
-                  @default
-                    <span class="badge bg-secondary">{{ __('Unknown') }}</span>
-                @endswitch
+                <div class="d-flex align-items-center gap-2">
+                  @switch($purchase->payment_status)
+                    @case('unpaid')
+                      <span class="badge bg-danger">{{ __('Unpaid') }}</span>
+                      @break
+                    @case('partial')
+                      <span class="badge bg-warning">{{ __('Partially Paid') }}</span>
+                      @break
+                    @case('paid')
+                      <span class="badge bg-success">{{ __('Paid') }}</span>
+                      @break
+                    @default
+                      <span class="badge bg-secondary">{{ __('Unknown') }}</span>
+                  @endswitch
+                  @can('wmsinventory.edit-purchase')
+                    @if(in_array($purchase->status, ['approved', 'partially_received', 'received']))
+                      <button type="button" class="btn btn-sm btn-outline-primary" onclick="updatePaymentStatus()">
+                        <i class="bx bx-edit"></i> {{ __('Update') }}
+                      </button>
+                    @endif
+                  @endcan
+                </div>
                 @if($purchase->paid_amount > 0)
-                  <small class="ms-2">({{ __('Paid') }}: ${{ number_format($purchase->paid_amount, 2) }})</small>
+                  <small class="ms-0 mt-1 d-block">({{ __('Paid') }}: ${{ number_format($purchase->paid_amount, 2) }} / ${{ number_format($purchase->total_amount, 2) }})</small>
                 @endif
               </div>
             </div>

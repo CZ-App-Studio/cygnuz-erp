@@ -867,7 +867,7 @@ class PurchaseController extends Controller
      * Duplicate a purchase order as draft.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function duplicate($id)
     {
@@ -914,12 +914,120 @@ class PurchaseController extends Controller
                 }
             });
 
+            // Handle AJAX request
+            if (request()->expectsJson()) {
+                return Success::response([
+                    'message' => __('Purchase order has been duplicated successfully'),
+                    'purchase' => $newPurchase,
+                    'redirect' => route('wmsinventorycore.purchases.edit', $newPurchase->id),
+                ]);
+            }
+
+            // Handle regular form request
             return redirect()->route('wmsinventorycore.purchases.edit', $newPurchase->id)
                 ->with('success', __('Purchase order has been duplicated successfully'));
         } catch (\Exception $e) {
             Log::error('Failed to duplicate purchase order: '.$e->getMessage());
 
+            // Handle AJAX request
+            if (request()->expectsJson()) {
+                return Error::response(__('Failed to duplicate purchase order'));
+            }
+
+            // Handle regular form request
             return redirect()->back()->with('error', __('Failed to duplicate purchase order'));
+        }
+    }
+
+    /**
+     * Update payment status of a purchase order.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updatePaymentStatus(Request $request, $id)
+    {
+        // $this->authorize('wmsinventory.edit-purchase');
+
+        $validated = $request->validate([
+            'payment_status' => 'required|in:unpaid,partial,paid',
+            'paid_amount' => 'nullable|numeric|min:0',
+            'payment_date' => 'nullable|date',
+            'payment_notes' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $purchase = Purchase::findOrFail($id);
+
+            // Only allow payment status updates on approved, partially received, or received purchases
+            if (!in_array($purchase->status, ['approved', 'partially_received', 'received'])) {
+                return Error::response(__('Payment status can only be updated for approved or received purchase orders'));
+            }
+
+            DB::transaction(function () use ($purchase, $validated) {
+                $paymentStatus = $validated['payment_status'];
+                $paidAmount = $validated['paid_amount'];
+
+                // Auto-calculate paid amount if not provided
+                if (is_null($paidAmount)) {
+                    switch ($paymentStatus) {
+                        case 'unpaid':
+                            $paidAmount = 0;
+                            break;
+                        case 'paid':
+                            $paidAmount = $purchase->total_amount;
+                            break;
+                        case 'partial':
+                            // If changing to partial but no amount specified, keep current paid amount
+                            $paidAmount = $purchase->paid_amount > 0 ? $purchase->paid_amount : ($purchase->total_amount * 0.5);
+                            break;
+                    }
+                } else {
+                    // Validate paid amount against total and status
+                    if ($paymentStatus === 'unpaid' && $paidAmount > 0) {
+                        throw new \Exception(__('Unpaid orders cannot have a paid amount greater than zero'));
+                    }
+                    
+                    if ($paymentStatus === 'paid' && $paidAmount < $purchase->total_amount) {
+                        throw new \Exception(__('For paid status, the paid amount must equal the total amount'));
+                    }
+                    
+                    if ($paymentStatus === 'partial' && ($paidAmount <= 0 || $paidAmount >= $purchase->total_amount)) {
+                        throw new \Exception(__('For partial payment, the paid amount must be between zero and the total amount'));
+                    }
+                }
+
+                // Update the purchase record
+                $updateData = [
+                    'payment_status' => $paymentStatus,
+                    'paid_amount' => $paidAmount,
+                    'updated_by_id' => auth()->id(),
+                ];
+
+                // Add payment date if provided
+                if (!empty($validated['payment_date'])) {
+                    $updateData['payment_due_date'] = $validated['payment_date'];
+                }
+
+                // Append payment notes to existing notes if provided
+                if (!empty($validated['payment_notes'])) {
+                    $existingNotes = $purchase->notes ?: '';
+                    $newNote = "Payment Update (" . now()->format('Y-m-d H:i') . "): " . $validated['payment_notes'];
+                    $updateData['notes'] = $existingNotes ? $existingNotes . "\n\n" . $newNote : $newNote;
+                }
+
+                $purchase->update($updateData);
+            });
+
+            return Success::response([
+                'message' => __('Payment status has been updated successfully'),
+                'purchase' => $purchase->fresh(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to update payment status: '.$e->getMessage());
+
+            return Error::response(__('Failed to update payment status: ') . $e->getMessage());
         }
     }
 
