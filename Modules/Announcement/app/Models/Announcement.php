@@ -2,12 +2,12 @@
 
 namespace Modules\Announcement\app\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Modules\HRCore\app\Models\Department;
 use Modules\HRCore\app\Models\Team;
-use Carbon\Carbon;
 
 class Announcement extends Model
 {
@@ -30,7 +30,7 @@ class Announcement extends Model
         'attachment',
         'metadata',
         'created_by',
-        'updated_by'
+        'updated_by',
     ];
 
     protected $casts = [
@@ -40,7 +40,7 @@ class Announcement extends Model
         'requires_acknowledgment' => 'boolean',
         'publish_date' => 'datetime',
         'expiry_date' => 'datetime',
-        'metadata' => 'array'
+        'metadata' => 'array',
     ];
 
     /**
@@ -51,7 +51,7 @@ class Announcement extends Model
         parent::boot();
 
         static::creating(function ($announcement) {
-            if (!$announcement->created_by) {
+            if (! $announcement->created_by) {
                 $announcement->created_by = auth()->id();
             }
         });
@@ -64,7 +64,7 @@ class Announcement extends Model
         static::saving(function ($announcement) {
             if ($announcement->status !== 'draft' && $announcement->status !== 'archived') {
                 $now = Carbon::now();
-                
+
                 if ($announcement->expiry_date && $announcement->expiry_date->isPast()) {
                     $announcement->status = 'expired';
                 } elseif ($announcement->publish_date && $announcement->publish_date->isFuture()) {
@@ -98,7 +98,7 @@ class Announcement extends Model
     public function departments()
     {
         return $this->belongsToMany(Department::class, 'announcement_departments')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -107,7 +107,7 @@ class Announcement extends Model
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'announcement_teams')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -116,7 +116,7 @@ class Announcement extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'announcement_users')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -133,8 +133,8 @@ class Announcement extends Model
     public function readBy()
     {
         return $this->belongsToMany(User::class, 'announcement_reads')
-                    ->withPivot(['read_at', 'acknowledged', 'acknowledged_at'])
-                    ->withTimestamps();
+            ->withPivot(['read_at', 'acknowledged', 'acknowledged_at'])
+            ->withTimestamps();
     }
 
     /**
@@ -143,14 +143,14 @@ class Announcement extends Model
     public function scopePublished($query)
     {
         return $query->where('status', 'published')
-                     ->where(function ($q) {
-                         $q->whereNull('publish_date')
-                           ->orWhere('publish_date', '<=', now());
-                     })
-                     ->where(function ($q) {
-                         $q->whereNull('expiry_date')
-                           ->orWhere('expiry_date', '>', now());
-                     });
+            ->where(function ($q) {
+                $q->whereNull('publish_date')
+                    ->orWhere('publish_date', '<=', now());
+            })
+            ->where(function ($q) {
+                $q->whereNull('expiry_date')
+                    ->orWhere('expiry_date', '>', now());
+            });
     }
 
     /**
@@ -159,15 +159,16 @@ class Announcement extends Model
     public function scopeActive($query)
     {
         $now = Carbon::now();
+
         return $query->where(function ($q) use ($now) {
             $q->where('status', 'published')
-              ->orWhere(function ($q2) use ($now) {
-                  $q2->where('status', 'scheduled')
-                     ->where('publish_date', '<=', $now);
-              });
+                ->orWhere(function ($q2) use ($now) {
+                    $q2->where('status', 'scheduled')
+                        ->where('publish_date', '<=', $now);
+                });
         })->where(function ($q) use ($now) {
             $q->whereNull('expiry_date')
-              ->orWhere('expiry_date', '>', $now);
+                ->orWhere('expiry_date', '>', $now);
         });
     }
 
@@ -195,33 +196,33 @@ class Announcement extends Model
         return $query->where(function ($q) use ($user) {
             // All employees
             $q->where('target_audience', 'all');
-              
+
             // Specific departments (through designation)
             if ($user->designation_id && $user->designation && $user->designation->department_id) {
                 $q->orWhere(function ($q2) use ($user) {
                     $q2->where('target_audience', 'departments')
-                       ->whereHas('departments', function ($q3) use ($user) {
-                           $q3->where('departments.id', $user->designation->department_id);
-                       });
+                        ->whereHas('departments', function ($q3) use ($user) {
+                            $q3->where('departments.id', $user->designation->department_id);
+                        });
                 });
             }
-            
+
             // Specific teams
             if ($user->team_id) {
                 $q->orWhere(function ($q2) use ($user) {
                     $q2->where('target_audience', 'teams')
-                       ->whereHas('teams', function ($q3) use ($user) {
-                           $q3->where('teams.id', $user->team_id);
-                       });
+                        ->whereHas('teams', function ($q3) use ($user) {
+                            $q3->where('teams.id', $user->team_id);
+                        });
                 });
             }
-            
+
             // Specific users
             $q->orWhere(function ($q2) use ($user) {
                 $q2->where('target_audience', 'specific_users')
-                   ->whereHas('users', function ($q3) use ($user) {
-                       $q3->where('users.id', $user->id);
-                   });
+                    ->whereHas('users', function ($q3) use ($user) {
+                        $q3->where('users.id', $user->id);
+                    });
             });
         });
     }
@@ -240,9 +241,9 @@ class Announcement extends Model
     public function isAcknowledgedBy(User $user)
     {
         return $this->reads()
-                    ->where('user_id', $user->id)
-                    ->where('acknowledged', true)
-                    ->exists();
+            ->where('user_id', $user->id)
+            ->where('acknowledged', true)
+            ->exists();
     }
 
     /**
@@ -250,11 +251,11 @@ class Announcement extends Model
      */
     public function markAsReadBy(User $user)
     {
-        if (!$this->isReadBy($user)) {
+        if (! $this->isReadBy($user)) {
             AnnouncementRead::create([
                 'announcement_id' => $this->id,
                 'user_id' => $user->id,
-                'read_at' => now()
+                'read_at' => now(),
             ]);
         }
     }
@@ -265,11 +266,11 @@ class Announcement extends Model
     public function markAsAcknowledgedBy(User $user)
     {
         $read = $this->reads()->where('user_id', $user->id)->first();
-        
+
         if ($read) {
             $read->update([
                 'acknowledged' => true,
-                'acknowledged_at' => now()
+                'acknowledged_at' => now(),
             ]);
         } else {
             AnnouncementRead::create([
@@ -277,7 +278,7 @@ class Announcement extends Model
                 'user_id' => $user->id,
                 'read_at' => now(),
                 'acknowledged' => true,
-                'acknowledged_at' => now()
+                'acknowledged_at' => now(),
             ]);
         }
     }
@@ -293,6 +294,7 @@ class Announcement extends Model
         }
 
         $readCount = $this->reads()->count();
+
         return round(($readCount / $totalUsers) * 100, 2);
     }
 
@@ -304,20 +306,21 @@ class Announcement extends Model
         switch ($this->target_audience) {
             case 'all':
                 return User::count();
-            
+
             case 'departments':
                 // Count users whose designation belongs to the selected departments
                 $departmentIds = $this->departments->pluck('id');
+
                 return User::whereHas('designation', function ($q) use ($departmentIds) {
                     $q->whereIn('department_id', $departmentIds);
                 })->count();
-            
+
             case 'teams':
                 return User::whereIn('team_id', $this->teams->pluck('id'))->count();
-            
+
             case 'specific_users':
                 return $this->users()->count();
-            
+
             default:
                 return 0;
         }

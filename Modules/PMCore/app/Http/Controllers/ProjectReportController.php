@@ -3,13 +3,13 @@
 namespace Modules\PMCore\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Modules\PMCore\app\Models\Project;
-use Modules\PMCore\app\Models\Timesheet;
-use Modules\PMCore\app\Models\ResourceAllocation;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\PMCore\app\Models\Project;
+use Modules\PMCore\app\Models\ResourceAllocation;
+use Modules\PMCore\app\Models\Timesheet;
 
 class ProjectReportController extends Controller
 {
@@ -19,6 +19,7 @@ class ProjectReportController extends Controller
     public function index()
     {
         $stats = $this->getOverallStats();
+
         return view('pmcore::reports.index', compact('stats'));
     }
 
@@ -53,18 +54,18 @@ class ProjectReportController extends Controller
 
         // Group by project
         $projectSummary = Timesheet::select(
-                'project_id',
-                DB::raw('SUM(hours) as total_hours'),
-                DB::raw('SUM(CASE WHEN is_billable = 1 THEN hours ELSE 0 END) as billable_hours'),
-                DB::raw('SUM(cost_amount) as total_cost'),
-                DB::raw('SUM(CASE WHEN is_billable = 1 THEN billable_amount ELSE 0 END) as total_revenue')
-            )
+            'project_id',
+            DB::raw('SUM(hours) as total_hours'),
+            DB::raw('SUM(CASE WHEN is_billable = 1 THEN hours ELSE 0 END) as billable_hours'),
+            DB::raw('SUM(cost_amount) as total_cost'),
+            DB::raw('SUM(CASE WHEN is_billable = 1 THEN billable_amount ELSE 0 END) as total_revenue')
+        )
             ->with('project')
             ->whereBetween('date', [$startDate, $endDate])
-            ->when($projectId, function($q) use ($projectId) {
+            ->when($projectId, function ($q) use ($projectId) {
                 $q->where('project_id', $projectId);
             })
-            ->when($userId, function($q) use ($userId) {
+            ->when($userId, function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })
             ->groupBy('project_id')
@@ -149,7 +150,7 @@ class ProjectReportController extends Controller
         });
 
         if ($departmentId) {
-            $query->whereHas('designation', function($q) use ($departmentId) {
+            $query->whereHas('designation', function ($q) use ($departmentId) {
                 $q->where('department_id', $departmentId);
             });
         }
@@ -157,15 +158,15 @@ class ProjectReportController extends Controller
         $resources = $query->get()->map(function ($user) use ($startDate, $endDate) {
             $allocations = ResourceAllocation::where('user_id', $user->id)
                 ->whereIn('status', ['active', 'planned'])
-                ->where(function($q) use ($startDate, $endDate) {
+                ->where(function ($q) use ($startDate, $endDate) {
                     $q->whereBetween('start_date', [$startDate, $endDate])
-                      ->orWhere(function($q2) use ($startDate, $endDate) {
-                          $q2->where('start_date', '<=', $startDate)
-                             ->where(function($q3) use ($endDate) {
-                                 $q3->whereNull('end_date')
-                                    ->orWhere('end_date', '>=', $endDate);
-                             });
-                      });
+                        ->orWhere(function ($q2) use ($startDate, $endDate) {
+                            $q2->where('start_date', '<=', $startDate)
+                                ->where(function ($q3) use ($endDate) {
+                                    $q3->whereNull('end_date')
+                                        ->orWhere('end_date', '>=', $endDate);
+                                });
+                        });
                 })
                 ->get();
 
@@ -180,7 +181,8 @@ class ProjectReportController extends Controller
                 $allocationStart = Carbon::parse($allocation->start_date)->max($startDate);
                 $allocationEnd = $allocation->end_date ? Carbon::parse($allocation->end_date)->min($endDate) : Carbon::parse($endDate);
                 $days = $this->getWorkingDays($allocationStart, $allocationEnd);
-                return ($days * $allocation->hours_per_day * ($allocation->allocation_percentage / 100));
+
+                return $days * $allocation->hours_per_day * ($allocation->allocation_percentage / 100);
             });
             $actualHours = $timesheets->sum('hours');
             $utilizationPercentage = $availableHours > 0 ? round(($actualHours / $availableHours) * 100, 2) : 0;
@@ -229,7 +231,7 @@ class ProjectReportController extends Controller
     private function getOverallStats()
     {
         $activeProjects = Project::notArchived();
-        
+
         return [
             'total_projects' => $activeProjects->count(),
             'ongoing_projects' => $activeProjects->ongoing()->count(),
@@ -250,14 +252,14 @@ class ProjectReportController extends Controller
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
         $days = 0;
-        
+
         while ($start <= $end) {
             if ($start->isWeekday()) {
                 $days++;
             }
             $start->addDay();
         }
-        
+
         return $days;
     }
 

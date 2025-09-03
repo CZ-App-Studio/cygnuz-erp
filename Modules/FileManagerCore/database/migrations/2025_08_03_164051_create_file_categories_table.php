@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('max_file_size')->nullable(); // in bytes
             $table->json('allowed_mime_types')->nullable();
             $table->timestamps();
-            
+
             $table->foreign('parent_id')->references('id')->on('file_categories')->onDelete('set null');
             $table->index(['is_active', 'sort_order']);
         });

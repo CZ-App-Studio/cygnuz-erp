@@ -3,15 +3,13 @@
 namespace Modules\Announcement\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Modules\Announcement\app\Models\Announcement;
-use Modules\Announcement\app\Models\AnnouncementRead;
-use Modules\HRCore\app\Models\Department;
-use Modules\HRCore\app\Models\Team;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
+use Modules\Announcement\app\Models\Announcement;
+use Modules\HRCore\app\Models\Department;
+use Modules\HRCore\app\Models\Team;
 
 class AnnouncementController extends Controller
 {
@@ -25,24 +23,24 @@ class AnnouncementController extends Controller
             $query = Announcement::with(['creator', 'departments', 'teams', 'users', 'reads']);
 
             // Apply filters
-            if ($request->has('status') && !empty($request->status)) {
+            if ($request->has('status') && ! empty($request->status)) {
                 $query->where('status', $request->status);
             }
 
-            if ($request->has('priority') && !empty($request->priority)) {
+            if ($request->has('priority') && ! empty($request->priority)) {
                 $query->where('priority', $request->priority);
             }
 
-            if ($request->has('type') && !empty($request->type)) {
+            if ($request->has('type') && ! empty($request->type)) {
                 $query->where('type', $request->type);
             }
 
             // Apply search
-            if ($request->has('search') && !empty($request->search['value'])) {
+            if ($request->has('search') && ! empty($request->search['value'])) {
                 $search = $request->search['value'];
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 
@@ -50,22 +48,22 @@ class AnnouncementController extends Controller
             if ($request->has('order')) {
                 $orderColumn = $request->columns[$request->order[0]['column']]['data'];
                 $orderDirection = $request->order[0]['dir'];
-                
+
                 if ($orderColumn && $orderColumn !== '') {
                     $query->orderBy($orderColumn, $orderDirection);
                 }
             } else {
                 $query->orderBy('is_pinned', 'desc')
-                      ->byPriority()
-                      ->orderBy('created_at', 'desc');
+                    ->byPriority()
+                    ->orderBy('created_at', 'desc');
             }
 
             $totalRecords = Announcement::count();
             $filteredRecords = $query->count();
-            
+
             $announcements = $query->skip($request->start ?? 0)
-                                  ->take($request->length ?? 10)
-                                  ->get();
+                ->take($request->length ?? 10)
+                ->get();
 
             // Format data for DataTables
             $data = $announcements->map(function ($announcement) {
@@ -85,7 +83,7 @@ class AnnouncementController extends Controller
                     'users_count' => $announcement->users->count(),
                     'creator_name' => $announcement->creator->name ?? 'Unknown',
                     'created_at' => $announcement->created_at->format('Y-m-d H:i:s'),
-                    'action' => ''
+                    'action' => '',
                 ];
             });
 
@@ -93,26 +91,26 @@ class AnnouncementController extends Controller
                 'draw' => intval($request->draw ?? 1),
                 'recordsTotal' => $totalRecords,
                 'recordsFiltered' => $filteredRecords,
-                'data' => $data
+                'data' => $data,
             ]);
         }
 
         // Regular page load
         $query = Announcement::with(['creator', 'departments', 'teams', 'users', 'reads'])
-                            ->orderBy('is_pinned', 'desc')
-                            ->byPriority()
-                            ->orderBy('created_at', 'desc');
+            ->orderBy('is_pinned', 'desc')
+            ->byPriority()
+            ->orderBy('created_at', 'desc');
 
         // Apply filters
-        if ($request->has('status') && !empty($request->status)) {
+        if ($request->has('status') && ! empty($request->status)) {
             $query->where('status', $request->status);
         }
 
-        if ($request->has('type') && !empty($request->type)) {
+        if ($request->has('type') && ! empty($request->type)) {
             $query->where('type', $request->type);
         }
 
-        if ($request->has('priority') && !empty($request->priority)) {
+        if ($request->has('priority') && ! empty($request->priority)) {
             $query->where('priority', $request->priority);
         }
 
@@ -120,7 +118,7 @@ class AnnouncementController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -132,7 +130,7 @@ class AnnouncementController extends Controller
             'published' => Announcement::where('status', 'published')->count(),
             'scheduled' => Announcement::where('status', 'scheduled')->count(),
             'draft' => Announcement::where('status', 'draft')->count(),
-            'pinned' => Announcement::where('is_pinned', true)->count()
+            'pinned' => Announcement::where('is_pinned', true)->count(),
         ];
 
         return view('announcement::index', compact('announcements', 'stats'));
@@ -146,7 +144,7 @@ class AnnouncementController extends Controller
         $departments = Department::orderBy('name')->get();
         $teams = Team::orderBy('name')->get();
         $users = User::orderBy('name')->get();
-        
+
         return view('announcement::create', compact('departments', 'teams', 'users'));
     }
 
@@ -175,11 +173,11 @@ class AnnouncementController extends Controller
             'publish_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after:publish_date',
             'status' => 'required|in:draft,published,scheduled',
-            'attachment' => 'nullable|file|max:10240' // 10MB max
+            'attachment' => 'nullable|file|max:10240', // 10MB max
         ]);
 
         DB::beginTransaction();
-        
+
         try {
             // Handle file upload
             if ($request->hasFile('attachment')) {
@@ -206,17 +204,17 @@ class AnnouncementController extends Controller
             DB::commit();
 
             return redirect()->route('announcements.index')
-                           ->with('success', 'Announcement created successfully.');
+                ->with('success', 'Announcement created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Delete uploaded file if exists
             if (isset($validated['attachment'])) {
                 Storage::disk('public')->delete($validated['attachment']);
             }
-            
+
             return back()->withInput()
-                        ->with('error', 'Failed to create announcement: ' . $e->getMessage());
+                ->with('error', 'Failed to create announcement: '.$e->getMessage());
         }
     }
 
@@ -226,7 +224,7 @@ class AnnouncementController extends Controller
     public function show($id)
     {
         $announcement = Announcement::with(['creator', 'departments', 'teams', 'users', 'reads.user'])
-                                   ->findOrFail($id);
+            ->findOrFail($id);
 
         // Mark as read for current user
         if (auth()->check()) {
@@ -238,7 +236,7 @@ class AnnouncementController extends Controller
             'total_targets' => $announcement->getTotalTargetUsers(),
             'total_reads' => $announcement->reads()->count(),
             'read_percentage' => $announcement->read_percentage,
-            'acknowledged_count' => $announcement->reads()->where('acknowledged', true)->count()
+            'acknowledged_count' => $announcement->reads()->where('acknowledged', true)->count(),
         ];
 
         return view('announcement::show', compact('announcement', 'readStats'));
@@ -250,16 +248,16 @@ class AnnouncementController extends Controller
     public function edit($id)
     {
         $announcement = Announcement::with(['departments', 'teams', 'users'])->findOrFail($id);
-        
+
         // Check if user can edit
-        if ($announcement->created_by !== auth()->id() && !auth()->user()->hasRole('admin')) {
+        if ($announcement->created_by !== auth()->id() && ! auth()->user()->hasRole('admin')) {
             abort(403, 'Unauthorized to edit this announcement.');
         }
 
         $departments = Department::orderBy('name')->get();
         $teams = Team::orderBy('name')->get();
         $users = User::orderBy('name')->get();
-        
+
         return view('announcement::edit', compact('announcement', 'departments', 'teams', 'users'));
     }
 
@@ -269,9 +267,9 @@ class AnnouncementController extends Controller
     public function update(Request $request, $id)
     {
         $announcement = Announcement::findOrFail($id);
-        
+
         // Check if user can update
-        if ($announcement->created_by !== auth()->id() && !auth()->user()->hasRole('admin')) {
+        if ($announcement->created_by !== auth()->id() && ! auth()->user()->hasRole('admin')) {
             abort(403, 'Unauthorized to update this announcement.');
         }
 
@@ -295,11 +293,11 @@ class AnnouncementController extends Controller
             'publish_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after:publish_date',
             'status' => 'required|in:draft,published,scheduled,expired,archived',
-            'attachment' => 'nullable|file|max:10240'
+            'attachment' => 'nullable|file|max:10240',
         ]);
 
         DB::beginTransaction();
-        
+
         try {
             // Handle file upload
             if ($request->hasFile('attachment')) {
@@ -335,12 +333,12 @@ class AnnouncementController extends Controller
             DB::commit();
 
             return redirect()->route('announcements.index')
-                           ->with('success', 'Announcement updated successfully.');
+                ->with('success', 'Announcement updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return back()->withInput()
-                        ->with('error', 'Failed to update announcement: ' . $e->getMessage());
+                ->with('error', 'Failed to update announcement: '.$e->getMessage());
         }
     }
 
@@ -350,9 +348,9 @@ class AnnouncementController extends Controller
     public function destroy($id)
     {
         $announcement = Announcement::findOrFail($id);
-        
+
         // Check if user can delete
-        if ($announcement->created_by !== auth()->id() && !auth()->user()->hasRole('admin')) {
+        if ($announcement->created_by !== auth()->id() && ! auth()->user()->hasRole('admin')) {
             abort(403, 'Unauthorized to delete this announcement.');
         }
 
@@ -365,9 +363,9 @@ class AnnouncementController extends Controller
             $announcement->delete();
 
             return redirect()->route('announcements.index')
-                           ->with('success', 'Announcement deleted successfully.');
+                ->with('success', 'Announcement deleted successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to delete announcement: ' . $e->getMessage());
+            return back()->with('error', 'Failed to delete announcement: '.$e->getMessage());
         }
     }
 
@@ -377,19 +375,19 @@ class AnnouncementController extends Controller
     public function acknowledge($id)
     {
         $announcement = Announcement::findOrFail($id);
-        
+
         if (auth()->check()) {
             $announcement->markAsAcknowledgedBy(auth()->user());
-            
+
             return response()->json([
                 'success' => true,
-                'message' => 'Announcement acknowledged successfully.'
+                'message' => 'Announcement acknowledged successfully.',
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'User not authenticated.'
+            'message' => 'User not authenticated.',
         ], 401);
     }
 
@@ -399,19 +397,19 @@ class AnnouncementController extends Controller
     public function togglePin($id)
     {
         $announcement = Announcement::findOrFail($id);
-        
+
         // Check if user can pin/unpin
-        if (!auth()->user()->hasRole(['admin', 'manager'])) {
+        if (! auth()->user()->hasRole(['admin', 'manager'])) {
             abort(403, 'Unauthorized to pin/unpin announcements.');
         }
 
-        $announcement->is_pinned = !$announcement->is_pinned;
+        $announcement->is_pinned = ! $announcement->is_pinned;
         $announcement->save();
 
         return response()->json([
             'success' => true,
             'is_pinned' => $announcement->is_pinned,
-            'message' => $announcement->is_pinned ? 'Announcement pinned.' : 'Announcement unpinned.'
+            'message' => $announcement->is_pinned ? 'Announcement pinned.' : 'Announcement unpinned.',
         ]);
     }
 
@@ -421,16 +419,16 @@ class AnnouncementController extends Controller
     public function myAnnouncements()
     {
         $user = auth()->user();
-        
+
         $announcements = Announcement::forUser($user)
-                                    ->active()
-                                    ->with(['creator', 'reads' => function ($query) use ($user) {
-                                        $query->where('user_id', $user->id);
-                                    }])
-                                    ->orderBy('is_pinned', 'desc')
-                                    ->byPriority()
-                                    ->orderBy('created_at', 'desc')
-                                    ->paginate(10);
+            ->active()
+            ->with(['creator', 'reads' => function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }])
+            ->orderBy('is_pinned', 'desc')
+            ->byPriority()
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('announcement::my-announcements', compact('announcements'));
     }
@@ -442,12 +440,12 @@ class AnnouncementController extends Controller
     {
         // Get target users based on audience
         $users = collect();
-        
+
         switch ($announcement->target_audience) {
             case 'all':
                 $users = User::all();
                 break;
-                
+
             case 'departments':
                 // Get users whose designation belongs to the selected departments
                 $departmentIds = $announcement->departments->pluck('id');
@@ -455,11 +453,11 @@ class AnnouncementController extends Controller
                     $q->whereIn('department_id', $departmentIds);
                 })->get();
                 break;
-                
+
             case 'teams':
                 $users = User::whereIn('team_id', $announcement->teams->pluck('id'))->get();
                 break;
-                
+
             case 'specific_users':
                 $users = $announcement->users;
                 break;
@@ -471,10 +469,10 @@ class AnnouncementController extends Controller
                 try {
                     $user->notify(new \App\Notifications\AnnouncementPublished($announcement));
                 } catch (\Exception $e) {
-                    \Log::error('Failed to send announcement notification to user ' . $user->id . ': ' . $e->getMessage());
+                    \Log::error('Failed to send announcement notification to user '.$user->id.': '.$e->getMessage());
                 }
             }
-            
+
             // Email notifications are handled through the AnnouncementPublished notification class
             // if send_email is true, the notification will include 'mail' channel
         }

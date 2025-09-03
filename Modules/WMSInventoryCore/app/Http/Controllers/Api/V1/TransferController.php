@@ -7,12 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Modules\WMSInventoryCore\app\Http\Controllers\Api\BaseApiController;
+use Modules\WMSInventoryCore\Models\Inventory;
+use Modules\WMSInventoryCore\Models\InventoryTransaction;
+use Modules\WMSInventoryCore\Models\Product;
 use Modules\WMSInventoryCore\Models\Transfer;
 use Modules\WMSInventoryCore\Models\TransferProduct;
 use Modules\WMSInventoryCore\Models\Warehouse;
-use Modules\WMSInventoryCore\Models\Product;
-use Modules\WMSInventoryCore\Models\Inventory;
-use Modules\WMSInventoryCore\Models\InventoryTransaction;
 
 class TransferController extends BaseApiController
 {
@@ -34,7 +34,7 @@ class TransferController extends BaseApiController
                 $warehouseId = $request->warehouse_id;
                 $query->where(function ($q) use ($warehouseId) {
                     $q->where('from_warehouse_id', $warehouseId)
-                      ->orWhere('to_warehouse_id', $warehouseId);
+                        ->orWhere('to_warehouse_id', $warehouseId);
                 });
             }
 
@@ -51,7 +51,7 @@ class TransferController extends BaseApiController
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('reference', 'LIKE', "%{$search}%")
-                      ->orWhere('notes', 'LIKE', "%{$search}%");
+                        ->orWhere('notes', 'LIKE', "%{$search}%");
                 });
             }
 
@@ -104,7 +104,7 @@ class TransferController extends BaseApiController
                 $request->products
             );
 
-            if (!$stockValidation['valid']) {
+            if (! $stockValidation['valid']) {
                 return $this->errorResponse('Insufficient stock', $stockValidation['errors'], 400);
             }
 
@@ -134,6 +134,7 @@ class TransferController extends BaseApiController
             return $this->successResponse($transfer, 'Transfer created successfully', 201);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to create transfer', $e->getMessage(), 500);
         }
     }
@@ -151,7 +152,7 @@ class TransferController extends BaseApiController
                 'createdBy',
                 'updatedBy',
                 'approvedBy',
-                'receivedBy'
+                'receivedBy',
             ])->findOrFail($id);
 
             return $this->successResponse($transfer, 'Transfer retrieved successfully');
@@ -205,8 +206,9 @@ class TransferController extends BaseApiController
                     $request->products
                 );
 
-                if (!$stockValidation['valid']) {
+                if (! $stockValidation['valid']) {
                     DB::rollBack();
+
                     return $this->errorResponse('Insufficient stock', $stockValidation['errors'], 400);
                 }
 
@@ -232,9 +234,11 @@ class TransferController extends BaseApiController
             return $this->successResponse($transfer, 'Transfer updated successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
+
             return $this->notFoundResponse('Transfer not found');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to update transfer', $e->getMessage(), 500);
         }
     }
@@ -265,9 +269,11 @@ class TransferController extends BaseApiController
             return $this->successResponse(null, 'Transfer deleted successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
+
             return $this->notFoundResponse('Transfer not found');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to delete transfer', $e->getMessage(), 500);
         }
     }
@@ -309,9 +315,11 @@ class TransferController extends BaseApiController
             return $this->successResponse($transfer, 'Transfer approved successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
+
             return $this->notFoundResponse('Transfer not found');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to approve transfer', $e->getMessage(), 500);
         }
     }
@@ -352,8 +360,9 @@ class TransferController extends BaseApiController
                 })->toArray()
             );
 
-            if (!$stockValidation['valid']) {
+            if (! $stockValidation['valid']) {
                 DB::rollBack();
+
                 return $this->errorResponse('Insufficient stock', $stockValidation['errors'], 400);
             }
 
@@ -392,6 +401,7 @@ class TransferController extends BaseApiController
             return $this->successResponse($transfer, 'Transfer shipped successfully');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to ship transfer', $e->getMessage(), 500);
         }
     }
@@ -431,7 +441,7 @@ class TransferController extends BaseApiController
                     ->where('product_id', $receivedItem['product_id'])
                     ->first();
 
-                if (!$transferProduct) {
+                if (! $transferProduct) {
                     continue;
                 }
 
@@ -478,7 +488,7 @@ class TransferController extends BaseApiController
 
             // Update transfer status
             $status = $totalDiscrepancy > 0 ? 'completed_with_discrepancy' : 'completed';
-            
+
             $transfer->update([
                 'status' => $status,
                 'received_date' => $request->received_date,
@@ -493,6 +503,7 @@ class TransferController extends BaseApiController
             return $this->successResponse($transfer, 'Transfer received successfully');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to receive transfer', $e->getMessage(), 500);
         }
     }
@@ -560,6 +571,7 @@ class TransferController extends BaseApiController
             return $this->successResponse($transfer, 'Transfer cancelled successfully');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to cancel transfer', $e->getMessage(), 500);
         }
     }
@@ -577,7 +589,7 @@ class TransferController extends BaseApiController
                 ->where('product_id', $productData['product_id'])
                 ->first();
 
-            if (!$inventory || $inventory->quantity < $productData['quantity']) {
+            if (! $inventory || $inventory->quantity < $productData['quantity']) {
                 $product = Product::find($productData['product_id']);
                 $available = $inventory ? $inventory->quantity : 0;
                 $errors[] = [
@@ -606,10 +618,10 @@ class TransferController extends BaseApiController
             ->orderBy('id', 'desc')
             ->first();
 
-        $sequence = $lastTransfer 
-            ? intval(substr($lastTransfer->reference, -4)) + 1 
+        $sequence = $lastTransfer
+            ? intval(substr($lastTransfer->reference, -4)) + 1
             : 1;
 
-        return $prefix . $date . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        return $prefix.$date.str_pad($sequence, 4, '0', STR_PAD_LEFT);
     }
 }

@@ -3,11 +3,10 @@
 namespace Modules\AccountingCore\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\AddonService\AddonService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Modules\AccountingCore\app\Models\BasicTransaction;
-use Modules\AccountingCore\app\Models\BasicTransactionCategory;
-use Carbon\Carbon;
-use App\Services\AddonService\AddonService;
 
 class DashboardController extends Controller
 {
@@ -35,17 +34,17 @@ class DashboardController extends Controller
 
         // Get summary statistics
         $summary = BasicTransaction::getSummaryForPeriod($startDate, $endDate);
-        
+
         // Get running balance
         $runningBalance = BasicTransaction::getRunningBalance($endDate);
-        
+
         // Get recent transactions
         $recentTransactions = BasicTransaction::with(['category', 'createdBy'])
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
-        
+
         // Get top expense categories for the period (for donut chart)
         $topCategories = BasicTransaction::expense()
             ->forDateRange($startDate, $endDate)
@@ -59,17 +58,17 @@ class DashboardController extends Controller
                 return (object) [
                     'name' => $item->category ? $item->category->name : 'Unknown',
                     'total' => floatval($item->total),
-                    'transaction_count' => intval($item->transaction_count)
+                    'transaction_count' => intval($item->transaction_count),
                 ];
             });
-        
+
         // Get chart data for income vs expense
         $chartData = $this->getMonthlyTrend();
-        
+
         // Breadcrumb data
         $breadcrumbs = [
             ['name' => __('Accounting'), 'url' => route('accountingcore.dashboard')],
-            ['name' => __('Dashboard'), 'url' => '']
+            ['name' => __('Dashboard'), 'url' => ''],
         ];
 
         return view('accountingcore::dashboard.index', compact(
@@ -93,20 +92,20 @@ class DashboardController extends Controller
         $incomeData = [];
         $expenseData = [];
         $labels = [];
-        
+
         // Show only last 6 months for cleaner display
         for ($i = 5; $i >= 0; $i--) {
             $month = now()->subMonths($i);
             $startOfMonth = $month->copy()->startOfMonth();
             $endOfMonth = $month->copy()->endOfMonth();
-            
+
             $monthSummary = BasicTransaction::getSummaryForPeriod($startOfMonth, $endOfMonth);
-            
+
             $labels[] = $month->format('M');
             $incomeData[] = floatval($monthSummary['income']);
             $expenseData[] = floatval($monthSummary['expense']);
         }
-        
+
         return [
             'labels' => $labels,
             'income' => $incomeData,
@@ -120,7 +119,7 @@ class DashboardController extends Controller
     public function statistics(Request $request)
     {
         $period = $request->get('period', 'this_month');
-        
+
         switch ($period) {
             case 'last_month':
                 $startDate = now()->subMonth()->startOfMonth();
@@ -135,16 +134,16 @@ class DashboardController extends Controller
                 $endDate = now()->endOfMonth();
                 break;
         }
-        
+
         // Get chart data for the selected period
         $chartData = $this->getChartDataForPeriod($startDate, $endDate);
-        
+
         return response()->json([
             'success' => true,
-            'chartData' => $chartData
+            'chartData' => $chartData,
         ]);
     }
-    
+
     /**
      * Get chart data for a specific period.
      */
@@ -153,23 +152,23 @@ class DashboardController extends Controller
         $incomeData = [];
         $expenseData = [];
         $labels = [];
-        
+
         // Determine the interval based on date range
         $diffInDays = $startDate->diffInDays($endDate);
-        
+
         if ($diffInDays <= 31) {
             // Daily data for month view
             $current = $startDate->copy();
             while ($current <= $endDate) {
                 $dayStart = $current->copy()->startOfDay();
                 $dayEnd = $current->copy()->endOfDay();
-                
+
                 $daySummary = BasicTransaction::getSummaryForPeriod($dayStart, $dayEnd);
-                
+
                 $labels[] = $current->format('d');
                 $incomeData[] = $daySummary['income'];
                 $expenseData[] = $daySummary['expense'];
-                
+
                 $current->addDay();
             }
         } else {
@@ -178,21 +177,21 @@ class DashboardController extends Controller
             while ($current <= $endDate) {
                 $monthStart = $current->copy()->startOfMonth();
                 $monthEnd = $current->copy()->endOfMonth();
-                
+
                 if ($monthEnd > $endDate) {
                     $monthEnd = $endDate;
                 }
-                
+
                 $monthSummary = BasicTransaction::getSummaryForPeriod($monthStart, $monthEnd);
-                
+
                 $labels[] = $current->format('M');
                 $incomeData[] = $monthSummary['income'];
                 $expenseData[] = $monthSummary['expense'];
-                
+
                 $current->addMonth();
             }
         }
-        
+
         return [
             'labels' => $labels,
             'income' => $incomeData,

@@ -213,7 +213,7 @@ class WMSInventoryCoreSettings extends BaseModuleSettings
     public function getSettingsDefinition(): array
     {
         $settings = parent::getSettingsDefinition();
-        
+
         // Dynamically populate warehouse options for default_warehouse_id
         if (isset($settings['warehouse_operations']['default_warehouse_id'])) {
             $warehouses = DB::table('warehouses')
@@ -222,10 +222,10 @@ class WMSInventoryCoreSettings extends BaseModuleSettings
                 ->get()
                 ->pluck('name', 'id')
                 ->toArray();
-            
+
             $settings['warehouse_operations']['default_warehouse_id']['options'] = $warehouses;
         }
-        
+
         return $settings;
     }
 }

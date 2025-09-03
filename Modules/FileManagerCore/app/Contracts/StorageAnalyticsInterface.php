@@ -2,7 +2,4 @@
 
 namespace Modules\FileManagerCore\Interfaces;
 
-interface StorageAnalyticsInterface
-{
-
-}
+interface StorageAnalyticsInterface {}

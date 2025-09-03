@@ -2,16 +2,16 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use Database\Seeders\DemoSeeder;
 use Database\Seeders\ERPPermissionSeeder;
 use Database\Seeders\ERPRoleSeeder;
 use Database\Seeders\SystemSettingsSeeder;
-use Database\Seeders\DemoSeeder;
-use Modules\HRCore\database\seeders\HRCoreDemoDataSeeder;
-use Modules\HRCore\database\seeders\LeaveTypeSeeder;
-use Modules\HRCore\database\seeders\ExpenseTypeSeeder;
-use Modules\HRCore\database\seeders\HRCoreSettingsSeeder;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Modules\HRCore\database\seeders\ExpenseTypeSeeder;
+use Modules\HRCore\database\seeders\HRCoreDemoDataSeeder;
+use Modules\HRCore\database\seeders\HRCoreSettingsSeeder;
+use Modules\HRCore\database\seeders\LeaveTypeSeeder;
 use Nwidart\Modules\Facades\Module;
 
 class DemoSetupCommand extends Command
@@ -52,7 +52,7 @@ class DemoSetupCommand extends Command
         }
 
         // Step 1: Seed permissions (base + module permissions)
-        if (!$this->option('skip-permissions')) {
+        if (! $this->option('skip-permissions')) {
             $this->info('Step 1: Seeding permissions and roles...');
 
             // Base permissions
@@ -102,7 +102,7 @@ class DemoSetupCommand extends Command
         $this->newLine();
 
         // Step 6: Seed module demo data (following migrate:erp order)
-        if (!$this->option('skip-modules')) {
+        if (! $this->option('skip-modules')) {
             $this->info('Step 6: Seeding module demo data...');
             $this->seedModuleDemoData();
             $this->info('✓ Module demo data completed');
@@ -149,8 +149,9 @@ class DemoSetupCommand extends Command
 
                 // Check if module is enabled
                 $module = Module::find($moduleName);
-                if ($module && !$module->isEnabled()) {
+                if ($module && ! $module->isEnabled()) {
                     $this->warn("  ⏩ Skipping disabled module: {$moduleName}");
+
                     continue;
                 }
 
@@ -158,7 +159,7 @@ class DemoSetupCommand extends Command
                 try {
                     $this->call('db:seed', ['--class' => $seederClass]);
                 } catch (\Exception $e) {
-                    $this->warn("    ⚠ Could not seed {$moduleName} permissions: " . $e->getMessage());
+                    $this->warn("    ⚠ Could not seed {$moduleName} permissions: ".$e->getMessage());
                 }
             }
         }
@@ -185,7 +186,7 @@ class DemoSetupCommand extends Command
         $modules = [];
         $modulesPath = base_path('Modules');
 
-        if (!File::exists($modulesPath)) {
+        if (! File::exists($modulesPath)) {
             return [];
         }
 
@@ -196,11 +197,11 @@ class DemoSetupCommand extends Command
 
             // Check if module is enabled
             $module = Module::find($moduleName);
-            if ($module && !$module->isEnabled()) {
+            if ($module && ! $module->isEnabled()) {
                 continue; // Skip disabled modules
             }
 
-            $moduleJsonPath = $moduleDir . '/module.json';
+            $moduleJsonPath = $moduleDir.'/module.json';
 
             if (File::exists($moduleJsonPath)) {
                 $moduleConfig = json_decode(File::get($moduleJsonPath), true);
@@ -232,7 +233,7 @@ class DemoSetupCommand extends Command
         unset($modules['HRCore']);
 
         // Sort remaining by priority
-        uasort($modules, function($a, $b) {
+        uasort($modules, function ($a, $b) {
             return $a['priority'] <=> $b['priority'];
         });
 
@@ -250,21 +251,22 @@ class DemoSetupCommand extends Command
     {
         // Check if module is enabled
         $module = Module::find($moduleName);
-        if ($module && !$module->isEnabled()) {
+        if ($module && ! $module->isEnabled()) {
             $this->warn("  ⏩ Skipping disabled module: {$moduleName}");
+
             return;
         }
 
         $seederClass = "Modules\\{$moduleName}\\database\\seeders\\{$moduleName}DatabaseSeeder";
 
         // Try alternative naming patterns
-        if (!class_exists($seederClass)) {
+        if (! class_exists($seederClass)) {
             $seederClass = "Modules\\{$moduleName}\\Database\\Seeders\\{$moduleName}DatabaseSeeder";
         }
-        if (!class_exists($seederClass)) {
+        if (! class_exists($seederClass)) {
             $seederClass = "Modules\\{$moduleName}\\database\\seeders\\{$moduleName}Seeder";
         }
-        if (!class_exists($seederClass)) {
+        if (! class_exists($seederClass)) {
             $seederClass = "Modules\\{$moduleName}\\Database\\Seeders\\{$moduleName}Seeder";
         }
 
@@ -273,7 +275,7 @@ class DemoSetupCommand extends Command
             try {
                 $this->call('module:seed', ['module' => $moduleName]);
             } catch (\Exception $e) {
-                $this->warn("    ⚠ Could not seed {$moduleName}: " . $e->getMessage());
+                $this->warn("    ⚠ Could not seed {$moduleName}: ".$e->getMessage());
             }
         }
     }
@@ -313,6 +315,7 @@ class DemoSetupCommand extends Command
         if (preg_match('/Modules\\\\(.+?)\\\\/', $seederClass, $matches)) {
             return $matches[1];
         }
+
         return 'Unknown';
     }
 }

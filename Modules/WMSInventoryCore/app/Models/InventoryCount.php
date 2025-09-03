@@ -19,13 +19,13 @@ class InventoryCount extends Model
         'started_at',
         'completed_at',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
         'count_date' => 'date',
         'started_at' => 'datetime',
-        'completed_at' => 'datetime'
+        'completed_at' => 'datetime',
     ];
 
     /**
@@ -82,9 +82,12 @@ class InventoryCount extends Model
     public function getCountProgressAttribute()
     {
         $totalItems = $this->items->count();
-        if ($totalItems === 0) return 0;
+        if ($totalItems === 0) {
+            return 0;
+        }
 
         $countedItems = $this->items->whereNotNull('counted_quantity')->count();
+
         return ($countedItems / $totalItems) * 100;
     }
 }

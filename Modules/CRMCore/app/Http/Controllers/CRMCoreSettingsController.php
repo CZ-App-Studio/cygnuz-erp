@@ -5,17 +5,18 @@ namespace Modules\CRMCore\app\Http\Controllers;
 use App\ApiClasses\Error;
 use App\ApiClasses\Success;
 use App\Http\Controllers\Controller;
+use App\Services\Settings\ModuleSettingsService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Modules\CRMCore\app\Settings\CRMCoreSettings;
-use App\Services\Settings\ModuleSettingsService;
 
 class CRMCoreSettingsController extends Controller
 {
     protected CRMCoreSettings $crmCoreSettings;
+
     protected ModuleSettingsService $settingsService;
 
     public function __construct(CRMCoreSettings $crmCoreSettings, ModuleSettingsService $settingsService)
@@ -38,7 +39,7 @@ class CRMCoreSettingsController extends Controller
         try {
             $settings = $this->crmCoreSettings->getCurrentValues();
             $settingsStructure = $this->crmCoreSettings->getSettingsDefinition();
-            
+
             return Success::response([
                 'settings' => $settings,
                 'structure' => $settingsStructure,
@@ -46,10 +47,11 @@ class CRMCoreSettingsController extends Controller
                     'name' => $this->crmCoreSettings->getModuleName(),
                     'description' => $this->crmCoreSettings->getModuleDescription(),
                     'icon' => $this->crmCoreSettings->getModuleIcon(),
-                ]
+                ],
             ]);
         } catch (Exception $e) {
-            Log::error('CRMCoreSettings show error: ' . $e->getMessage());
+            Log::error('CRMCoreSettings show error: '.$e->getMessage());
+
             return Error::response(__('Failed to load CRM settings.'));
         }
     }
@@ -60,7 +62,7 @@ class CRMCoreSettingsController extends Controller
             // Get all settings structure for validation
             $settingsStructure = $this->crmCoreSettings->getSettingsDefinition();
             $validationRules = [];
-            
+
             // Build validation rules from settings structure
             foreach ($settingsStructure as $groupSettings) {
                 foreach ($groupSettings as $key => $setting) {
@@ -78,7 +80,7 @@ class CRMCoreSettingsController extends Controller
             }
 
             DB::beginTransaction();
-            
+
             // Update each setting
             foreach ($request->all() as $key => $value) {
                 if ($key !== '_token' && $key !== '_method') {
@@ -86,20 +88,21 @@ class CRMCoreSettingsController extends Controller
                     if (in_array($value, ['true', 'false'])) {
                         $value = $value === 'true';
                     }
-                    
+
                     $this->settingsService->set('CRMCore', $key, $value);
                 }
             }
 
             DB::commit();
-            
+
             return Success::response([
                 'message' => __('CRM settings updated successfully!'),
-                'settings' => $this->crmCoreSettings->getCurrentValues()
+                'settings' => $this->crmCoreSettings->getCurrentValues(),
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('CRMCoreSettings update failed: ' . $e->getMessage());
+            Log::error('CRMCoreSettings update failed: '.$e->getMessage());
+
             return Error::response(__('Failed to update CRM settings. Please try again.'));
         }
     }
@@ -107,14 +110,14 @@ class CRMCoreSettingsController extends Controller
     public function reset()
     {
         // Additional permission check for reset operation
-        abort_if(!auth()->user()->can('manage-crm-settings'), 403, 'You do not have permission to reset CRM settings.');
-        
+        abort_if(! auth()->user()->can('manage-crm-settings'), 403, 'You do not have permission to reset CRM settings.');
+
         try {
             DB::beginTransaction();
-            
+
             // Reset all settings to default values
             $settingsStructure = $this->crmCoreSettings->getSettingsDefinition();
-            
+
             foreach ($settingsStructure as $groupSettings) {
                 foreach ($groupSettings as $key => $setting) {
                     if (isset($setting['default'])) {
@@ -124,14 +127,15 @@ class CRMCoreSettingsController extends Controller
             }
 
             DB::commit();
-            
+
             return Success::response([
                 'message' => __('CRM settings reset to default values successfully!'),
-                'settings' => $this->crmCoreSettings->getCurrentValues()
+                'settings' => $this->crmCoreSettings->getCurrentValues(),
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('CRMCoreSettings reset failed: ' . $e->getMessage());
+            Log::error('CRMCoreSettings reset failed: '.$e->getMessage());
+
             return Error::response(__('Failed to reset CRM settings. Please try again.'));
         }
     }
@@ -139,26 +143,27 @@ class CRMCoreSettingsController extends Controller
     public function export()
     {
         // Check export permission
-        abort_if(!auth()->user()->can('export-crm-settings'), 403, 'You do not have permission to export CRM settings.');
-        
+        abort_if(! auth()->user()->can('export-crm-settings'), 403, 'You do not have permission to export CRM settings.');
+
         try {
             $settings = $this->crmCoreSettings->getCurrentValues();
             $settingsStructure = $this->crmCoreSettings->getSettingsDefinition();
-            
+
             $exportData = [
                 'module' => 'CRMCore',
                 'exported_at' => now()->toISOString(),
                 'settings' => $settings,
-                'structure' => $settingsStructure
+                'structure' => $settingsStructure,
             ];
-            
-            $fileName = 'crm_settings_' . now()->format('Y-m-d_H-i-s') . '.json';
-            
+
+            $fileName = 'crm_settings_'.now()->format('Y-m-d_H-i-s').'.json';
+
             return response()->json($exportData)
                 ->header('Content-Type', 'application/json')
                 ->header('Content-Disposition', "attachment; filename=\"{$fileName}\"");
         } catch (Exception $e) {
-            Log::error('CRMCoreSettings export failed: ' . $e->getMessage());
+            Log::error('CRMCoreSettings export failed: '.$e->getMessage());
+
             return Error::response(__('Failed to export CRM settings.'));
         }
     }
@@ -166,8 +171,8 @@ class CRMCoreSettingsController extends Controller
     public function import(Request $request)
     {
         // Check import permission
-        abort_if(!auth()->user()->can('import-crm-settings'), 403, 'You do not have permission to import CRM settings.');
-        
+        abort_if(! auth()->user()->can('import-crm-settings'), 403, 'You do not have permission to import CRM settings.');
+
         $validator = Validator::make($request->all(), [
             'settings_file' => 'required|file|mimes:json|max:2048',
         ]);
@@ -181,7 +186,7 @@ class CRMCoreSettingsController extends Controller
             $content = file_get_contents($file->getRealPath());
             $importData = json_decode($content, true);
 
-            if (!$importData || !isset($importData['settings'])) {
+            if (! $importData || ! isset($importData['settings'])) {
                 return Error::response(__('Invalid settings file format.'));
             }
 
@@ -194,7 +199,7 @@ class CRMCoreSettingsController extends Controller
             // Get current settings structure for validation
             $settingsStructure = $this->crmCoreSettings->getSettingsDefinition();
             $validKeys = [];
-            
+
             foreach ($settingsStructure as $groupSettings) {
                 $validKeys = array_merge($validKeys, array_keys($groupSettings));
             }
@@ -210,11 +215,12 @@ class CRMCoreSettingsController extends Controller
 
             return Success::response([
                 'message' => __('CRM settings imported successfully!'),
-                'settings' => $this->crmCoreSettings->getCurrentValues()
+                'settings' => $this->crmCoreSettings->getCurrentValues(),
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('CRMCoreSettings import failed: ' . $e->getMessage());
+            Log::error('CRMCoreSettings import failed: '.$e->getMessage());
+
             return Error::response(__('Failed to import CRM settings. Please try again.'));
         }
     }
@@ -222,8 +228,8 @@ class CRMCoreSettingsController extends Controller
     public function updateSingleSetting(Request $request)
     {
         // Check manage permission
-        abort_if(!auth()->user()->can('manage-crm-settings'), 403, 'You do not have permission to manage CRM settings.');
-        
+        abort_if(! auth()->user()->can('manage-crm-settings'), 403, 'You do not have permission to manage CRM settings.');
+
         $validator = Validator::make($request->all(), [
             'key' => 'required|string',
             'value' => 'required',
@@ -236,7 +242,7 @@ class CRMCoreSettingsController extends Controller
         try {
             $key = $request->key;
             $value = $request->value;
-            
+
             // Convert boolean strings to actual boolean values
             if (in_array($value, ['true', 'false'])) {
                 $value = $value === 'true';
@@ -245,17 +251,17 @@ class CRMCoreSettingsController extends Controller
             // Validate against settings structure
             $settingsStructure = $this->crmCoreSettings->getSettingsDefinition();
             $isValidKey = false;
-            
+
             foreach ($settingsStructure as $groupSettings) {
                 if (array_key_exists($key, $groupSettings)) {
                     $isValidKey = true;
-                    
+
                     // Validate the value if validation rules exist
                     if (isset($groupSettings[$key]['validation'])) {
                         $valueValidator = Validator::make(['value' => $value], [
-                            'value' => $groupSettings[$key]['validation']
+                            'value' => $groupSettings[$key]['validation'],
                         ]);
-                        
+
                         if ($valueValidator->fails()) {
                             return Error::response($valueValidator->errors()->first(), 422);
                         }
@@ -264,7 +270,7 @@ class CRMCoreSettingsController extends Controller
                 }
             }
 
-            if (!$isValidKey) {
+            if (! $isValidKey) {
                 return Error::response(__('Invalid setting key.'));
             }
 
@@ -273,10 +279,11 @@ class CRMCoreSettingsController extends Controller
             return Success::response([
                 'message' => __('Setting updated successfully!'),
                 'key' => $key,
-                'value' => $value
+                'value' => $value,
             ]);
         } catch (Exception $e) {
-            Log::error('CRMCoreSettings updateSingleSetting failed: ' . $e->getMessage());
+            Log::error('CRMCoreSettings updateSingleSetting failed: '.$e->getMessage());
+
             return Error::response(__('Failed to update setting. Please try again.'));
         }
     }
@@ -288,9 +295,11 @@ class CRMCoreSettingsController extends Controller
     {
         try {
             $settings = $this->crmCoreSettings->getCurrentValues();
+
             return Success::response($settings);
         } catch (Exception $e) {
-            Log::error('CRMCoreSettings getSettings error: ' . $e->getMessage());
+            Log::error('CRMCoreSettings getSettings error: '.$e->getMessage());
+
             return Error::response(__('Failed to load CRM settings.'));
         }
     }
@@ -315,10 +324,11 @@ class CRMCoreSettingsController extends Controller
 
             return Success::response([
                 'key' => $key,
-                'value' => $value
+                'value' => $value,
             ]);
         } catch (Exception $e) {
-            Log::error('CRMCoreSettings getSetting failed: ' . $e->getMessage());
+            Log::error('CRMCoreSettings getSetting failed: '.$e->getMessage());
+
             return Error::response(__('Failed to get setting value.'));
         }
     }

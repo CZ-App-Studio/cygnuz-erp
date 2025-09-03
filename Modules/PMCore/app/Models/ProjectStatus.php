@@ -2,16 +2,16 @@
 
 namespace Modules\PMCore\app\Models;
 
+use App\Traits\UserActionsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\UserActionsTrait;
-use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
+use OwenIt\Auditing\Contracts\Auditable;
 
 class ProjectStatus extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'project_statuses';
 
@@ -130,7 +130,7 @@ class ProjectStatus extends Model implements Auditable
     {
         // Remove default from all other statuses
         static::where('is_default', true)->update(['is_default' => false]);
-        
+
         // Set this as default
         return $this->update(['is_default' => true]);
     }
@@ -151,7 +151,7 @@ class ProjectStatus extends Model implements Auditable
         foreach ($orderedIds as $position => $id) {
             static::where('id', $id)->update(['sort_order' => $position]);
         }
-        
+
         return true;
     }
 }

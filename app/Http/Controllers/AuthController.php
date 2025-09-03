@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Enums\UserAccountStatus;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Services\AddonService\AddonService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use App\Services\AddonService\AddonService;
+
 // Optional module imports - checked before use
 // use Modules\GoogleReCAPTCHA\app\Rules\ReCaptchaRule;
 // use Modules\GoogleReCAPTCHA\app\Services\ReCaptchaService;
@@ -33,7 +34,7 @@ class AuthController extends Controller
             // Add reCAPTCHA validation if module is enabled
             $addonService = app(AddonService::class);
             if ($addonService->isAddonEnabled('GoogleReCAPTCHA')) {
-                if (class_exists('\Modules\GoogleReCAPTCHA\app\Services\ReCaptchaService') && 
+                if (class_exists('\Modules\GoogleReCAPTCHA\app\Services\ReCaptchaService') &&
                     class_exists('\Modules\GoogleReCAPTCHA\app\Rules\ReCaptchaRule')) {
                     $recaptchaService = app('\Modules\GoogleReCAPTCHA\app\Services\ReCaptchaService');
                     if ($recaptchaService->isEnabled()) {
@@ -58,14 +59,14 @@ class AuthController extends Controller
 
                 if (Auth::attempt($credentials, $request->rememberMe ?? false)) {
                     // Check if 2FA is required
-                    Log::info('Login successful for user: ' . $user->email);
-                    
+                    Log::info('Login successful for user: '.$user->email);
+
                     if (class_exists(\Modules\TwoFactorAuth\app\Services\TwoFactorAuthService::class)) {
                         Log::info('TwoFactorAuthService class exists');
                         $twoFactorService = app(\Modules\TwoFactorAuth\app\Services\TwoFactorAuthService::class);
                         $isRequired = $twoFactorService->isRequired($user);
-                        Log::info('2FA required check: ' . ($isRequired ? 'true' : 'false'));
-                        
+                        Log::info('2FA required check: '.($isRequired ? 'true' : 'false'));
+
                         if ($isRequired) {
                             // Store user ID and remember me status in session
                             session(['2fa_user_id' => $user->id]);
@@ -78,9 +79,10 @@ class AuthController extends Controller
 
                             // Save session before redirect
                             session()->save();
-                            
+
                             // Redirect to 2FA verification
-                            Log::info('About to redirect to: ' . route('twofactorauth.verify'));
+                            Log::info('About to redirect to: '.route('twofactorauth.verify'));
+
                             return redirect('/2fa/verify');
                         }
                     } else {

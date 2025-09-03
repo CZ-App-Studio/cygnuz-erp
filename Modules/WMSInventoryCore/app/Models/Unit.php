@@ -17,6 +17,14 @@ class Unit extends Model implements Auditable
 
     protected $table = 'units';
 
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Modules\WMSInventoryCore\Database\Factories\UnitFactory::new();
+    }
+
     protected $fillable = [
         'name',
         'code',

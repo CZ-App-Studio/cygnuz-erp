@@ -17,6 +17,7 @@ use Modules\AiChat\Http\Controllers\AIChatEnhancedController;
 
 Route::group(['middleware' => function ($request, $next) {
     $request->headers->set('addon', ModuleConstants::AI_CHAT);
+
     return $next($request);
 }], function () {
     Route::middleware([
@@ -28,7 +29,7 @@ Route::group(['middleware' => function ($request, $next) {
         Route::prefix('aichat')->name('aichat.')->group(function () {
             // Main chat interface
             Route::get('/', [AIChatEnhancedController::class, 'index'])->name('index');
-            
+
             // Chat management
             Route::post('/create', [AIChatEnhancedController::class, 'createChat'])->name('create');
             Route::post('/send', [AIChatEnhancedController::class, 'sendMessage'])->name('send');
@@ -37,14 +38,14 @@ Route::group(['middleware' => function ($request, $next) {
             Route::post('/chat/{chatId}/archive', [AIChatEnhancedController::class, 'archiveChat'])->name('archive');
             Route::post('/chat/{chatId}/clear', [AIChatEnhancedController::class, 'clearChat'])->name('clear');
             Route::get('/chat/{chatId}/export', [AIChatEnhancedController::class, 'exportChat'])->name('export');
-            
+
             // Search and statistics
             Route::get('/search', [AIChatEnhancedController::class, 'searchChats'])->name('search');
             Route::get('/statistics', [AIChatEnhancedController::class, 'getChatStatistics'])->name('statistics');
-            
+
             // Message actions
             Route::post('/message/{messageId}/pin', [AIChatEnhancedController::class, 'toggleMessagePin'])->name('message.pin');
-            
+
             // API endpoints using AICore
             Route::post('/api/chat', [AiChatController::class, 'chat'])->name('api.chat');
             Route::post('/api/complete', [AiChatController::class, 'complete'])->name('api.complete');
@@ -54,7 +55,7 @@ Route::group(['middleware' => function ($request, $next) {
             Route::get('/api/providers', [AiChatController::class, 'getProviders'])->name('api.providers');
             Route::post('/api/test-provider', [AiChatController::class, 'testProvider'])->name('api.test-provider');
         });
-        
+
         // Legacy routes (kept for backward compatibility)
         Route::prefix('aiChat')->group(function () {
             Route::get('/', function () {

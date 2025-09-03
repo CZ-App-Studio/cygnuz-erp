@@ -2,12 +2,12 @@
 
 namespace Modules\PMCore\Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Modules\PMCore\app\Models\Project;
+use Modules\PMCore\app\Enums\ProjectPriority;
 use Modules\PMCore\app\Enums\ProjectStatus;
 use Modules\PMCore\app\Enums\ProjectType;
-use Modules\PMCore\app\Enums\ProjectPriority;
-use App\Models\User;
+use Modules\PMCore\app\Models\Project;
 
 class ProjectSeeder extends Seeder
 {
@@ -18,9 +18,10 @@ class ProjectSeeder extends Seeder
     {
         // Get first user as project manager
         $user = User::first();
-        
-        if (!$user) {
+
+        if (! $user) {
             $this->command->info('No users found. Skipping project seeder.');
+
             return;
         }
 
@@ -175,7 +176,7 @@ class ProjectSeeder extends Seeder
 
         foreach ($projects as $projectData) {
             $project = Project::create($projectData);
-            
+
             // Add project manager as member
             $project->addMember($user->id, [
                 'role' => 'manager',
@@ -183,6 +184,6 @@ class ProjectSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Created ' . count($projects) . ' sample projects.');
+        $this->command->info('Created '.count($projects).' sample projects.');
     }
 }

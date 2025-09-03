@@ -3,8 +3,8 @@
 namespace Modules\PMCore\app\Policies;
 
 use App\Models\User;
-use Modules\PMCore\app\Models\Timesheet;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Modules\PMCore\app\Models\Timesheet;
 
 class TimesheetPolicy
 {
@@ -81,7 +81,7 @@ class TimesheetPolicy
      */
     public function submit(User $user, Timesheet $timesheet): bool
     {
-        return $user->can('pmcore.submit-timesheet') && 
+        return $user->can('pmcore.submit-timesheet') &&
                $timesheet->user_id === $user->id &&
                $timesheet->status === 'draft';
     }

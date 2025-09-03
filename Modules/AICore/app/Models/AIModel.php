@@ -2,8 +2,8 @@
 
 namespace Modules\AICore\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -23,7 +23,7 @@ class AIModel extends Model
         'cost_per_input_token',
         'cost_per_output_token',
         'is_active',
-        'configuration'
+        'configuration',
     ];
 
     protected $casts = [
@@ -32,7 +32,7 @@ class AIModel extends Model
         'supports_streaming' => 'boolean',
         'max_tokens' => 'integer',
         'cost_per_input_token' => 'decimal:8',
-        'cost_per_output_token' => 'decimal:8'
+        'cost_per_output_token' => 'decimal:8',
     ];
 
     /**
@@ -58,7 +58,7 @@ class AIModel extends Model
     {
         $inputCost = $inputTokens * ($this->cost_per_input_token ?? 0);
         $outputCost = $outputTokens * ($this->cost_per_output_token ?? 0);
-        
+
         return round($inputCost + $outputCost, 6);
     }
 
@@ -78,7 +78,7 @@ class AIModel extends Model
         $capabilities = [
             'max_tokens' => $this->max_tokens,
             'supports_streaming' => $this->supports_streaming,
-            'type' => $this->type
+            'type' => $this->type,
         ];
 
         // Add configuration-based capabilities
@@ -129,9 +129,9 @@ class AIModel extends Model
             'total_cost' => $logs->total_cost ?? 0,
             'avg_processing_time' => $logs->avg_processing_time ?? 0,
             'successful_requests' => $logs->successful_requests ?? 0,
-            'success_rate' => $logs->total_requests > 0 
-                ? round(($logs->successful_requests / $logs->total_requests) * 100, 2) 
-                : 0
+            'success_rate' => $logs->total_requests > 0
+                ? round(($logs->successful_requests / $logs->total_requests) * 100, 2)
+                : 0,
         ];
     }
 

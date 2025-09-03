@@ -23,11 +23,11 @@ class SettingsCacheManager
     public function remember(string $key, Closure $callback, ?int $ttl = null)
     {
         $ttl = $ttl ?? $this->ttl;
-        
+
         if ($this->supportsTags()) {
             return Cache::tags($this->tags)->remember($key, $ttl, $callback);
         }
-        
+
         return Cache::remember($key, $ttl, $callback);
     }
 
@@ -39,7 +39,7 @@ class SettingsCacheManager
         if ($this->supportsTags()) {
             return Cache::tags($this->tags)->forget($key);
         }
-        
+
         return Cache::forget($key);
     }
 
@@ -51,21 +51,21 @@ class SettingsCacheManager
         if ($this->supportsTags()) {
             return Cache::tags($this->tags)->flush();
         }
-        
+
         // If tags not supported, manually clear known keys
         $keys = [
             'system_settings',
             'module_settings_all',
             'global_settings',
         ];
-        
+
         foreach ($keys as $key) {
             Cache::forget($key);
         }
-        
+
         // Clear module-specific caches
         $this->clearModuleCaches();
-        
+
         return true;
     }
 
@@ -75,6 +75,7 @@ class SettingsCacheManager
     public function tags(array $tags): self
     {
         $this->tags = array_merge(['settings'], $tags);
+
         return $this;
     }
 
@@ -84,6 +85,7 @@ class SettingsCacheManager
     public function ttl(int $seconds): self
     {
         $this->ttl = $seconds;
+
         return $this;
     }
 
@@ -95,7 +97,7 @@ class SettingsCacheManager
         if ($this->supportsTags()) {
             return Cache::tags($this->tags)->get($key, $default);
         }
-        
+
         return Cache::get($key, $default);
     }
 
@@ -105,11 +107,11 @@ class SettingsCacheManager
     public function put(string $key, $value, ?int $ttl = null): bool
     {
         $ttl = $ttl ?? $this->ttl;
-        
+
         if ($this->supportsTags()) {
             return Cache::tags($this->tags)->put($key, $value, $ttl);
         }
-        
+
         return Cache::put($key, $value, $ttl);
     }
 
@@ -119,6 +121,7 @@ class SettingsCacheManager
     protected function supportsTags(): bool
     {
         $driver = Cache::getDefaultDriver();
+
         return in_array($driver, ['redis', 'memcached', 'dynamodb', 'apc']);
     }
 
@@ -133,7 +136,7 @@ class SettingsCacheManager
             'module_settings_*',
             'module_config_*',
         ];
-        
+
         if (Cache::getDefaultDriver() === 'redis') {
             foreach ($patterns as $pattern) {
                 $keys = Cache::connection()->keys($pattern);
@@ -151,7 +154,7 @@ class SettingsCacheManager
     {
         // Load system settings
         app(SettingsService::class)->refresh();
-        
+
         // Load module settings
         app(ModuleSettingsService::class)->getAllGrouped();
     }

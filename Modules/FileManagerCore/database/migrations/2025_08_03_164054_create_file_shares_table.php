@@ -20,11 +20,11 @@ return new class extends Migration
             $table->unsignedInteger('max_downloads')->nullable();
             $table->unsignedBigInteger('created_by_id');
             $table->timestamps();
-            
+
             $table->index(['file_id', 'shared_with_type', 'shared_with_id']);
             $table->index('share_token');
             $table->index('expires_at');
-            
+
             $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
             $table->foreign('created_by_id')->references('id')->on('users')->onDelete('cascade');
         });

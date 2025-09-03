@@ -32,14 +32,14 @@ class ModuleAccessMiddleware
      */
     public function handle(Request $request, Closure $next, string $module): Response
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
         $user = Auth::user();
         $userRole = $user->roles()->first();
 
-        if (!$userRole) {
+        if (! $userRole) {
             abort(403, 'No role assigned to user.');
         }
 

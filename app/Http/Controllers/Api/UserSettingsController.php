@@ -10,70 +10,70 @@ use Illuminate\Http\Request;
 
 class UserSettingsController extends Controller
 {
-  public function getAll()
-  {
-    $userSettings = auth()->user()->userSettings();
+    public function getAll()
+    {
+        $userSettings = auth()->user()->userSettings();
 
-    $response = [];
-    foreach ($userSettings as $userSetting) {
-      $response[$userSetting->key] = $userSetting->value;
+        $response = [];
+        foreach ($userSettings as $userSetting) {
+            $response[$userSetting->key] = $userSetting->value;
+        }
+
+        return Success::response($response);
     }
 
-    return Success::response($response);
-  }
+    public function getByKey(Request $request)
+    {
+        $validated = $request->validate([
+            'key' => 'required|string',
+        ]);
 
-  public function getByKey(Request $request)
-  {
-    $validated = $request->validate([
-      'key' => 'required|string',
-    ]);
+        $userSetting = auth()->user()->userSettings()->first();
 
-    $userSetting = auth()->user()->userSettings()->first();
+        if (! $userSetting) {
+            return Error::response('Setting not found', 404);
+        }
 
-    if (!$userSetting) {
-      return Error::response('Setting not found', 404);
+        return Success::response($userSetting->value);
     }
 
-    return Success::response($userSetting->value);
-  }
+    public function addOrUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'key' => 'required|string',
+            'value' => 'required',
+        ]);
 
-  public function addOrUpdate(Request $request)
-  {
-    $validated = $request->validate([
-      'key' => 'required|string',
-      'value' => 'required',
-    ]);
+        $userSetting = auth()->user()->userSettings()
+            ->first();
 
-    $userSetting = auth()->user()->userSettings()
-      ->first();
+        if (! $userSetting) {
+            $userSetting = new UserSettings;
+            $userSetting->user_id = auth()->id();
+            $userSetting->key = $validated['key'];
+        }
 
-    if (!$userSetting) {
-      $userSetting = new UserSettings();
-      $userSetting->user_id = auth()->id();
-      $userSetting->key = $validated['key'];
+        $userSetting->value = $validated['value'];
+        $userSetting->save();
+
+        return Success::response('Setting saved successfully');
     }
 
-    $userSetting->value = $validated['value'];
-    $userSetting->save();
+    public function delete(Request $request)
+    {
+        $validated = $request->validate([
+            'key' => 'required|string',
+        ]);
 
-    return Success::response('Setting saved successfully');
-  }
+        $userSetting = auth()->user()->userSettings()
+            ->first();
 
-  public function delete(Request $request)
-  {
-    $validated = $request->validate([
-      'key' => 'required|string',
-    ]);
+        if (! $userSetting) {
+            return Error::response('Setting not found', 404);
+        }
 
-    $userSetting = auth()->user()->userSettings()
-      ->first();
+        $userSetting->delete();
 
-    if (!$userSetting) {
-      return Error::response('Setting not found', 404);
+        return Success::response('Setting deleted successfully');
     }
-
-    $userSetting->delete();
-
-    return Success::response('Setting deleted successfully');
-  }
 }

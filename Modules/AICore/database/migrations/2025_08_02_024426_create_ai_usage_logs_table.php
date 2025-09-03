@@ -27,7 +27,7 @@ return new class extends Migration
             $table->text('error_message')->nullable();
             $table->string('request_hash', 64)->nullable();
             $table->timestamps();
-            
+
             $table->index(['company_id', 'module_name']);
             $table->index('created_at');
             $table->index('status');

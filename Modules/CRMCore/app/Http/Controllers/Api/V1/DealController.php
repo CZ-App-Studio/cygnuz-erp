@@ -12,7 +12,6 @@ use Modules\CRMCore\app\Http\Resources\DealResource;
 use Modules\CRMCore\app\Models\Deal;
 use Modules\CRMCore\app\Models\DealPipeline;
 use Modules\CRMCore\app\Models\DealStage;
-use Carbon\Carbon;
 
 class DealController extends BaseApiController
 {
@@ -131,6 +130,7 @@ class DealController extends BaseApiController
             );
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->errorResponse('Failed to create deal', $e->getMessage(), 500);
         }
     }
@@ -181,10 +181,10 @@ class DealController extends BaseApiController
 
         try {
             $deal = Deal::findOrFail($id);
-            
+
             $data = $request->all();
             $data['updated_by_id'] = Auth::id();
-            
+
             $deal->update($data);
             $deal->load(['pipeline', 'stage', 'contact', 'company', 'assignedTo']);
 
@@ -223,11 +223,11 @@ class DealController extends BaseApiController
     {
         try {
             $deal = Deal::findOrFail($id);
-            
+
             if ($deal->won_at) {
                 return $this->errorResponse('Deal already marked as won', null, 400);
             }
-            
+
             if ($deal->lost_at) {
                 return $this->errorResponse('Cannot mark lost deal as won', null, 400);
             }
@@ -265,11 +265,11 @@ class DealController extends BaseApiController
 
         try {
             $deal = Deal::findOrFail($id);
-            
+
             if ($deal->lost_at) {
                 return $this->errorResponse('Deal already marked as lost', null, 400);
             }
-            
+
             if ($deal->won_at) {
                 return $this->errorResponse('Cannot mark won deal as lost', null, 400);
             }
@@ -356,7 +356,7 @@ class DealController extends BaseApiController
                 'total_value' => (clone $query)->sum('value'),
                 'won_value' => (clone $query)->whereNotNull('won_at')->sum('value'),
                 'average_deal_value' => $query->count() > 0 ? (clone $query)->avg('value') : 0,
-                'win_rate' => $query->count() > 0 
+                'win_rate' => $query->count() > 0
                     ? round(((clone $query)->whereNotNull('won_at')->count() / $query->count()) * 100, 2)
                     : 0,
                 'deals_by_pipeline' => DealPipeline::where('is_active', true)->withCount(['deals' => function ($q) use ($query) {

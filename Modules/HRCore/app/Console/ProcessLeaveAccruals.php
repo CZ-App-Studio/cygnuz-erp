@@ -2,9 +2,9 @@
 
 namespace Modules\HRCore\app\Console;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Modules\HRCore\app\Models\LeaveAccrual;
-use Carbon\Carbon;
 
 class ProcessLeaveAccruals extends Command
 {
@@ -28,19 +28,19 @@ class ProcessLeaveAccruals extends Command
     public function handle()
     {
         $date = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::now();
-        
-        $this->info("Processing leave accruals for date: " . $date->format('Y-m-d'));
-        
+
+        $this->info('Processing leave accruals for date: '.$date->format('Y-m-d'));
+
         try {
             $processedCount = LeaveAccrual::processAccruals($date);
-            
+
             $this->info("Successfully processed {$processedCount} accrual entries.");
-            
+
             return Command::SUCCESS;
-            
+
         } catch (\Exception $e) {
-            $this->error("Error processing accruals: " . $e->getMessage());
-            
+            $this->error('Error processing accruals: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

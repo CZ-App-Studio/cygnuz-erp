@@ -16,11 +16,11 @@ use Modules\FileManagerCore\app\Http\Controllers\Settings\FileManagerCoreSetting
 
 Route::group(['middleware' => ['web', 'auth']], function () {
     Route::prefix('filemanagercore')->name('filemanagercore.')->group(function () {
-        
+
         // File access routes
         Route::get('/file/{uuid}/download', [\Modules\FileManagerCore\app\Http\Controllers\FileController::class, 'download'])->name('file.download');
         Route::get('/file/{uuid}/view', [\Modules\FileManagerCore\app\Http\Controllers\FileController::class, 'view'])->name('file.view');
-        
+
         // Settings routes
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('/', [FileManagerCoreSettingsController::class, 'index'])->name('index');

@@ -2,9 +2,9 @@
 
 namespace Modules\FileManagerCore\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StorageUsage extends Model
 {
@@ -17,14 +17,14 @@ class StorageUsage extends Model
         'used_space',
         'file_count',
         'quota_limit',
-        'last_calculated_at'
+        'last_calculated_at',
     ];
 
     protected $casts = [
         'used_space' => 'integer',
         'file_count' => 'integer',
         'quota_limit' => 'integer',
-        'last_calculated_at' => 'datetime'
+        'last_calculated_at' => 'datetime',
     ];
 
     /**
@@ -84,7 +84,7 @@ class StorageUsage extends Model
      */
     public function isQuotaExceeded(): bool
     {
-        if (!$this->quota_limit) {
+        if (! $this->quota_limit) {
             return false;
         }
 
@@ -96,7 +96,7 @@ class StorageUsage extends Model
      */
     public function isNearQuotaLimit(): bool
     {
-        if (!$this->quota_limit) {
+        if (! $this->quota_limit) {
             return false;
         }
 
@@ -108,7 +108,7 @@ class StorageUsage extends Model
      */
     public function getUsagePercentage(): ?float
     {
-        if (!$this->quota_limit || $this->quota_limit === 0) {
+        if (! $this->quota_limit || $this->quota_limit === 0) {
             return null;
         }
 
@@ -120,7 +120,7 @@ class StorageUsage extends Model
      */
     public function getAvailableSpace(): ?int
     {
-        if (!$this->quota_limit) {
+        if (! $this->quota_limit) {
             return null; // Unlimited
         }
 
@@ -132,7 +132,7 @@ class StorageUsage extends Model
      */
     public function canUpload(int $fileSize): bool
     {
-        if (!$this->quota_limit) {
+        if (! $this->quota_limit) {
             return true; // No quota limit
         }
 
@@ -152,7 +152,7 @@ class StorageUsage extends Model
      */
     public function getFormattedQuotaLimit(): string
     {
-        if (!$this->quota_limit) {
+        if (! $this->quota_limit) {
             return 'Unlimited';
         }
 
@@ -165,7 +165,7 @@ class StorageUsage extends Model
     public function getFormattedAvailableSpace(): string
     {
         $available = $this->getAvailableSpace();
-        
+
         if ($available === null) {
             return 'Unlimited';
         }
@@ -179,11 +179,11 @@ class StorageUsage extends Model
     public function recalculate(): void
     {
         $stats = File::where(function ($query) {
-                if ($this->user_id) {
-                    $query->where('created_by_id', $this->user_id);
-                }
-                // Add department logic here when available
-            })
+            if ($this->user_id) {
+                $query->where('created_by_id', $this->user_id);
+            }
+            // Add department logic here when available
+        })
             ->where('storage_provider', $this->storage_provider)
             ->where('status', 'active')
             ->selectRaw('SUM(size) as total_size, COUNT(*) as total_count')
@@ -192,7 +192,7 @@ class StorageUsage extends Model
         $this->update([
             'used_space' => $stats->total_size ?? 0,
             'file_count' => $stats->total_count ?? 0,
-            'last_calculated_at' => now()
+            'last_calculated_at' => now(),
         ]);
     }
 
@@ -202,11 +202,11 @@ class StorageUsage extends Model
     private function formatBytes(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 }

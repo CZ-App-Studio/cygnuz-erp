@@ -2,12 +2,23 @@
 
 namespace Modules\WMSInventoryCore\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
+    use HasFactory;
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Modules\WMSInventoryCore\Database\Factories\CategoryFactory::new();
+    }
+
     protected $fillable = [
         'name',
         'code',
@@ -15,7 +26,7 @@ class Category extends Model
         'parent_id',
         'status',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     /**

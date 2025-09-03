@@ -6,9 +6,9 @@ use Illuminate\Support\Collection;
 
 interface ISettings
 {
-  public function isDeviceVerificationEnabled(): bool;
+    public function isDeviceVerificationEnabled(): bool;
 
-  public function getDocumentTypePrefix(): string;
+    public function getDocumentTypePrefix(): string;
 
-  public function getAllSettings(): Collection;
+    public function getAllSettings(): Collection;
 }

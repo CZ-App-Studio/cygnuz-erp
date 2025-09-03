@@ -4,20 +4,20 @@ namespace App\Enums;
 
 enum TaskUpdateType: string
 {
-  case TEXT = 'text';
+    case TEXT = 'text';
 
-  case IMAGE = 'image';
+    case IMAGE = 'image';
 
-  case FILE = 'file';
+    case FILE = 'file';
 
-  case LINK = 'link';
+    case LINK = 'link';
 
-  case START = 'start';
+    case START = 'start';
 
-  case COMPLETE = 'complete';
+    case COMPLETE = 'complete';
 
-  case HOLD = 'hold';
+    case HOLD = 'hold';
 
-  case RESUME = 'resume';
+    case RESUME = 'resume';
 
 }

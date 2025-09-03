@@ -2,20 +2,18 @@
 
 namespace Modules\WMSInventoryCore\app\DataTables;
 
+use App\Helpers\FormattingHelper;
 use Modules\WMSInventoryCore\app\Models\Transfer;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
-use App\Helpers\FormattingHelper;
 
 class TransfersDataTable extends DataTable
 {
     /**
      * Build DataTable class.
      *
-     * @param mixed $query Results from query() method.
+     * @param  mixed  $query  Results from query() method.
      * @return \Yajra\DataTables\DataTableAbstract
      */
     public function dataTable($query)
@@ -40,7 +38,6 @@ class TransfersDataTable extends DataTable
     /**
      * Get query source of dataTable.
      *
-     * @param \Modules\WMSInventoryCore\app\Models\Transfer $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function query(Transfer $model)
@@ -70,7 +67,7 @@ class TransfersDataTable extends DataTable
             )
             ->parameters([
                 'responsive' => true,
-                'autoWidth' => false
+                'autoWidth' => false,
             ]);
     }
 
@@ -100,11 +97,9 @@ class TransfersDataTable extends DataTable
 
     /**
      * Get filename for export.
-     *
-     * @return string
      */
     protected function filename(): string
     {
-        return 'Transfers_' . date('YmdHis');
+        return 'Transfers_'.date('YmdHis');
     }
 }

@@ -26,7 +26,7 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index(['sort_order']);
             $table->index(['position']);
