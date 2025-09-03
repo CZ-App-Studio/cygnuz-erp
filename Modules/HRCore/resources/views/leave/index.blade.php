@@ -131,7 +131,8 @@
       urls: {
         datatable: @json(route('hrcore.leaves.datatable')),
         show: @json(route('hrcore.leaves.show', ':id')),
-        action: @json(route('hrcore.leaves.action', ':id'))
+        action: @json(route('hrcore.leaves.action', ':id')),
+        edit: @json(route('hrcore.leaves.edit', ':id'))
       },
       labels: {
         search: @json(__('Search')),
@@ -154,7 +155,11 @@
         approved: @json(__('Approved')),
         rejected: @json(__('Rejected')),
         cancelled: @json(__('Cancelled')),
-        pending: @json(__('Pending'))
+        pending: @json(__('Pending')),
+        addLeaveRequest: @json(__('Add Leave Request')),
+        editLeaveRequest: @json(__('Edit Leave Request')),
+        submitRequest: @json(__('Submit Request')),
+        updateRequest: @json(__('Update Request'))
       }
     };
   </script>

@@ -24,6 +24,9 @@ use Modules\HRCore\app\Models\LeaveRequest;
 use Modules\HRCore\app\Models\LeaveType;
 use Yajra\DataTables\Facades\DataTables;
 use App\Services\Settings\ModuleSettingsService;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class LeaveController extends Controller
 {
@@ -381,6 +384,155 @@ class LeaveController extends Controller
     }
 
     /**
+     * Edit a leave request
+     */
+    public function edit($id)
+    {
+        try {
+            $leaveRequest = LeaveRequest::findOrFail($id);
+
+            // Check permissions
+            if (!auth()->user()->can('hrcore.edit-leave') && 
+                (!auth()->user()->can('hrcore.edit-own-leave') || $leaveRequest->user_id !== auth()->id())) {
+                return Error::response(__('Unauthorized access'));
+            }
+
+            // Only pending leave requests can be edited
+            if ($leaveRequest->status->value !== 'pending') {
+                return Error::response(__('Only pending leave requests can be edited'));
+            }
+
+            return Success::response([
+                'leave' => [
+                    'id' => $leaveRequest->id,
+                    'user_id' => $leaveRequest->user_id,
+                    'leave_type_id' => $leaveRequest->leave_type_id,
+                    'from_date' => $leaveRequest->from_date->format('Y-m-d'),
+                    'to_date' => $leaveRequest->to_date->format('Y-m-d'),
+                    'total_days' => $leaveRequest->total_days,
+                    'is_half_day' => $leaveRequest->is_half_day,
+                    'half_day_type' => $leaveRequest->half_day_type,
+                    'user_notes' => $leaveRequest->user_notes,
+                    'emergency_contact' => $leaveRequest->emergency_contact,
+                    'emergency_phone' => $leaveRequest->emergency_phone,
+                    'is_abroad' => $leaveRequest->is_abroad,
+                    'abroad_location' => $leaveRequest->abroad_location,
+                    'document' => $leaveRequest->document,
+                    'leave_duration' => $leaveRequest->is_half_day ? 'half' : 'full',
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch leave request for edit: ' . $e->getMessage());
+            return Error::response(__('Failed to fetch leave request'));
+        }
+    }
+
+    /**
+     * Update a leave request
+     */
+    public function update(Request $request, $id)
+    {
+        try {
+            $leaveRequest = LeaveRequest::findOrFail($id);
+
+            // Check permissions
+            if (!auth()->user()->can('hrcore.edit-leave') && 
+                (!auth()->user()->can('hrcore.edit-own-leave') || $leaveRequest->user_id !== auth()->id())) {
+                return Error::response(__('Unauthorized access'));
+            }
+
+            // Only pending leave requests can be edited
+            if ($leaveRequest->status->value !== 'pending') {
+                return Error::response(__('Only pending leave requests can be edited'));
+            }
+
+            // Validate the request
+            $validated = $request->validate([
+                'user_id' => [
+                    Rule::requiredIf(auth()->user()->can('hrcore.create-leave-for-others')),
+                    'exists:users,id'
+                ],
+                'leave_type_id' => 'required|exists:leave_types,id',
+                'from_date' => 'required|date',
+                'to_date' => 'required|date|after_or_equal:from_date',
+                'user_notes' => 'required|string',
+                'is_half_day' => 'nullable|boolean',
+                'half_day_type' => 'nullable|in:first_half,second_half',
+                'emergency_contact' => 'nullable|string|max:100',
+                'emergency_phone' => 'nullable|string|max:20',
+                'is_abroad' => 'nullable|boolean',
+                'abroad_location' => 'nullable|string|max:100',
+                'document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            // Update the leave request
+            $leaveRequest->fill($validated);
+
+            // Calculate total days
+            if ($request->input('is_half_day')) {
+                $leaveRequest->total_days = 0.5;
+            } else {
+                $fromDate = Carbon::parse($request->from_date);
+                $toDate = Carbon::parse($request->to_date);
+                $totalDays = 0;
+                for ($date = $fromDate; $date->lte($toDate); $date->addDay()) {
+                    if (!$date->isWeekend()) {
+                        $totalDays++;
+                    }
+                }
+                $leaveRequest->total_days = $totalDays;
+            }
+
+            // Handle document upload if provided
+            if ($request->hasFile('document')) {
+                try {
+                    // Delete old document if exists
+                    if ($leaveRequest->document) {
+                        Storage::delete('public/uploads/leaverequestdocuments/' . $leaveRequest->document);
+                    }
+                    
+                    $file = $request->file('document');
+                    $fileName = time() . '_' . $file->getClientOriginalName();
+                    $path = $file->storeAs('public/uploads/leaverequestdocuments', $fileName);
+                    $leaveRequest->document = $fileName;
+                } catch (\Exception $e) {
+                    Log::error('Document upload failed: ' . $e->getMessage());
+                }
+            }
+
+            $leaveRequest->save();
+
+            // Check for overlapping leaves (exclude current leave)
+            $overlappingQuery = LeaveRequest::where('user_id', $leaveRequest->user_id)
+                ->where('id', '!=', $leaveRequest->id)
+                ->whereIn('status', ['pending', 'approved'])
+                ->where(function ($q) use ($leaveRequest) {
+                    $q->whereBetween('from_date', [$leaveRequest->from_date, $leaveRequest->to_date])
+                      ->orWhereBetween('to_date', [$leaveRequest->from_date, $leaveRequest->to_date])
+                      ->orWhere(function ($q2) use ($leaveRequest) {
+                          $q2->where('from_date', '<=', $leaveRequest->from_date)
+                             ->where('to_date', '>=', $leaveRequest->to_date);
+                      });
+                });
+
+            if ($overlappingQuery->exists()) {
+                \Illuminate\Support\Facades\DB::rollBack();
+                return Error::response(__('You already have a leave request for the selected dates.'));
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return Success::response(__('Leave request updated successfully!'));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            Log::error('Failed to update leave request: ' . $e->getMessage());
+            return Error::response(__('Failed to update leave request. Please try again.'));
+        }
+    }
+
+    /**
      * Get leave requests for DataTable via AJAX
      */
     public function indexAjax(Request $request)
@@ -483,15 +635,30 @@ class LeaveController extends Controller
                 return 'N/A';
             })
             ->addColumn('actions', function ($leave) {
+                $actions = [
+                    [
+                        'label' => __('View Details'),
+                        'icon' => 'bx bx-show',
+                        'onclick' => "viewLeaveDetails({$leave->id})",
+                    ],
+                ];
+
+                // Add edit option for pending leaves if user has permission
+                $statusValue = $leave->status instanceof LeaveRequestStatus ? $leave->status->value : $leave->status;
+                if ($statusValue === 'pending') {
+                    if (auth()->user()->can('hrcore.edit-leave') || 
+                        (auth()->user()->can('hrcore.edit-own-leave') && $leave->user_id === auth()->id())) {
+                        $actions[] = [
+                            'label' => __('Edit'),
+                            'icon' => 'bx bx-edit',
+                            'onclick' => "editLeaveRequest({$leave->id})",
+                        ];
+                    }
+                }
+
                 return view('components.datatable-actions', [
                     'id' => $leave->id,
-                    'actions' => [
-                        [
-                            'label' => __('View Details'),
-                            'icon' => 'bx bx-show',
-                            'onclick' => "viewLeaveDetails({$leave->id})",
-                        ],
-                    ],
+                    'actions' => $actions,
                 ])->render();
             })
             ->rawColumns(['user', 'leave_dates', 'status', 'document', 'actions'])

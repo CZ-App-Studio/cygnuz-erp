@@ -399,6 +399,121 @@ window.handleLeaveAction = function(id, status) {
   }, 300); // Wait 300ms for offcanvas to close
 }
 
+// Edit leave request
+window.editLeaveRequest = function(id) {
+  const url = pageData.urls.edit.replace(':id', id);
+  
+  $.ajax({
+    url: url,
+    method: 'GET',
+    success: function(response) {
+      if (response.status === 'success') {
+        const leave = response.data.leave;
+        
+        // Reset form
+        $('#leaveRequestForm')[0].reset();
+        
+        // Set form mode to edit
+        $('#leaveRequestForm').data('mode', 'edit');
+        $('#leaveRequestForm').data('leaveId', leave.id);
+        
+        // Update form title
+        $('#offcanvasAddLeaveLabel').text(pageData.labels.editLeaveRequest || 'Edit Leave Request');
+        
+        // Populate form fields
+        
+        // If user can select employees, set the user
+        if ($('#user_id').length) {
+          // First, we need to load the user into Select2
+          if (leave.user_id) {
+            $.ajax({
+              url: '/hrcore/employees/search',
+              data: { id: leave.user_id },
+              success: function(userData) {
+                if (userData.data && userData.data.length > 0) {
+                  const employee = userData.data[0];
+                  const option = new Option(employee.name + ' (' + employee.code + ')', employee.id, true, true);
+                  $('#user_id').append(option).trigger('change');
+                }
+              }
+            });
+          }
+        }
+        
+        // Set leave type
+        $('#leave_type_id').val(leave.leave_type_id).trigger('change');
+        
+        // Set duration type
+        $('input[name="leave_duration"][value="' + leave.leave_duration + '"]').prop('checked', true).trigger('change');
+        
+        // Set dates
+        if (leave.leave_duration === 'half') {
+          $('#half_day_date').val(leave.from_date);
+          $('input[name="half_day_type"][value="' + leave.half_day_type + '"]').prop('checked', true);
+        } else {
+          $('#from_date').val(leave.from_date);
+          $('#to_date').val(leave.to_date);
+        }
+        
+        // Set other fields
+        $('#user_notes').val(leave.user_notes);
+        $('#emergency_contact').val(leave.emergency_contact);
+        $('#emergency_phone').val(leave.emergency_phone);
+        
+        if (leave.emergency_contact || leave.emergency_phone) {
+          $('#add_emergency_contact').prop('checked', true).trigger('change');
+        }
+        
+        $('#is_abroad').prop('checked', leave.is_abroad).trigger('change');
+        if (leave.is_abroad) {
+          $('#abroad_location').val(leave.abroad_location);
+        }
+        
+        // Show document section if there's a document
+        if (leave.document) {
+          $('#document_section').show();
+          // Add note about existing document
+          if (!$('#existing_document_info').length) {
+            $('#document_section').prepend('<div id="existing_document_info" class="alert alert-info mb-2">Existing document: ' + leave.document + '</div>');
+          }
+        }
+        
+        // Update submit button text
+        $('#leaveRequestForm button[type="submit"]').text(pageData.labels.updateRequest || 'Update Request');
+        
+        // Show offcanvas
+        const offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasAddLeave'));
+        offcanvas.show();
+      }
+    },
+    error: function(xhr) {
+      let message = pageData.labels.error || 'An error occurred';
+      if (xhr.responseJSON && xhr.responseJSON.message) {
+        message = xhr.responseJSON.message;
+      }
+      Swal.fire({
+        icon: 'error',
+        title: pageData.labels.error,
+        text: message
+      });
+    }
+  });
+}
+
+// Reset form when offcanvas is hidden
+document.getElementById('offcanvasAddLeave').addEventListener('hidden.bs.offcanvas', function () {
+  $('#leaveRequestForm')[0].reset();
+  $('#leaveRequestForm').data('mode', 'add');
+  $('#leaveRequestForm').data('leaveId', null);
+  $('#offcanvasAddLeaveLabel').text(pageData.labels.addLeaveRequest || 'Add Leave Request');
+  $('#leaveRequestForm button[type="submit"]').text(pageData.labels.submitRequest || 'Submit Request');
+  $('#existing_document_info').remove();
+  $('#user_id').val(null).trigger('change');
+  $('#emergency_contact_section').hide();
+  $('#abroad_location_section').hide();
+  $('#document_section').hide();
+});
+
 // Attach action button handlers
 $(document).on('click', '#approveBtn', function () {
   handleLeaveAction($(this).data('id'), 'approved');

@@ -272,6 +272,8 @@ document.addEventListener('DOMContentLoaded', function() {
     e.preventDefault();
 
     const formData = new FormData(this);
+    const mode = $(this).data('mode') || 'add';
+    const leaveId = $(this).data('leaveId');
 
     // Add calculated values
     const leaveType = $('input[name="leave_duration"]:checked').val();
@@ -283,19 +285,34 @@ document.addEventListener('DOMContentLoaded', function() {
       formData.append('total_days', '0.5');
     }
 
+    // Determine URL and method based on mode
+    let url, method;
+    if (mode === 'edit' && leaveId) {
+      url = @json(route('hrcore.leaves.update', ':id')).replace(':id', leaveId);
+      method = 'POST';
+      formData.append('_method', 'PUT');
+    } else {
+      url = @json(route('hrcore.leaves.store'));
+      method = 'POST';
+    }
+
     // Submit via AJAX
     $.ajax({
-      url: @json(route('hrcore.leaves.store')),
-      method: 'POST',
+      url: url,
+      method: method,
       data: formData,
       processData: false,
       contentType: false,
       success: function(response) {
         if (response.status === 'success') {
+          const message = mode === 'edit' ? 
+            '@lang("Leave request updated successfully!")' : 
+            '@lang("Leave request submitted successfully!")';
+          
           Swal.fire({
             icon: 'success',
             title: '@lang("Success")',
-            text: '@lang("Leave request submitted successfully!")'
+            text: message
           });
           $('#offcanvasAddLeave').offcanvas('hide');
           $('#leaveRequestsTable').DataTable().ajax.reload();
