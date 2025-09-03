@@ -233,14 +233,13 @@ class TimesheetController extends Controller
     /**
      * Show the form for editing the specified timesheet
      */
-    public function edit($id)
+    public function edit(Timesheet $timesheet)
     {
-        $timesheet = Timesheet::findOrFail($id);
+       $timesheet = Timesheet::findOrFail($id);
 
         if (! $timesheet->canBeEditedBy(Auth::user())) {
             return Error::response(__('You do not have permission to edit this timesheet.'));
         }
-
         $projects = Project::active()->get();
         // CRM tasks don't have direct project relationship, so we'll pass empty collection
         $tasks = collect();
@@ -251,7 +250,7 @@ class TimesheetController extends Controller
     /**
      * Update the specified timesheet
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Timesheet $timesheet)
     {
         $timesheet = Timesheet::findOrFail($id);
 
@@ -299,14 +298,13 @@ class TimesheetController extends Controller
     /**
      * Remove the specified timesheet
      */
-    public function destroy($id)
+    public function destroy(Timesheet $timesheet)
     {
         $timesheet = Timesheet::findOrFail($id);
 
         if (! $timesheet->canBeEditedBy(Auth::user())) {
             return Error::response(__('You do not have permission to delete this timesheet.'));
         }
-
         try {
             $timesheet->delete();
 
@@ -319,12 +317,12 @@ class TimesheetController extends Controller
     /**
      * Approve a timesheet
      */
-    public function approve($id)
+    public function approve(Timesheet $timesheet)
     {
-        $timesheet = Timesheet::findOrFail($id);
-
+       $timesheet = Timesheet::findOrFail($id);
+      
         \Illuminate\Support\Facades\Log::debug('Approve timesheet attempt', [
-            'timesheet_id' => $id,
+            'timesheet_id' => $timesheet->id,
             'timesheet_status' => $timesheet->status->value,
             'user_id' => Auth::id(),
             'user_roles' => Auth::user()->getRoleNames()->toArray(),
@@ -347,11 +345,9 @@ class TimesheetController extends Controller
     /**
      * Reject a timesheet
      */
-    public function reject($id)
+    public function reject(Timesheet $timesheet)
     {
-        $timesheet = Timesheet::findOrFail($id);
-
-        if (! $timesheet->canBeApprovedBy(Auth::user())) {
+       if (!$timesheet->canBeApprovedBy(Auth::user())) {
             return Error::response(__('You do not have permission to reject this timesheet.'));
         }
 
@@ -367,10 +363,9 @@ class TimesheetController extends Controller
     /**
      * Submit a timesheet for approval
      */
-    public function submit($id)
+    public function submit(Timesheet $timesheet)
     {
-        $timesheet = Timesheet::findOrFail($id);
-
+      
         if ($timesheet->user_id !== Auth::id()) {
             return Error::response(__('You can only submit your own timesheets.'));
         }
