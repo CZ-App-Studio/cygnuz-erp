@@ -27,7 +27,7 @@ return new class extends Migration
             $table->json('metadata')->nullable(); // Additional data like badges, etc.
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             $table->index(['module', 'is_active']);
             $table->index(['menu_type', 'priority']);
             $table->foreign('parent_id')->references('id')->on('menus')->onDelete('cascade');
@@ -40,7 +40,7 @@ return new class extends Migration
             $table->string('permission'); // Permission name required
             $table->string('role')->nullable(); // Role required (alternative to permission)
             $table->timestamps();
-            
+
             $table->unique(['menu_id', 'permission']);
             $table->index('permission');
             $table->index('role');
@@ -56,7 +56,7 @@ return new class extends Migration
             $table->string('menu_type')->default('vertical');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             $table->index(['menu_type', 'priority']);
         });
 
@@ -67,7 +67,7 @@ return new class extends Migration
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->integer('display_order')->default(0);
             $table->timestamps();
-            
+
             $table->unique(['user_id', 'menu_id']);
             $table->index(['user_id', 'display_order']);
         });
@@ -80,7 +80,7 @@ return new class extends Migration
             $table->integer('access_count')->default(1);
             $table->timestamp('last_accessed_at');
             $table->timestamps();
-            
+
             $table->unique(['user_id', 'menu_id']);
             $table->index(['user_id', 'last_accessed_at']);
             $table->index(['user_id', 'access_count']);
@@ -95,13 +95,13 @@ return new class extends Migration
             $table->json('menu_configuration'); // Stores complete menu state
             $table->boolean('is_active')->default(false);
             $table->timestamps();
-            
+
             $table->unique(['user_id', 'slug']);
             $table->index(['user_id', 'is_active']);
         });
 
         // Enhanced user menu preferences (update existing table)
-        if (!Schema::hasColumn('user_menu_preferences', 'is_collapsed')) {
+        if (! Schema::hasColumn('user_menu_preferences', 'is_collapsed')) {
             Schema::table('user_menu_preferences', function (Blueprint $table) {
                 $table->boolean('is_collapsed')->default(false)->after('is_pinned');
                 $table->boolean('is_hidden')->default(false)->after('is_collapsed');

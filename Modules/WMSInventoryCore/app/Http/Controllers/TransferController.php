@@ -10,13 +10,13 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\WMSInventoryCore\app\Services\WMSInventoryCoreSettingsService;
 use Modules\WMSInventoryCore\Models\Inventory;
 use Modules\WMSInventoryCore\Models\InventoryTransaction;
 use Modules\WMSInventoryCore\Models\Product;
 use Modules\WMSInventoryCore\Models\Transfer;
 use Modules\WMSInventoryCore\Models\TransferProduct;
 use Modules\WMSInventoryCore\Models\Warehouse;
-use Modules\WMSInventoryCore\app\Services\WMSInventoryCoreSettingsService;
 use Yajra\DataTables\Facades\DataTables;
 
 class TransferController extends Controller
@@ -573,7 +573,7 @@ class TransferController extends Controller
                     ->first();
 
                 // Check if negative stock is allowed
-                if (!WMSInventoryCoreSettingsService::allowNegativeStock()) {
+                if (! WMSInventoryCoreSettingsService::allowNegativeStock()) {
                     $newStockLevel = $inventory->stock_level - $transferProduct->quantity;
                     if ($newStockLevel < 0) {
                         return response()->json([

@@ -20,7 +20,7 @@ class TaxRateSeeder extends Seeder
                 'is_default' => true,
                 'is_active' => true,
                 'description' => 'No tax applied',
-                'tax_authority' => 'None'
+                'tax_authority' => 'None',
             ],
             [
                 'name' => 'Sales Tax 5%',
@@ -29,7 +29,7 @@ class TaxRateSeeder extends Seeder
                 'is_default' => false,
                 'is_active' => true,
                 'description' => 'Standard sales tax rate',
-                'tax_authority' => 'State'
+                'tax_authority' => 'State',
             ],
             [
                 'name' => 'Sales Tax 10%',
@@ -38,7 +38,7 @@ class TaxRateSeeder extends Seeder
                 'is_default' => false,
                 'is_active' => true,
                 'description' => 'High sales tax rate',
-                'tax_authority' => 'State'
+                'tax_authority' => 'State',
             ],
             [
                 'name' => 'GST 18%',
@@ -47,7 +47,7 @@ class TaxRateSeeder extends Seeder
                 'is_default' => false,
                 'is_active' => true,
                 'description' => 'Goods and Services Tax',
-                'tax_authority' => 'Federal'
+                'tax_authority' => 'Federal',
             ],
             [
                 'name' => 'VAT 20%',
@@ -56,7 +56,7 @@ class TaxRateSeeder extends Seeder
                 'is_default' => false,
                 'is_active' => true,
                 'description' => 'Value Added Tax',
-                'tax_authority' => 'Federal'
+                'tax_authority' => 'Federal',
             ],
             [
                 'name' => 'Service Tax 15%',
@@ -65,7 +65,7 @@ class TaxRateSeeder extends Seeder
                 'is_default' => false,
                 'is_active' => true,
                 'description' => 'Tax on services',
-                'tax_authority' => 'Federal'
+                'tax_authority' => 'Federal',
             ],
             [
                 'name' => 'Flat Fee $25',
@@ -74,8 +74,8 @@ class TaxRateSeeder extends Seeder
                 'is_default' => false,
                 'is_active' => true,
                 'description' => 'Fixed tax amount',
-                'tax_authority' => 'State'
-            ]
+                'tax_authority' => 'State',
+            ],
         ];
 
         foreach ($taxRates as $taxRate) {

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\Leave\LeaveRequestApproval;
 use App\Services\HRNotificationService;
+use App\Services\Settings\ModuleSettingsService;
 use Constants;
 use Exception;
 use Illuminate\Http\Request;
@@ -22,8 +23,8 @@ use Modules\FileManagerCore\Enums\FileType;
 use Modules\FileManagerCore\Enums\FileVisibility;
 use Modules\HRCore\app\Models\LeaveRequest;
 use Modules\HRCore\app\Models\LeaveType;
+use Modules\HRCore\app\Models\UserAvailableLeave;
 use Yajra\DataTables\Facades\DataTables;
-use App\Services\Settings\ModuleSettingsService;
 
 class LeaveController extends Controller
 {
@@ -50,37 +51,39 @@ class LeaveController extends Controller
         $settingsService = app(ModuleSettingsService::class);
         $includeWeekends = $settingsService->get('HRCore', 'weekend_included_in_leave', false);
         $includeHolidays = $settingsService->get('HRCore', 'holidays_included_in_leave', false);
-        
+
         $startDate = \Carbon\Carbon::parse($fromDate);
         $endDate = \Carbon\Carbon::parse($toDate);
-        
+
         if ($isHalfDay) {
             return 0.5;
         }
-        
+
         $days = 0;
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate <= $endDate) {
             $isWeekend = $currentDate->isWeekend();
             $isHoliday = \Modules\HRCore\app\Models\Holiday::whereDate('date', $currentDate)->exists();
-            
+
             // Skip weekends if not included
-            if (!$includeWeekends && $isWeekend) {
+            if (! $includeWeekends && $isWeekend) {
                 $currentDate->addDay();
+
                 continue;
             }
-            
+
             // Skip holidays if not included
-            if (!$includeHolidays && $isHoliday) {
+            if (! $includeHolidays && $isHoliday) {
                 $currentDate->addDay();
+
                 continue;
             }
-            
+
             $days++;
             $currentDate->addDay();
         }
-        
+
         return $days;
     }
 
@@ -265,13 +268,13 @@ class LeaveController extends Controller
     {
         // Get settings for leave validation
         $settingsService = app(ModuleSettingsService::class);
-        $minAdvanceNoticeDays = (int) $settingsService->get('HRCore', 'min_advance_notice_days', '1');
-        $minDate = now()->addDays($minAdvanceNoticeDays)->toDateString();
-        
+        $minAdvanceNoticeDays = (int) $settingsService->get('HRCore', 'min_advance_notice_days', '0');
+        // If minAdvanceNoticeDays is 0, allow today. Otherwise, add the days
+        $minDate = $minAdvanceNoticeDays > 0 ? now()->addDays($minAdvanceNoticeDays)->toDateString() : now()->toDateString();
+
         $validated = $request->validate([
-            'user_id' => auth()->user()->can('hrcore.create-leave-for-others') ? 'required|exists:users,id' : 'nullable',
             'leave_type_id' => 'required|exists:leave_types,id',
-            'from_date' => 'required|date|after_or_equal:' . $minDate,
+            'from_date' => 'required|date|after_or_equal:'.$minDate,
             'to_date' => 'required|date|after_or_equal:from_date',
             'is_half_day' => 'nullable|boolean',
             'half_day_type' => 'nullable|in:first_half,second_half',
@@ -288,9 +291,7 @@ class LeaveController extends Controller
             \Illuminate\Support\Facades\DB::beginTransaction();
 
             // Set user_id if not provided (for self leave request)
-            if (! isset($validated['user_id'])) {
-                $validated['user_id'] = auth()->id();
-            }
+            $validated['user_id'] = auth()->id();
 
             // Calculate total days based on settings
             $totalDays = $this->calculateLeaveDays(
@@ -367,7 +368,7 @@ class LeaveController extends Controller
                 $notificationService = app(HRNotificationService::class);
                 $notificationService->sendNewLeaveRequestNotification($leaveRequest);
             } catch (\Exception $e) {
-                Log::error('Failed to send leave request notification: ' . $e->getMessage());
+                Log::error('Failed to send leave request notification: '.$e->getMessage());
                 // Don't fail the request if notification fails
             }
 
@@ -421,19 +422,19 @@ class LeaveController extends Controller
             $query->where(function ($q) use ($searchValue) {
                 // Search in actual database columns
                 $q->where('leave_requests.id', 'like', "%{$searchValue}%")
-                  ->orWhere('leave_requests.status', 'like', "%{$searchValue}%")
-                  ->orWhere('leave_requests.user_notes', 'like', "%{$searchValue}%")
+                    ->orWhere('leave_requests.status', 'like', "%{$searchValue}%")
+                    ->orWhere('leave_requests.user_notes', 'like', "%{$searchValue}%")
                   // Search in related tables - user names
-                  ->orWhereHas('user', function ($userQuery) use ($searchValue) {
-                      $userQuery->where('first_name', 'like', "%{$searchValue}%")
-                                ->orWhere('last_name', 'like', "%{$searchValue}%")
-                                ->orWhere('code', 'like', "%{$searchValue}%")
-                                ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$searchValue}%");
-                  })
+                    ->orWhereHas('user', function ($userQuery) use ($searchValue) {
+                        $userQuery->where('first_name', 'like', "%{$searchValue}%")
+                            ->orWhere('last_name', 'like', "%{$searchValue}%")
+                            ->orWhere('code', 'like', "%{$searchValue}%")
+                            ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$searchValue}%");
+                    })
                   // Search in leave type name
-                  ->orWhereHas('leaveType', function ($typeQuery) use ($searchValue) {
-                      $typeQuery->where('name', 'like', "%{$searchValue}%");
-                  });
+                    ->orWhereHas('leaveType', function ($typeQuery) use ($searchValue) {
+                        $typeQuery->where('name', 'like', "%{$searchValue}%");
+                    });
             });
         }
 
@@ -561,7 +562,7 @@ class LeaveController extends Controller
                 $notificationService = app(HRNotificationService::class);
                 $notificationService->sendLeaveRequestApprovalNotification($leaveRequest, $validated['status']);
             } catch (\Exception $e) {
-                Log::error('Failed to send leave approval notification: ' . $e->getMessage());
+                Log::error('Failed to send leave approval notification: '.$e->getMessage());
                 // Don't fail the request if notification fails
             }
 
@@ -928,5 +929,282 @@ class LeaveController extends Controller
 
             return Error::response(__('Failed to cancel leave request'));
         }
+    }
+
+    /**
+     * Self-Service Methods
+     */
+
+    /**
+     * Display my leave requests
+     */
+    public function myLeaves()
+    {
+        $leaveTypes = LeaveType::where('status', 'active')->get();
+
+        // Calculate statistics for the current user
+        $statistics = [
+            'total' => LeaveRequest::where('user_id', auth()->id())->count(),
+            'pending' => LeaveRequest::where('user_id', auth()->id())->where('status', 'pending')->count(),
+            'approved' => LeaveRequest::where('user_id', auth()->id())->where('status', 'approved')->count(),
+            'rejected' => LeaveRequest::where('user_id', auth()->id())->where('status', 'rejected')->count(),
+        ];
+
+        return view('hrcore::leave.my-leaves', compact('leaveTypes', 'statistics'));
+    }
+
+    /**
+     * Get my leave requests for DataTables
+     */
+    public function myLeavesAjax(Request $request)
+    {
+        $query = LeaveRequest::query()
+            ->where('user_id', auth()->id())
+            ->with(['leaveType', 'approvedBy']);
+
+        // Apply filters
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('leave_type_id') && $request->leave_type_id) {
+            $query->where('leave_type_id', $request->leave_type_id);
+        }
+
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('from_date', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('to_date', '<=', $request->date_to);
+        }
+
+        return DataTables::of($query)
+            ->editColumn('created_at', function ($leave) {
+                return $leave->created_at->format('M d, Y');
+            })
+            ->addColumn('leave_type', function ($leave) {
+                return $leave->leaveType->name;
+            })
+            ->editColumn('from_date', function ($leave) {
+                return $leave->from_date->format('M d, Y');
+            })
+            ->editColumn('to_date', function ($leave) {
+                return $leave->to_date->format('M d, Y');
+            })
+            ->addColumn('total_days', function ($leave) {
+                return $leave->total_days;
+            })
+            ->addColumn('status', function ($leave) {
+                $badgeClass = match ($leave->status->value) {
+                    'pending' => 'bg-label-warning',
+                    'approved' => 'bg-label-success',
+                    'rejected' => 'bg-label-danger',
+                    'cancelled' => 'bg-label-secondary',
+                    default => 'bg-label-primary'
+                };
+
+                return '<span class="badge '.$badgeClass.'">'.ucfirst($leave->status->value).'</span>';
+            })
+            ->addColumn('approved_by', function ($leave) {
+                return $leave->approvedBy ? $leave->approvedBy->getFullName() : '-';
+            })
+            ->addColumn('actions', function ($leave) {
+                $actions = [
+                    [
+                        'label' => __('View'),
+                        'icon' => 'bx bx-show',
+                        'onclick' => "viewMyLeave({$leave->id})",
+                    ],
+                ];
+
+                if ($leave->status->value === 'pending') {
+                    $actions[] = [
+                        'label' => __('Cancel'),
+                        'icon' => 'bx bx-x',
+                        'onclick' => "cancelMyLeave({$leave->id})",
+                        'class' => 'text-danger',
+                    ];
+                }
+
+                return view('components.datatable-actions', [
+                    'id' => $leave->id,
+                    'actions' => $actions,
+                ])->render();
+            })
+            ->rawColumns(['status', 'actions'])
+            ->make(true);
+    }
+
+    /**
+     * Show form for creating my leave request
+     */
+    public function createMyLeave()
+    {
+        $leaveTypes = LeaveType::where('status', 'active')->get();
+        $currentYear = date('Y');
+        $leaveBalances = UserAvailableLeave::where('user_id', auth()->id())
+            ->where('year', $currentYear)
+            ->with('leaveType')
+            ->get()
+            ->keyBy('leave_type_id');
+
+        return view('hrcore::leave.my-create', compact('leaveTypes', 'leaveBalances'));
+    }
+
+    /**
+     * Store my leave request
+     */
+    public function storeMyLeave(Request $request)
+    {
+        $request->validate([
+            'leave_type_id' => 'required|exists:leave_types,id',
+            'from_date' => 'required|date|after_or_equal:today',
+            'to_date' => 'required|date|after_or_equal:from_date',
+            'is_half_day' => 'boolean',
+            'half_day_type' => 'required_if:is_half_day,1|in:first_half,second_half',
+            'user_notes' => 'required|string|max:1000',
+            'emergency_contact' => 'nullable|string|max:255',
+            'emergency_phone' => 'nullable|string|max:20',
+            'is_abroad' => 'boolean',
+            'abroad_location' => 'required_if:is_abroad,1|nullable|string|max:255',
+            'document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Calculate total days
+            $totalDays = $this->calculateLeaveDays(
+                $request->from_date,
+                $request->to_date,
+                $request->is_half_day
+            );
+
+            // Check leave balance
+            $currentYear = date('Y');
+            $leaveBalance = UserAvailableLeave::where('user_id', auth()->id())
+                ->where('leave_type_id', $request->leave_type_id)
+                ->where('year', $currentYear)
+                ->first();
+
+            if ($leaveBalance && $leaveBalance->available_leaves < $totalDays) {
+                return Error::response(__('Insufficient leave balance. You have '.$leaveBalance->available_leaves.' days available.'));
+            }
+
+            // Handle file upload
+            $documentPath = null;
+            if ($request->hasFile('document')) {
+                $fileManager = app(FileManagerInterface::class);
+                $fileRequest = new FileUploadRequest(
+                    file: $request->file('document'),
+                    type: FileType::DOCUMENT,
+                    visibility: FileVisibility::PRIVATE,
+                    relatedType: 'leave_request',
+                    userId: auth()->id()
+                );
+                $uploadedFile = $fileManager->uploadFile($fileRequest);
+                $documentPath = $uploadedFile->path;
+            }
+
+            // Create leave request
+            $leaveRequest = LeaveRequest::create([
+                'user_id' => auth()->id(), // Always use auth()->id() for self-service
+                'leave_type_id' => $request->leave_type_id,
+                'from_date' => $request->from_date,
+                'to_date' => $request->to_date,
+                'total_days' => $totalDays,
+                'is_half_day' => $request->is_half_day ?? false,
+                'half_day_type' => $request->half_day_type,
+                'user_notes' => $request->user_notes,
+                'emergency_contact' => $request->emergency_contact,
+                'emergency_phone' => $request->emergency_phone,
+                'is_abroad' => $request->is_abroad ?? false,
+                'abroad_location' => $request->abroad_location,
+                'document' => $documentPath,
+                'status' => LeaveRequestStatus::PENDING,
+            ]);
+
+            DB::commit();
+
+            return Success::response([
+                'message' => __('Leave request submitted successfully'),
+                'leave_request' => $leaveRequest,
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error('My leave request creation error: '.$e->getMessage());
+
+            return Error::response(__('Failed to submit leave request'));
+        }
+    }
+
+    /**
+     * Display my specific leave request
+     */
+    public function showMyLeave($id)
+    {
+        $leaveRequest = LeaveRequest::with(['leaveType', 'approvedBy'])
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'leave_request' => $leaveRequest,
+                'leave_type' => $leaveRequest->leaveType,
+                'approved_by' => $leaveRequest->approvedBy,
+            ],
+        ]);
+    }
+
+    /**
+     * Cancel my leave request
+     */
+    public function cancelMyLeave(Request $request, $id)
+    {
+        $leaveRequest = LeaveRequest::where('user_id', auth()->id())
+            ->where('status', LeaveRequestStatus::PENDING)
+            ->findOrFail($id);
+
+        try {
+            DB::beginTransaction();
+
+            $leaveRequest->update([
+                'status' => LeaveRequestStatus::CANCELLED,
+                'cancelled_at' => now(),
+                'cancellation_reason' => $request->reason ?? 'Cancelled by employee',
+            ]);
+
+            DB::commit();
+
+            return Success::response([
+                'message' => __('Leave request cancelled successfully'),
+                'leave_request' => $leaveRequest,
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error('My leave cancellation error: '.$e->getMessage());
+
+            return Error::response(__('Failed to cancel leave request'));
+        }
+    }
+
+    /**
+     * Get my leave balance
+     */
+    public function myLeaveBalance()
+    {
+        $currentYear = date('Y');
+        $leaveBalances = UserAvailableLeave::where('user_id', auth()->id())
+            ->where('year', $currentYear)
+            ->with('leaveType')
+            ->get();
+
+        $leaveTypes = LeaveType::where('status', 'active')->get();
+
+        return view('hrcore::leave.my-balance', compact('leaveBalances', 'leaveTypes'));
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Modules\WMSInventoryCore\database\seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Modules\WMSInventoryCore\Models\AdjustmentType;
 
@@ -19,29 +18,29 @@ class AdjustmentTypesSeeder extends Seeder
                 'code' => 'INC',
                 'effect' => 'increase',
                 'description' => 'Increase inventory quantity',
-                'status' => 'active'
+                'status' => 'active',
             ],
             [
                 'name' => 'Stock Decrease',
                 'code' => 'DEC',
-                'effect' => 'decrease', 
+                'effect' => 'decrease',
                 'description' => 'Decrease inventory quantity',
-                'status' => 'active'
+                'status' => 'active',
             ],
             [
                 'name' => 'Damaged',
                 'code' => 'DMG',
                 'effect' => 'decrease',
                 'description' => 'Items damaged and removed from stock',
-                'status' => 'active'
+                'status' => 'active',
             ],
             [
                 'name' => 'Found',
                 'code' => 'FND',
                 'effect' => 'increase',
                 'description' => 'Items found and added to stock',
-                'status' => 'active'
-            ]
+                'status' => 'active',
+            ],
         ];
 
         foreach ($adjustmentTypes as $type) {

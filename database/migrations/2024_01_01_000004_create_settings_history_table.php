@@ -22,11 +22,11 @@ return new class extends Migration
             $table->timestamp('changed_at')->useCurrent();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
-            
+
             $table->index(['setting_type', 'setting_key']);
             $table->index('changed_by');
             $table->index('changed_at');
-            
+
             $table->foreign('changed_by')->references('id')->on('users')->onDelete('cascade');
         });
     }

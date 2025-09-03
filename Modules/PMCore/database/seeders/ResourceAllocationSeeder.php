@@ -2,12 +2,11 @@
 
 namespace Modules\PMCore\database\seeders;
 
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\User;
 use Modules\PMCore\app\Models\Project;
-use Modules\PMCore\app\Models\ResourceAllocation;
 
 class ResourceAllocationSeeder extends Seeder
 {
@@ -20,11 +19,12 @@ class ResourceAllocationSeeder extends Seeder
         $users = User::whereHas('roles', function ($q) {
             $q->whereNotIn('name', ['client', 'customer']);
         })->limit(15)->get();
-        
+
         $projects = Project::all();
-        
+
         if ($users->isEmpty() || $projects->isEmpty()) {
             $this->command->warn('No users or projects found. Please seed users and projects first.');
+
             return;
         }
 
@@ -37,15 +37,15 @@ class ResourceAllocationSeeder extends Seeder
             // Each project should have 3-6 team members
             $teamSize = rand(3, 6);
             $projectUsers = $users->random(min($teamSize, $users->count()));
-            
+
             foreach ($projectUsers as $user) {
                 // Determine allocation percentage based on role
                 $isLead = $projectUsers->first()->id === $user->id;
                 $allocationPercentage = $isLead ? rand(80, 100) : rand(40, 80);
-                
+
                 // Hours per day (based on allocation percentage of 8-hour day)
                 $hoursPerDay = round(8 * ($allocationPercentage / 100), 1);
-                
+
                 // Determine allocation dates based on project status
                 if ($project->status->value === 'completed') {
                     // Completed projects - past allocations
@@ -63,13 +63,13 @@ class ResourceAllocationSeeder extends Seeder
                     $endDate = null; // Ongoing
                     $status = 'active';
                 }
-                
+
                 // Add some variance to dates
                 if (rand(1, 10) <= 3 && $startDate->isFuture()) {
                     // 30% chance to start a few days later
                     $startDate->addDays(rand(1, 7));
                 }
-                
+
                 $allocations[] = [
                     'project_id' => $project->id,
                     'user_id' => $user->id,
@@ -107,7 +107,7 @@ class ResourceAllocationSeeder extends Seeder
 
         $this->command->info('Resource Allocation Statistics:');
         foreach ($stats as $stat) {
-            $this->command->info("  - {$stat->status}: {$stat->count} allocations, " . round($stat->avg_allocation, 1) . "% average allocation");
+            $this->command->info("  - {$stat->status}: {$stat->count} allocations, ".round($stat->avg_allocation, 1).'% average allocation');
         }
     }
 
@@ -128,7 +128,7 @@ class ResourceAllocationSeeder extends Seeder
             'Database Administrator',
             'Frontend Developer',
             'Backend Developer',
-            'Full Stack Developer'
+            'Full Stack Developer',
         ];
 
         return $roles[array_rand($roles)];
@@ -144,12 +144,12 @@ class ResourceAllocationSeeder extends Seeder
         }
 
         $role = $isLead ? 'Lead Developer' : $this->getRandomRole();
-        
+
         $leadNotes = [
             "Role: {$role}. Primary technical lead for the project",
             "Role: {$role}. Responsible for architecture decisions and code reviews",
             "Role: {$role}. Point of contact for technical discussions",
-            "Role: {$role}. Managing development team and sprint planning"
+            "Role: {$role}. Managing development team and sprint planning",
         ];
 
         $memberNotes = [
@@ -160,7 +160,7 @@ class ResourceAllocationSeeder extends Seeder
             "Role: {$role}. Part-time allocation due to other commitments",
             "Role: {$role}. Remote team member",
             "Role: {$role}. Specialized in performance optimization",
-            "Role: {$role}. Working on security implementations"
+            "Role: {$role}. Working on security implementations",
         ];
 
         return $isLead ? $leadNotes[array_rand($leadNotes)] : $memberNotes[array_rand($memberNotes)];

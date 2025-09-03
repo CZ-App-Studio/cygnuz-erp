@@ -4,8 +4,8 @@ namespace Modules\AICore\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Crypt;
-use Modules\AICore\Models\AIProvider;
 use Modules\AICore\Models\AIModel;
+use Modules\AICore\Models\AIProvider;
 
 class DefaultAIProvidersSeeder extends Seeder
 {
@@ -16,10 +16,10 @@ class DefaultAIProvidersSeeder extends Seeder
     {
         // Create default AI providers (OpenAI comes free with AI Core)
         $this->createOpenAIProvider();
-        
+
         // Note: Other providers are available as separate paid addons:
         // - Claude AI Provider (Anthropic) - ClaudeAIProvider addon
-        // - Google Gemini - GeminiAIProvider addon  
+        // - Google Gemini - GeminiAIProvider addon
         // - Azure OpenAI - AzureOpenAIProvider addon
         // - Other providers available in marketplace
     }
@@ -42,8 +42,8 @@ class DefaultAIProvidersSeeder extends Seeder
             'configuration' => [
                 'api_version' => 'v1',
                 'organization' => null,
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         // Create OpenAI models
@@ -73,8 +73,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 272000,
                     'supports_vision' => true,
                     'reasoning_levels' => ['minimal', 'low', 'medium', 'high'],
-                    'description' => 'Smartest, fastest, most useful model with built-in thinking'
-                ]
+                    'description' => 'Smartest, fastest, most useful model with built-in thinking',
+                ],
             ],
             [
                 'name' => 'GPT-5 Mini',
@@ -92,8 +92,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 272000,
                     'supports_vision' => true,
                     'reasoning_levels' => ['minimal', 'low', 'medium', 'high'],
-                    'description' => 'Efficient GPT-5 variant for everyday tasks'
-                ]
+                    'description' => 'Efficient GPT-5 variant for everyday tasks',
+                ],
             ],
             [
                 'name' => 'GPT-5 Nano',
@@ -110,8 +110,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_functions' => true,
                     'context_window' => 272000,
                     'reasoning_levels' => ['minimal', 'low', 'medium', 'high'],
-                    'description' => 'Smallest GPT-5 variant for simple tasks'
-                ]
+                    'description' => 'Smallest GPT-5 variant for simple tasks',
+                ],
             ],
             // o3 and o4 Series (Advanced Reasoning Models)
             [
@@ -130,8 +130,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 200000,
                     'reasoning_model' => true,
                     'supports_vision' => true,
-                    'description' => 'Powerful reasoning model for complex multi-faceted analysis'
-                ]
+                    'description' => 'Powerful reasoning model for complex multi-faceted analysis',
+                ],
             ],
             [
                 'name' => 'o3-mini',
@@ -148,8 +148,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_functions' => true,
                     'context_window' => 200000,
                     'reasoning_model' => true,
-                    'description' => 'Fast, cost-efficient reasoning model for coding, math, and science'
-                ]
+                    'description' => 'Fast, cost-efficient reasoning model for coding, math, and science',
+                ],
             ],
             [
                 'name' => 'o4-mini',
@@ -167,8 +167,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 200000,
                     'reasoning_model' => true,
                     'supports_vision' => true,
-                    'description' => 'Compact, efficient reasoning model excelling in math, coding, and visual tasks'
-                ]
+                    'description' => 'Compact, efficient reasoning model excelling in math, coding, and visual tasks',
+                ],
             ],
             // GPT-4.1 Series (1 Million Token Context)
             [
@@ -186,8 +186,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_functions' => true,
                     'context_window' => 1000000,
                     'supports_vision' => true,
-                    'description' => 'Advanced general-purpose model with 1M token context and June 2024 knowledge'
-                ]
+                    'description' => 'Advanced general-purpose model with 1M token context and June 2024 knowledge',
+                ],
             ],
             [
                 'name' => 'GPT-4.1 Mini',
@@ -204,8 +204,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_functions' => true,
                     'context_window' => 1000000,
                     'supports_vision' => true,
-                    'description' => 'Efficient GPT-4.1 variant with 1M token context'
-                ]
+                    'description' => 'Efficient GPT-4.1 variant with 1M token context',
+                ],
             ],
             [
                 'name' => 'GPT-4.1 Nano',
@@ -221,8 +221,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'default_temperature' => 0.7,
                     'supports_functions' => true,
                     'context_window' => 1000000,
-                    'description' => 'Smallest GPT-4.1 variant for simple tasks'
-                ]
+                    'description' => 'Smallest GPT-4.1 variant for simple tasks',
+                ],
             ],
             // GPT-4o Series (Still Available)
             [
@@ -241,8 +241,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 128000,
                     'supports_images' => true,
                     'supports_audio' => true,
-                    'description' => 'Multimodal model with vision and audio capabilities'
-                ]
+                    'description' => 'Multimodal model with vision and audio capabilities',
+                ],
             ],
             [
                 'name' => 'GPT-4o Mini',
@@ -259,8 +259,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_functions' => true,
                     'context_window' => 128000,
                     'supports_vision' => true,
-                    'description' => 'Most cost-efficient small model with vision capabilities'
-                ]
+                    'description' => 'Most cost-efficient small model with vision capabilities',
+                ],
             ],
             // Legacy o1 Series (Being phased out)
             [
@@ -278,8 +278,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_functions' => true,
                     'context_window' => 128000,
                     'reasoning_model' => true,
-                    'description' => 'Legacy reasoning model (superseded by o3)'
-                ]
+                    'description' => 'Legacy reasoning model (superseded by o3)',
+                ],
             ],
             [
                 'name' => 'o1-mini',
@@ -296,8 +296,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_functions' => true,
                     'context_window' => 128000,
                     'reasoning_model' => true,
-                    'description' => 'Legacy mini reasoning model (superseded by o3-mini)'
-                ]
+                    'description' => 'Legacy mini reasoning model (superseded by o3-mini)',
+                ],
             ],
             // Embedding Models
             [
@@ -312,8 +312,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'configuration' => [
                     'dimensions' => 3072,
                     'use_case' => 'semantic_search',
-                    'description' => 'Most capable embedding model for semantic search'
-                ]
+                    'description' => 'Most capable embedding model for semantic search',
+                ],
             ],
             [
                 'name' => 'Text Embedding 3 Small',
@@ -327,8 +327,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'configuration' => [
                     'dimensions' => 1536,
                     'use_case' => 'semantic_search',
-                    'description' => 'Efficient embedding model for semantic search'
-                ]
+                    'description' => 'Efficient embedding model for semantic search',
+                ],
             ],
             // Image Generation Models
             [
@@ -348,8 +348,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'price_standard_wide' => 0.080,
                     'price_hd_1024' => 0.080,
                     'price_hd_wide' => 0.120,
-                    'description' => 'Advanced image generation with natural language prompts'
-                ]
+                    'description' => 'Advanced image generation with natural language prompts',
+                ],
             ],
             [
                 'name' => 'DALL-E 2',
@@ -365,8 +365,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'price_256' => 0.016,
                     'price_512' => 0.018,
                     'price_1024' => 0.020,
-                    'description' => 'Image generation with multiple size options'
-                ]
+                    'description' => 'Image generation with multiple size options',
+                ],
             ],
             // Audio Models
             [
@@ -381,8 +381,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'configuration' => [
                     'languages' => 'multiple',
                     'output_formats' => ['json', 'text', 'srt', 'vtt'],
-                    'description' => 'Audio transcription in multiple languages'
-                ]
+                    'description' => 'Audio transcription in multiple languages',
+                ],
             ],
             [
                 'name' => 'TTS-1',
@@ -396,8 +396,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'configuration' => [
                     'voices' => ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'],
                     'formats' => ['mp3', 'opus', 'aac', 'flac'],
-                    'description' => 'Text-to-speech with multiple voice options'
-                ]
+                    'description' => 'Text-to-speech with multiple voice options',
+                ],
             ],
             [
                 'name' => 'TTS-1 HD',
@@ -411,14 +411,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'configuration' => [
                     'voices' => ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'],
                     'formats' => ['mp3', 'opus', 'aac', 'flac'],
-                    'description' => 'High-quality text-to-speech with multiple voice options'
-                ]
-            ]
+                    'description' => 'High-quality text-to-speech with multiple voice options',
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -440,8 +440,8 @@ class DefaultAIProvidersSeeder extends Seeder
             'priority' => 2,
             'configuration' => [
                 'api_version' => '2023-06-01',
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         // Create Claude models (latest versions)
@@ -460,8 +460,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'max_output_tokens' => 64000,
                     'reasoning_model' => true,
                     'supports_vision' => true,
-                    'description' => 'High performance model with great reasoning capabilities'
-                ]
+                    'description' => 'High performance model with great reasoning capabilities',
+                ],
             ],
             [
                 'name' => 'Claude 3.7 Sonnet',
@@ -477,8 +477,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'max_output_tokens' => 8192,
                     'hybrid_reasoning' => true,
                     'supports_vision' => true,
-                    'description' => 'First hybrid reasoning model with extended thinking mode'
-                ]
+                    'description' => 'First hybrid reasoning model with extended thinking mode',
+                ],
             ],
             [
                 'name' => 'Claude 3.5 Sonnet (New)',
@@ -493,8 +493,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 200000,
                     'max_output_tokens' => 8192,
                     'supports_vision' => true,
-                    'description' => 'Superior reasoning, coding proficiency, and computer vision'
-                ]
+                    'description' => 'Superior reasoning, coding proficiency, and computer vision',
+                ],
             ],
             [
                 'name' => 'Claude 3.5 Haiku',
@@ -509,8 +509,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 200000,
                     'max_output_tokens' => 8192,
                     'supports_vision' => true,
-                    'description' => 'Fastest model with improved instruction following and vision'
-                ]
+                    'description' => 'Fastest model with improved instruction following and vision',
+                ],
             ],
             [
                 'name' => 'Claude 3 Opus',
@@ -525,14 +525,14 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 200000,
                     'max_output_tokens' => 4096,
                     'supports_vision' => true,
-                    'description' => 'Most powerful Claude 3 model for complex tasks'
-                ]
-            ]
+                    'description' => 'Most powerful Claude 3 model for complex tasks',
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -554,8 +554,8 @@ class DefaultAIProvidersSeeder extends Seeder
             'priority' => 3,
             'configuration' => [
                 'api_version' => 'v1',
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         // Create Gemini models
@@ -575,8 +575,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_thinking' => true,
                     'supports_audio' => true,
                     'supports_video' => true,
-                    'description' => 'Most intelligent model designed as thinking model with superior reasoning'
-                ]
+                    'description' => 'Most intelligent model designed as thinking model with superior reasoning',
+                ],
             ],
             [
                 'name' => 'Gemini 2.5 Flash',
@@ -590,8 +590,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'configuration' => [
                     'context_window' => 1000000,
                     'supports_multimodal' => true,
-                    'description' => 'Experimental model optimized for speed and efficiency'
-                ]
+                    'description' => 'Experimental model optimized for speed and efficiency',
+                ],
             ],
             [
                 'name' => 'Gemini 2.0 Flash Thinking',
@@ -606,8 +606,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 32768,
                     'supports_multimodal' => true,
                     'thinking_mode' => true,
-                    'description' => 'Experimental thinking model with visible reasoning'
-                ]
+                    'description' => 'Experimental thinking model with visible reasoning',
+                ],
             ],
             [
                 'name' => 'Gemini 2.0 Pro',
@@ -623,8 +623,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'supports_multimodal' => true,
                     'supports_audio' => true,
                     'supports_video' => true,
-                    'description' => 'Advanced multimodal model with superior capabilities'
-                ]
+                    'description' => 'Advanced multimodal model with superior capabilities',
+                ],
             ],
             [
                 'name' => 'Gemini 2.0 Flash',
@@ -639,8 +639,8 @@ class DefaultAIProvidersSeeder extends Seeder
                     'context_window' => 1000000,
                     'supports_multimodal' => true,
                     'supports_realtime' => true,
-                    'description' => 'Faster model for everyday tasks with native multimodal functionality'
-                ]
+                    'description' => 'Faster model for everyday tasks with native multimodal functionality',
+                ],
             ],
             [
                 'name' => 'Gemini 1.5 Pro (002)',
@@ -654,14 +654,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'configuration' => [
                     'context_window' => 2000000,
                     'supports_multimodal' => true,
-                    'description' => 'Enhanced version of Gemini 1.5 Pro'
-                ]
-            ]
+                    'description' => 'Enhanced version of Gemini 1.5 Pro',
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -685,8 +685,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'api_version' => '2024-02-01',
                 'deployment_name' => 'gpt-4',
                 'resource_name' => 'YOUR_RESOURCE_NAME',
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         $models = [
@@ -701,8 +701,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'is_active' => true,
                 'configuration' => [
                     'deployment_name' => 'gpt-4',
-                    'context_window' => 8192
-                ]
+                    'context_window' => 8192,
+                ],
             ],
             [
                 'name' => 'Azure GPT-3.5 Turbo',
@@ -715,14 +715,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'is_active' => true,
                 'configuration' => [
                     'deployment_name' => 'gpt-35-turbo',
-                    'context_window' => 16385
-                ]
-            ]
+                    'context_window' => 16385,
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -744,8 +744,8 @@ class DefaultAIProvidersSeeder extends Seeder
             'priority' => 5,
             'configuration' => [
                 'api_version' => 'v1',
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         $models = [
@@ -760,8 +760,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'is_active' => true,
                 'configuration' => [
                     'context_window' => 128000,
-                    'supports_rag' => true
-                ]
+                    'supports_rag' => true,
+                ],
             ],
             [
                 'name' => 'Command R',
@@ -774,8 +774,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'is_active' => true,
                 'configuration' => [
                     'context_window' => 128000,
-                    'supports_rag' => true
-                ]
+                    'supports_rag' => true,
+                ],
             ],
             [
                 'name' => 'Embed English',
@@ -788,14 +788,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'is_active' => true,
                 'configuration' => [
                     'dimensions' => 1024,
-                    'input_type' => 'search_document'
-                ]
-            ]
+                    'input_type' => 'search_document',
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -817,8 +817,8 @@ class DefaultAIProvidersSeeder extends Seeder
             'priority' => 6,
             'configuration' => [
                 'api_version' => 'v1',
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         $models = [
@@ -832,8 +832,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0.0000005,
                 'is_active' => true,
                 'configuration' => [
-                    'context_window' => 4096
-                ]
+                    'context_window' => 4096,
+                ],
             ],
             [
                 'name' => 'CodeLlama 34B Instruct',
@@ -846,8 +846,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'is_active' => true,
                 'configuration' => [
                     'context_window' => 16384,
-                    'specialization' => 'code_generation'
-                ]
+                    'specialization' => 'code_generation',
+                ],
             ],
             [
                 'name' => 'BERT Base Embeddings',
@@ -859,14 +859,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0,
                 'is_active' => true,
                 'configuration' => [
-                    'dimensions' => 384
-                ]
-            ]
+                    'dimensions' => 384,
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -888,8 +888,8 @@ class DefaultAIProvidersSeeder extends Seeder
             'priority' => 7,
             'configuration' => [
                 'api_version' => 'v1',
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         $models = [
@@ -903,8 +903,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0.000024,
                 'is_active' => true,
                 'configuration' => [
-                    'context_window' => 32768
-                ]
+                    'context_window' => 32768,
+                ],
             ],
             [
                 'name' => 'Mistral Medium',
@@ -916,8 +916,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0.0000081,
                 'is_active' => true,
                 'configuration' => [
-                    'context_window' => 32768
-                ]
+                    'context_window' => 32768,
+                ],
             ],
             [
                 'name' => 'Mistral Small',
@@ -929,8 +929,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0.000006,
                 'is_active' => true,
                 'configuration' => [
-                    'context_window' => 32768
-                ]
+                    'context_window' => 32768,
+                ],
             ],
             [
                 'name' => 'Mistral Embed',
@@ -942,14 +942,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0,
                 'is_active' => true,
                 'configuration' => [
-                    'dimensions' => 1024
-                ]
-            ]
+                    'dimensions' => 1024,
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -972,8 +972,8 @@ class DefaultAIProvidersSeeder extends Seeder
             'configuration' => [
                 'api_version' => 'v1',
                 'timeout' => 60,
-                'local' => true
-            ]
+                'local' => true,
+            ],
         ]);
 
         $models = [
@@ -988,8 +988,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'is_active' => true,
                 'configuration' => [
                     'context_window' => 128000,
-                    'local_model' => true
-                ]
+                    'local_model' => true,
+                ],
             ],
             [
                 'name' => 'Code Llama 13B',
@@ -1003,8 +1003,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'configuration' => [
                     'context_window' => 16384,
                     'local_model' => true,
-                    'specialization' => 'code_generation'
-                ]
+                    'specialization' => 'code_generation',
+                ],
             ],
             [
                 'name' => 'Mistral 7B',
@@ -1017,14 +1017,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'is_active' => true,
                 'configuration' => [
                     'context_window' => 32768,
-                    'local_model' => true
-                ]
-            ]
+                    'local_model' => true,
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -1048,8 +1048,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'region' => 'us-east-1',
                 'aws_access_key_id' => 'XXX',
                 'aws_secret_access_key' => 'XXX',
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         $models = [
@@ -1063,8 +1063,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0.000015,
                 'is_active' => true,
                 'configuration' => [
-                    'context_window' => 200000
-                ]
+                    'context_window' => 200000,
+                ],
             ],
             [
                 'name' => 'Llama 2 70B (Bedrock)',
@@ -1076,8 +1076,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0.00000256,
                 'is_active' => true,
                 'configuration' => [
-                    'context_window' => 4096
-                ]
+                    'context_window' => 4096,
+                ],
             ],
             [
                 'name' => 'Titan Embeddings',
@@ -1089,14 +1089,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0,
                 'is_active' => true,
                 'configuration' => [
-                    'dimensions' => 1536
-                ]
-            ]
+                    'dimensions' => 1536,
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }
@@ -1118,8 +1118,8 @@ class DefaultAIProvidersSeeder extends Seeder
             'priority' => 10,
             'configuration' => [
                 'api_version' => 'v1beta',
-                'timeout' => 30
-            ]
+                'timeout' => 30,
+            ],
         ]);
 
         $models = [
@@ -1133,8 +1133,8 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0.0000005,
                 'is_active' => true,
                 'configuration' => [
-                    'context_window' => 8192
-                ]
+                    'context_window' => 8192,
+                ],
             ],
             [
                 'name' => 'PaLM 2 Text',
@@ -1146,14 +1146,14 @@ class DefaultAIProvidersSeeder extends Seeder
                 'cost_per_output_token' => 0.0000005,
                 'is_active' => true,
                 'configuration' => [
-                    'context_window' => 8192
-                ]
-            ]
+                    'context_window' => 8192,
+                ],
+            ],
         ];
 
         foreach ($models as $modelData) {
             AIModel::create(array_merge($modelData, [
-                'provider_id' => $provider->id
+                'provider_id' => $provider->id,
             ]));
         }
     }

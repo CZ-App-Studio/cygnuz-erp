@@ -12,7 +12,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class SaleProduct extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'sale_products';
 
@@ -37,7 +37,7 @@ class SaleProduct extends Model implements Auditable
         'return_reason',
         'price_list_id',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -56,7 +56,7 @@ class SaleProduct extends Model implements Auditable
         'returned_quantity' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -112,7 +112,9 @@ class SaleProduct extends Model implements Auditable
      */
     public function getFulfillmentProgressAttribute()
     {
-        if ($this->quantity === 0) return 100;
+        if ($this->quantity === 0) {
+            return 100;
+        }
 
         return ($this->fulfilled_quantity / $this->quantity) * 100;
     }
@@ -122,7 +124,9 @@ class SaleProduct extends Model implements Auditable
      */
     public function getProfitMarginAttribute()
     {
-        if ($this->subtotal == 0) return 0;
+        if ($this->subtotal == 0) {
+            return 0;
+        }
 
         return ($this->profit / $this->subtotal) * 100;
     }
@@ -133,6 +137,7 @@ class SaleProduct extends Model implements Auditable
     public function getUnitPriceWithTaxAttribute()
     {
         $taxAmount = $this->unit_price * ($this->tax_rate / 100);
+
         return $this->unit_price + $taxAmount;
     }
 }

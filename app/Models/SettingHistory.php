@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class SettingHistory extends Model
 {
     protected $table = 'settings_history';
-    
+
     public $timestamps = false;
-    
+
     protected $fillable = [
         'setting_type',
         'setting_key',
@@ -61,6 +61,7 @@ class SettingHistory extends Model
         }
 
         $decoded = json_decode($value, true);
+
         return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
     }
 
@@ -101,11 +102,11 @@ class SettingHistory extends Model
     public function scopeModuleSettings($query, ?string $module = null)
     {
         $query = $query->where('setting_type', 'module');
-        
+
         if ($module) {
             $query->where('module', $module);
         }
-        
+
         return $query;
     }
 

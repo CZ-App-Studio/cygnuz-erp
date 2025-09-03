@@ -2,8 +2,8 @@
 
 namespace Modules\AICore\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Crypt;
@@ -24,7 +24,7 @@ class AIProvider extends Model
         'cost_per_token',
         'is_active',
         'priority',
-        'configuration'
+        'configuration',
     ];
 
     protected $casts = [
@@ -33,11 +33,11 @@ class AIProvider extends Model
         'cost_per_token' => 'decimal:8',
         'max_requests_per_minute' => 'integer',
         'max_tokens_per_request' => 'integer',
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     protected $hidden = [
-        'api_key_encrypted'
+        'api_key_encrypted',
     ];
 
     /**
@@ -69,7 +69,7 @@ class AIProvider extends Model
      */
     public function getDecryptedApiKeyAttribute(): ?string
     {
-        if (!$this->api_key_encrypted) {
+        if (! $this->api_key_encrypted) {
             return null;
         }
 
@@ -97,7 +97,7 @@ class AIProvider extends Model
      */
     public function isAvailable(): bool
     {
-        return $this->is_active && !empty($this->decrypted_api_key);
+        return $this->is_active && ! empty($this->decrypted_api_key);
     }
 
     /**

@@ -29,19 +29,19 @@ class AnnouncementPermissionSeeder extends Seeder
             'announcements.publish' => 'Publish announcements',
             'announcements.pin' => 'Pin/Unpin announcements',
             'announcements.acknowledge' => 'Acknowledge announcements',
-            
+
             // Announcement Targeting
             'announcements.target.all' => 'Target all employees',
             'announcements.target.departments' => 'Target specific departments',
             'announcements.target.teams' => 'Target specific teams',
             'announcements.target.users' => 'Target specific users',
-            
+
             // Announcement Features
             'announcements.send.email' => 'Send announcement emails',
             'announcements.send.notification' => 'Send announcement notifications',
             'announcements.require.acknowledgment' => 'Require acknowledgment',
             'announcements.upload.attachment' => 'Upload attachments',
-            
+
             // Announcement Reports
             'announcements.reports.view' => 'View announcement reports',
             'announcements.reports.read_tracking' => 'View read tracking',
@@ -54,10 +54,6 @@ class AnnouncementPermissionSeeder extends Seeder
                 ['module' => 'Announcement', 'description' => $description]
             );
         }
-
-
-    
-
 
         // Assign permissions to roles
 
@@ -92,7 +88,7 @@ class AnnouncementPermissionSeeder extends Seeder
                 'announcements.upload.attachment',
                 'announcements.reports.view',
                 'announcements.reports.read_tracking',
-                'announcements.reports.acknowledgment'
+                'announcements.reports.acknowledgment',
             ]);
         }
 
@@ -111,7 +107,7 @@ class AnnouncementPermissionSeeder extends Seeder
                 'announcements.send.notification',
                 'announcements.upload.attachment',
                 'announcements.reports.view',
-                'announcements.reports.read_tracking'
+                'announcements.reports.read_tracking',
             ]);
         }
 
@@ -120,7 +116,7 @@ class AnnouncementPermissionSeeder extends Seeder
         if ($employeeRole) {
             $employeeRole->givePermissionTo([
                 'announcements.view',
-                'announcements.acknowledge'
+                'announcements.acknowledge',
             ]);
         }
     }

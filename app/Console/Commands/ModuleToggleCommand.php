@@ -63,34 +63,35 @@ class ModuleToggleCommand extends Command
             case 'list':
                 $this->listModules();
                 break;
-            
+
             case 'enable-non-core':
                 $this->toggleNonCoreModules(true);
                 break;
-            
+
             case 'disable-non-core':
                 $this->toggleNonCoreModules(false);
                 break;
-            
+
             case 'enable-all':
                 $this->toggleAllModules(true);
                 break;
-            
+
             case 'disable-all':
                 $this->toggleAllModules(false);
                 break;
-            
+
             case 'backup':
                 $this->backupStatus();
                 break;
-            
+
             case 'restore':
                 $this->restoreStatus();
                 break;
-            
+
             default:
                 $this->error("Invalid action: {$action}");
                 $this->info('Valid actions: list, enable-non-core, disable-non-core, enable-all, disable-all, backup, restore');
+
                 return 1;
         }
 
@@ -103,7 +104,7 @@ class ModuleToggleCommand extends Command
     private function listModules(): void
     {
         $modules = $this->getModulesWithStatus();
-        
+
         $this->info('Module Status Overview:');
         $this->newLine();
 
@@ -115,12 +116,12 @@ class ModuleToggleCommand extends Command
             'enabled' => 0,
             'disabled' => 0,
             'core' => 0,
-            'non_core' => 0
+            'non_core' => 0,
         ];
 
         foreach ($modules as $module) {
             $stats['total']++;
-            
+
             if ($module['enabled']) {
                 $stats['enabled']++;
             } else {
@@ -140,13 +141,13 @@ class ModuleToggleCommand extends Command
         $this->info('🔧 Core Modules:');
         $this->table(
             ['Module', 'Display Name', 'Status', 'Priority', 'Dependencies'],
-            array_map(function($m) {
+            array_map(function ($m) {
                 return [
                     $m['name'],
                     $m['display_name'],
                     $m['enabled'] ? '✅ Enabled' : '❌ Disabled',
                     $m['priority'],
-                    implode(', ', $m['dependencies'])
+                    implode(', ', $m['dependencies']),
                 ];
             }, $coreModules)
         );
@@ -155,13 +156,13 @@ class ModuleToggleCommand extends Command
         $this->info('📦 Non-Core Modules:');
         $this->table(
             ['Module', 'Display Name', 'Status', 'Category', 'Dependencies'],
-            array_map(function($m) {
+            array_map(function ($m) {
                 return [
                     $m['name'],
                     $m['display_name'],
                     $m['enabled'] ? '✅ Enabled' : '❌ Disabled',
                     $m['category'],
-                    implode(', ', $m['dependencies'])
+                    implode(', ', $m['dependencies']),
                 ];
             }, $nonCoreModules)
         );
@@ -189,7 +190,7 @@ class ModuleToggleCommand extends Command
         $modules = $this->getModulesWithStatus();
         $excludedModules = $this->option('exclude') ?: [];
         $includedModules = $this->option('include') ?: [];
-        
+
         // Filter modules to toggle
         $modulesToToggle = [];
         foreach ($modules as $module) {
@@ -199,13 +200,13 @@ class ModuleToggleCommand extends Command
             }
 
             // If include list is specified, only process those
-            if (!empty($includedModules)) {
+            if (! empty($includedModules)) {
                 if (in_array($module['name'], $includedModules)) {
                     $modulesToToggle[] = $module;
                 }
             } else {
                 // Otherwise, process all non-core modules
-                if (!$module['is_core']) {
+                if (! $module['is_core']) {
                     $modulesToToggle[] = $module;
                 }
             }
@@ -213,6 +214,7 @@ class ModuleToggleCommand extends Command
 
         if (empty($modulesToToggle)) {
             $this->warn('No modules to toggle based on your criteria.');
+
             return;
         }
 
@@ -220,11 +222,11 @@ class ModuleToggleCommand extends Command
         $this->info("Modules to {$action}:");
         $this->table(
             ['Module', 'Display Name', 'Current Status'],
-            array_map(function($m) {
+            array_map(function ($m) {
                 return [
                     $m['name'],
                     $m['display_name'],
-                    $m['enabled'] ? 'Enabled' : 'Disabled'
+                    $m['enabled'] ? 'Enabled' : 'Disabled',
                 ];
             }, $modulesToToggle)
         );
@@ -232,13 +234,15 @@ class ModuleToggleCommand extends Command
         // Dry run check
         if ($this->option('dry-run')) {
             $this->info('🔍 Dry run mode - no changes made.');
+
             return;
         }
 
         // Confirmation
-        if (!$this->option('force')) {
-            if (!$this->confirm("Are you sure you want to {$action} " . count($modulesToToggle) . " modules?")) {
+        if (! $this->option('force')) {
+            if (! $this->confirm("Are you sure you want to {$action} ".count($modulesToToggle).' modules?')) {
                 $this->warn('Operation cancelled.');
+
                 return;
             }
         }
@@ -261,7 +265,7 @@ class ModuleToggleCommand extends Command
                 $this->info("✓ {$module['name']} - {$action}d");
             } catch (\Exception $e) {
                 $failed++;
-                $this->error("✗ {$module['name']} - Failed: " . $e->getMessage());
+                $this->error("✗ {$module['name']} - Failed: ".$e->getMessage());
             }
         }
 
@@ -280,13 +284,14 @@ class ModuleToggleCommand extends Command
     private function toggleAllModules(bool $enable): void
     {
         $action = $enable ? 'enable' : 'disable';
-        
+
         $this->warn("⚠️  WARNING: This will {$action} ALL modules including core modules!");
-        $this->warn("This operation is typically used for debugging purposes only.");
-        
-        if (!$this->option('force')) {
-            if (!$this->confirm("Are you absolutely sure you want to {$action} ALL modules?")) {
+        $this->warn('This operation is typically used for debugging purposes only.');
+
+        if (! $this->option('force')) {
+            if (! $this->confirm("Are you absolutely sure you want to {$action} ALL modules?")) {
                 $this->warn('Operation cancelled.');
+
                 return;
             }
         }
@@ -309,7 +314,7 @@ class ModuleToggleCommand extends Command
                 $this->info("✓ {$module->getName()} - {$action}d");
             } catch (\Exception $e) {
                 $failed++;
-                $this->error("✗ {$module->getName()} - Failed: " . $e->getMessage());
+                $this->error("✗ {$module->getName()} - Failed: ".$e->getMessage());
             }
         }
 
@@ -327,32 +332,33 @@ class ModuleToggleCommand extends Command
      */
     private function backupStatus(bool $silent = false): void
     {
-        if (!File::exists($this->statusFile)) {
-            if (!$silent) {
+        if (! File::exists($this->statusFile)) {
+            if (! $silent) {
                 $this->error('Module status file not found!');
             }
+
             return;
         }
 
         // Create backups directory if it doesn't exist
         $backupDir = base_path('backups');
-        if (!File::exists($backupDir)) {
+        if (! File::exists($backupDir)) {
             File::makeDirectory($backupDir);
         }
 
         // Create timestamped backup
         $timestamp = date('Y-m-d_H-i-s');
-        $backupPath = $backupDir . '/modules_statuses_' . $timestamp . '.json';
-        
+        $backupPath = $backupDir.'/modules_statuses_'.$timestamp.'.json';
+
         File::copy($this->statusFile, $backupPath);
-        
+
         // Also create a latest backup for quick restore
         File::copy($this->statusFile, $this->backupFile);
 
-        if (!$silent) {
+        if (! $silent) {
             $this->info('✓ Module status backed up to:');
-            $this->info('  - ' . $backupPath);
-            $this->info('  - ' . $this->backupFile . ' (latest)');
+            $this->info('  - '.$backupPath);
+            $this->info('  - '.$this->backupFile.' (latest)');
         }
     }
 
@@ -369,45 +375,48 @@ class ModuleToggleCommand extends Command
             $backups[] = [
                 'path' => $this->backupFile,
                 'name' => 'Latest backup',
-                'time' => date('Y-m-d H:i:s', filemtime($this->backupFile))
+                'time' => date('Y-m-d H:i:s', filemtime($this->backupFile)),
             ];
         }
 
         if (File::exists($backupDir)) {
-            $files = File::glob($backupDir . '/modules_statuses_*.json');
+            $files = File::glob($backupDir.'/modules_statuses_*.json');
             foreach ($files as $file) {
                 $backups[] = [
                     'path' => $file,
                     'name' => basename($file),
-                    'time' => date('Y-m-d H:i:s', filemtime($file))
+                    'time' => date('Y-m-d H:i:s', filemtime($file)),
                 ];
             }
         }
 
         if (empty($backups)) {
             $this->error('No backup files found!');
+
             return;
         }
 
         // Display available backups
         $this->info('Available backups:');
         foreach ($backups as $index => $backup) {
-            $this->line(($index + 1) . ". {$backup['name']} - {$backup['time']}");
+            $this->line(($index + 1).". {$backup['name']} - {$backup['time']}");
         }
 
         $choice = $this->ask('Select backup to restore (enter number)', 1);
-        $selectedIndex = (int)$choice - 1;
+        $selectedIndex = (int) $choice - 1;
 
-        if (!isset($backups[$selectedIndex])) {
+        if (! isset($backups[$selectedIndex])) {
             $this->error('Invalid selection!');
+
             return;
         }
 
         $selectedBackup = $backups[$selectedIndex];
 
-        if (!$this->option('force')) {
-            if (!$this->confirm("Restore from {$selectedBackup['name']}?")) {
+        if (! $this->option('force')) {
+            if (! $this->confirm("Restore from {$selectedBackup['name']}?")) {
                 $this->warn('Restore cancelled.');
+
                 return;
             }
         }
@@ -418,13 +427,13 @@ class ModuleToggleCommand extends Command
         // Restore the selected backup
         File::copy($selectedBackup['path'], $this->statusFile);
 
-        $this->info('✓ Module status restored from: ' . $selectedBackup['name']);
+        $this->info('✓ Module status restored from: '.$selectedBackup['name']);
 
         // Clear caches
         $this->call('cache:clear');
         $this->call('config:clear');
         $this->info('✓ Caches cleared');
-        
+
         // Show current status
         $this->newLine();
         $this->info('Current module status after restore:');
@@ -438,11 +447,11 @@ class ModuleToggleCommand extends Command
     {
         $modules = [];
         $allModules = Module::all();
-        
+
         foreach ($allModules as $module) {
-            $moduleJson = $module->getPath() . '/module.json';
+            $moduleJson = $module->getPath().'/module.json';
             $config = [];
-            
+
             if (File::exists($moduleJson)) {
                 $config = json_decode(File::get($moduleJson), true);
             }
@@ -459,10 +468,11 @@ class ModuleToggleCommand extends Command
         }
 
         // Sort by priority then name
-        usort($modules, function($a, $b) {
+        usort($modules, function ($a, $b) {
             if ($a['priority'] === $b['priority']) {
                 return strcmp($a['name'], $b['name']);
             }
+
             return $a['priority'] <=> $b['priority'];
         });
 

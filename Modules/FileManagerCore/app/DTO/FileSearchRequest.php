@@ -2,8 +2,8 @@
 
 namespace Modules\FileManagerCore\DTO;
 
-use Modules\FileManagerCore\Enums\FileType;
 use Modules\FileManagerCore\Enums\FileStatus;
+use Modules\FileManagerCore\Enums\FileType;
 use Modules\FileManagerCore\Enums\FileVisibility;
 
 class FileSearchRequest
@@ -27,7 +27,7 @@ class FileSearchRequest
         public readonly int $perPage = 15,
         public readonly int $page = 1
     ) {}
-    
+
     /**
      * Create from HTTP request parameters
      */
@@ -53,27 +53,27 @@ class FileSearchRequest
             page: isset($data['page']) ? (int) $data['page'] : 1
         );
     }
-    
+
     /**
      * Check if search has any filters
      */
     public function hasFilters(): bool
     {
-        return !empty($this->query) ||
-               !is_null($this->type) ||
-               !is_null($this->status) ||
-               !is_null($this->visibility) ||
-               !is_null($this->categoryId) ||
-               !is_null($this->userId) ||
-               !is_null($this->mimeType) ||
-               !is_null($this->minSize) ||
-               !is_null($this->maxSize) ||
-               !is_null($this->dateFrom) ||
-               !is_null($this->dateTo) ||
-               !is_null($this->attachableType) ||
-               !is_null($this->attachableId);
+        return ! empty($this->query) ||
+               ! is_null($this->type) ||
+               ! is_null($this->status) ||
+               ! is_null($this->visibility) ||
+               ! is_null($this->categoryId) ||
+               ! is_null($this->userId) ||
+               ! is_null($this->mimeType) ||
+               ! is_null($this->minSize) ||
+               ! is_null($this->maxSize) ||
+               ! is_null($this->dateFrom) ||
+               ! is_null($this->dateTo) ||
+               ! is_null($this->attachableType) ||
+               ! is_null($this->attachableId);
     }
-    
+
     /**
      * Convert to array for query building
      */
@@ -96,7 +96,7 @@ class FileSearchRequest
             'sort_by' => $this->sortBy,
             'sort_direction' => $this->sortDirection,
             'per_page' => $this->perPage,
-            'page' => $this->page
-        ], fn($value) => !is_null($value));
+            'page' => $this->page,
+        ], fn ($value) => ! is_null($value));
     }
 }

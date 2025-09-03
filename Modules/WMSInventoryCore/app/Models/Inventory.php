@@ -12,7 +12,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Inventory extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'inventories';
 
@@ -32,7 +32,7 @@ class Inventory extends Model implements Auditable
         'low_stock_alert_sent',
         'last_alert_sent_at',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -51,7 +51,7 @@ class Inventory extends Model implements Auditable
         'last_alert_sent_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -83,7 +83,9 @@ class Inventory extends Model implements Auditable
      */
     public function isBelowReorderPoint()
     {
-        if (!$this->product->reorder_point) return false;
+        if (! $this->product->reorder_point) {
+            return false;
+        }
 
         return $this->stock_level <= $this->product->reorder_point;
     }
@@ -93,7 +95,9 @@ class Inventory extends Model implements Auditable
      */
     public function isBelowMinStock()
     {
-        if (!$this->product->min_stock_level) return false;
+        if (! $this->product->min_stock_level) {
+            return false;
+        }
 
         return $this->stock_level <= $this->product->min_stock_level;
     }
@@ -103,7 +107,9 @@ class Inventory extends Model implements Auditable
      */
     public function isAboveMaxStock()
     {
-        if (!$this->product->max_stock_level) return false;
+        if (! $this->product->max_stock_level) {
+            return false;
+        }
 
         return $this->stock_level >= $this->product->max_stock_level;
     }

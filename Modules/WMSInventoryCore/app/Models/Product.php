@@ -13,9 +13,17 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Product extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'products';
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Modules\WMSInventoryCore\Database\Factories\ProductFactory::new();
+    }
 
     protected $fillable = [
         'name',
@@ -49,7 +57,7 @@ class Product extends Model implements Auditable
         'is_sellable',
         'status',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -75,7 +83,7 @@ class Product extends Model implements Auditable
         'additional_barcodes' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -160,8 +168,9 @@ class Product extends Model implements Auditable
      */
     public function isLowOnStock()
     {
-        if (!$this->reorder_point)
+        if (! $this->reorder_point) {
             return false;
+        }
 
         foreach ($this->inventories as $inventory) {
             if ($inventory->stock_level <= $this->reorder_point) {

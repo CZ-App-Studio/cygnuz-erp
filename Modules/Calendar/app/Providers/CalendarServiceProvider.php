@@ -87,8 +87,8 @@ class CalendarServiceProvider extends ServiceProvider
 
             foreach ($iterator as $file) {
                 if ($file->isFile() && $file->getExtension() === 'php') {
-                    $relativePath = str_replace($configPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
-                    $configKey = $this->nameLower . '.' . str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''], $relativePath);
+                    $relativePath = str_replace($configPath.DIRECTORY_SEPARATOR, '', $file->getPathname());
+                    $configKey = $this->nameLower.'.'.str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''], $relativePath);
                     $key = ($relativePath === 'config.php') ? $this->nameLower : $configKey;
 
                     $this->publishes([$file->getPathname() => config_path($relativePath)], 'config');
@@ -148,14 +148,12 @@ class CalendarServiceProvider extends ServiceProvider
 
     /**
      * Load menu items from the given file.
-     *
-     * @param string $path
      */
     private function loadMenu(string $path): void
     {
         $mainMenuPath = base_path('resources/menu/verticalMenu.json');
 
-        if (!file_exists($mainMenuPath)) {
+        if (! file_exists($mainMenuPath)) {
             return;
         }
 
@@ -163,7 +161,7 @@ class CalendarServiceProvider extends ServiceProvider
         $moduleMenuJson = file_get_contents($path);
         $moduleMenu = json_decode($moduleMenuJson, true);
 
-        if (!isset($moduleMenu['menu']) || !is_array($moduleMenu['menu'])) {
+        if (! isset($moduleMenu['menu']) || ! is_array($moduleMenu['menu'])) {
             return;
         }
 
@@ -171,7 +169,7 @@ class CalendarServiceProvider extends ServiceProvider
         $mainMenuJson = file_get_contents($mainMenuPath);
         $mainMenu = json_decode($mainMenuJson, true);
 
-        if (!isset($mainMenu['menu']) || !is_array($mainMenu['menu'])) {
+        if (! isset($mainMenu['menu']) || ! is_array($mainMenu['menu'])) {
             return;
         }
 
@@ -191,7 +189,7 @@ class CalendarServiceProvider extends ServiceProvider
                 }
             }
 
-            if (!$exists) {
+            if (! $exists) {
                 $mainMenu['menu'][] = $menuItem;
             }
         }

@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Middleware\ApplyTimezoneMiddleware;
+use App\Http\Middleware\EnsureSelfServiceAccess;
 use App\Http\Middleware\LicenseChecker;
 use App\Http\Middleware\LoadSettings;
 use App\Http\Middleware\LocaleMiddleware;
-use App\Http\Middleware\SetHrLayoutMiddleware;
 use App\Http\Middleware\SetEmployeeLayoutMiddleware;
+use App\Http\Middleware\SetHrLayoutMiddleware;
 use App\Http\Middleware\TrackUserSession;
 use App\Http\Middleware\TransformApiResponse;
 use Illuminate\Auth\AuthenticationException;
@@ -20,64 +21,65 @@ use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
-  ->withRouting(
-    web: __DIR__ . '/../routes/web.php',
-    api: __DIR__ . '/../routes/api.php',
-    commands: __DIR__ . '/../routes/console.php',
-    health: '/up',
-  )
-  ->withMiddleware(function (Middleware $middleware) {
-    //TODO:Need to check this for SaaS
-    //$middleware->web(\Modules\MultiTenancyCore\app\Http\Middleware\IdentifyTenant::class);
-    $middleware->web(LicenseChecker::class);
-    $middleware->web(LocaleMiddleware::class);
-    $middleware->web(LoadSettings::class);
-    $middleware->web(ApplyTimezoneMiddleware::class);
-    $middleware->web(SetHrLayoutMiddleware::class);
-    $middleware->web(SetEmployeeLayoutMiddleware::class);
-    $middleware->web(TrackUserSession::class);
-    // $middleware->appendToGroup('api', [
-    //   TransformApiResponse::class,
-    // ]);
-    $middleware->alias([
-      'role' => RoleMiddleware::class,
-      'permission' => PermissionMiddleware::class,
-      'role_or_permission' => RoleOrPermissionMiddleware::class,
-      //TODO:Need to check this for SaaS
-      //'ensure.tenant' => \Modules\MultiTenancyCore\app\Http\Middleware\EnsureTenantRole::class,
-      //'identify.tenant' => \Modules\MultiTenancyCore\app\Http\Middleware\IdentifyTenant::class,
-    ]);
-  })
-  ->withExceptions(function (Exceptions $exceptions) {
-    $exceptions->render(function (AuthenticationException $e, Request $request) {
-      if ($request->is('api/*')) {
-        return response()->json([
-          'statusCode' => 401,
-          'status' => 'failed',
-          'data' => 'Unauthorized'
-        ], 401);
-      } else {
-        return redirect()->guest('auth/login');
-      }
-    });
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        // TODO:Need to check this for SaaS
+        // $middleware->web(\Modules\MultiTenancyCore\app\Http\Middleware\IdentifyTenant::class);
+        $middleware->web(LicenseChecker::class);
+        $middleware->web(LocaleMiddleware::class);
+        $middleware->web(LoadSettings::class);
+        $middleware->web(ApplyTimezoneMiddleware::class);
+        $middleware->web(SetHrLayoutMiddleware::class);
+        $middleware->web(SetEmployeeLayoutMiddleware::class);
+        $middleware->web(TrackUserSession::class);
+        // $middleware->appendToGroup('api', [
+        //   TransformApiResponse::class,
+        // ]);
+        $middleware->alias([
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class,
+            'self_service' => EnsureSelfServiceAccess::class,
+            // TODO:Need to check this for SaaS
+            // 'ensure.tenant' => \Modules\MultiTenancyCore\app\Http\Middleware\EnsureTenantRole::class,
+            // 'identify.tenant' => \Modules\MultiTenancyCore\app\Http\Middleware\IdentifyTenant::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'statusCode' => 401,
+                    'status' => 'failed',
+                    'data' => 'Unauthorized',
+                ], 401);
+            } else {
+                return redirect()->guest('auth/login');
+            }
+        });
 
-    //Validation exception of api response
-    $exceptions->render(function (ValidationException $e, Request $request) {
-      if ($request->is('api/*')) {
-        return response()->json([
-          'status' => 'failed',
-          'message' => $e->getMessage(),
-          'data' => $e->errors()
-        ], 422);
-      }
-    });
+        // Validation exception of api response
+        $exceptions->render(function (ValidationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $e->getMessage(),
+                    'data' => $e->errors(),
+                ], 422);
+            }
+        });
 
-    $exceptions->render(function (Throwable $e, Request $request) {
-      if ($e instanceof UnauthorizedException) {
-        return response()->view("errors.403", [
-          "exception" => $e
-        ], 403);
-      }
-    });
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if ($e instanceof UnauthorizedException) {
+                return response()->view('errors.403', [
+                    'exception' => $e,
+                ], 403);
+            }
+        });
 
-  })->create();
+    })->create();

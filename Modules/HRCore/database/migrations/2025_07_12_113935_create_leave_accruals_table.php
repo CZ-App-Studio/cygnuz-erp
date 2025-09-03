@@ -23,13 +23,13 @@ return new class extends Migration
             $table->decimal('balance', 5, 2)->default(0);
             $table->date('accrual_date');
             $table->string('notes', 500)->nullable();
-            
+
             // System fields
             $table->foreignId('created_by_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('tenant_id', 191)->nullable();
             $table->timestamps();
-            
+
             // Indexes
             $table->unique(['user_id', 'leave_type_id', 'year', 'month']);
             $table->index(['user_id', 'year']);

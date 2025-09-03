@@ -11,7 +11,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class CustomerGroup extends Model implements AuditableContract
 {
-    use SoftDeletes, UserActionsTrait, AuditableTrait, HasFactory;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'customer_groups';
 

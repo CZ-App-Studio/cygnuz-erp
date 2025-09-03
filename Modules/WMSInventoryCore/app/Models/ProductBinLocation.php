@@ -13,7 +13,7 @@ class ProductBinLocation extends Model
         'bin_location_id',
         'quantity',
         'unit_id',
-        'batch_id'
+        'batch_id',
     ];
 
     /**

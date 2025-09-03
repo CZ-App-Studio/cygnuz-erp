@@ -5,13 +5,13 @@ namespace Modules\AccountingCore\app\Http\Controllers;
 use App\ApiClasses\Error;
 use App\ApiClasses\Success;
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Modules\AccountingCore\app\Models\TaxRate;
 use Yajra\DataTables\Facades\DataTables;
-use Exception;
 
 class TaxRateController extends Controller
 {
@@ -36,19 +36,19 @@ class TaxRateController extends Controller
         $query = TaxRate::query()->orderBy('rate', 'asc');
 
         return DataTables::of($query)
-            ->addColumn('rate_formatted', fn($tax) => $tax->rate . '%')
+            ->addColumn('rate_formatted', fn ($tax) => $tax->rate.'%')
             ->addColumn('is_default_display', function ($tax) {
-                return $tax->is_default ? '<span class="badge bg-label-success">' . __('Yes') . '</span>' : '<span class="badge bg-label-secondary">' . __('No') . '</span>';
+                return $tax->is_default ? '<span class="badge bg-label-success">'.__('Yes').'</span>' : '<span class="badge bg-label-secondary">'.__('No').'</span>';
             })
             ->addColumn('type_display', function ($tax) {
                 return match ($tax->type) {
-                    'percentage' => '<span class="badge bg-label-primary">' . __('Percentage') . '</span>',
-                    'fixed' => '<span class="badge bg-label-info">' . __('Fixed Amount') . '</span>',
-                    default => '<span class="badge bg-label-secondary">' . __('Unknown') . '</span>',
+                    'percentage' => '<span class="badge bg-label-primary">'.__('Percentage').'</span>',
+                    'fixed' => '<span class="badge bg-label-info">'.__('Fixed Amount').'</span>',
+                    default => '<span class="badge bg-label-secondary">'.__('Unknown').'</span>',
                 };
             })
             ->addColumn('status_display', function ($tax) {
-                return $tax->is_active ? '<span class="badge bg-label-success">' . __('Active') . '</span>' : '<span class="badge bg-label-warning">' . __('Inactive') . '</span>';
+                return $tax->is_active ? '<span class="badge bg-label-success">'.__('Active').'</span>' : '<span class="badge bg-label-warning">'.__('Inactive').'</span>';
             })
             ->addColumn('actions', function ($tax) {
                 $actions = [];
@@ -57,7 +57,7 @@ class TaxRateController extends Controller
                     $actions[] = [
                         'label' => __('Edit'),
                         'icon' => 'bx bx-edit',
-                        'onclick' => "editTaxRate({$tax->id})"
+                        'onclick' => "editTaxRate({$tax->id})",
                     ];
                 }
 
@@ -66,13 +66,13 @@ class TaxRateController extends Controller
                         'label' => __('Delete'),
                         'icon' => 'bx bx-trash',
                         'onclick' => "deleteTaxRate({$tax->id})",
-                        'class' => 'text-danger'
+                        'class' => 'text-danger',
                     ];
                 }
 
                 return view('components.datatable-actions', [
                     'id' => $tax->id,
-                    'actions' => $actions
+                    'actions' => $actions,
                 ])->render();
             })
             ->rawColumns(['is_default_display', 'type_display', 'status_display', 'actions'])
@@ -99,7 +99,7 @@ class TaxRateController extends Controller
         if ($validator->fails()) {
             return Error::response([
                 'message' => __('Validation failed'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
 
@@ -118,12 +118,14 @@ class TaxRateController extends Controller
             TaxRate::create($data);
 
             DB::commit();
+
             return Success::response([
-                'message' => __('Tax Rate created successfully.')
+                'message' => __('Tax Rate created successfully.'),
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error("TaxRate Store Error: " . $e->getMessage());
+            Log::error('TaxRate Store Error: '.$e->getMessage());
+
             return Error::response(__('Failed to create tax rate.'));
         }
     }
@@ -131,7 +133,7 @@ class TaxRateController extends Controller
     public function update(Request $request, TaxRate $taxRate)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:tax_rates,name,' . $taxRate->id,
+            'name' => 'required|string|max:255|unique:tax_rates,name,'.$taxRate->id,
             'rate' => 'required|numeric|min:0|max:100',
             'type' => 'required|in:percentage,fixed',
             'description' => 'nullable|string|max:500',
@@ -143,7 +145,7 @@ class TaxRateController extends Controller
         if ($validator->fails()) {
             return Error::response([
                 'message' => __('Validation failed'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
 
@@ -164,12 +166,14 @@ class TaxRateController extends Controller
             $taxRate->update($data);
 
             DB::commit();
+
             return Success::response([
-                'message' => __('Tax Rate updated successfully.')
+                'message' => __('Tax Rate updated successfully.'),
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error("TaxRate Update Error: " . $e->getMessage());
+            Log::error('TaxRate Update Error: '.$e->getMessage());
+
             return Error::response(__('Failed to update tax rate.'));
         }
     }
@@ -188,11 +192,13 @@ class TaxRateController extends Controller
             }
 
             $taxRate->delete();
+
             return Success::response([
-                'message' => __('Tax Rate deleted successfully.')
+                'message' => __('Tax Rate deleted successfully.'),
             ]);
         } catch (Exception $e) {
-            Log::error("TaxRate Delete Error: " . $e->getMessage());
+            Log::error('TaxRate Delete Error: '.$e->getMessage());
+
             return Error::response(__('Failed to delete tax rate.'));
         }
     }
@@ -209,7 +215,7 @@ class TaxRateController extends Controller
             ->map(function ($taxRate) {
                 return [
                     'id' => $taxRate->id,
-                    'text' => $taxRate->name . ' (' . $taxRate->rate . '%)',
+                    'text' => $taxRate->name.' ('.$taxRate->rate.'%)',
                     'rate' => $taxRate->rate,
                     'type' => $taxRate->type,
                 ];

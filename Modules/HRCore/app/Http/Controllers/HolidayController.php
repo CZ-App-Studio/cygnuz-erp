@@ -4,16 +4,15 @@ namespace Modules\HRCore\app\Http\Controllers;
 
 use App\ApiClasses\Error;
 use App\ApiClasses\Success;
-use App\Http\Controllers\Controller;
 use App\Helpers\FormattingHelper;
+use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Modules\HRCore\app\Models\Holiday;
-use Modules\HRCore\app\Models\Department;
 use Yajra\DataTables\DataTables;
-use Carbon\Carbon;
 
 class HolidayController extends Controller
 {
@@ -40,7 +39,7 @@ class HolidayController extends Controller
     {
         $currentYear = date('Y');
         $user = auth()->user();
-        
+
         // Get holidays applicable to current user
         $holidays = Holiday::active()
             ->visibleToEmployees()
@@ -50,12 +49,12 @@ class HolidayController extends Controller
             ->filter(function ($holiday) use ($user) {
                 return $holiday->isApplicableFor($user);
             });
-        
+
         // Group holidays by month
-        $holidaysByMonth = $holidays->groupBy(function($holiday) {
+        $holidaysByMonth = $holidays->groupBy(function ($holiday) {
             return $holiday->date->format('F');
         });
-        
+
         // Get upcoming holidays
         $upcomingHolidays = Holiday::active()
             ->visibleToEmployees()
@@ -65,12 +64,12 @@ class HolidayController extends Controller
             ->filter(function ($holiday) use ($user) {
                 return $holiday->isApplicableFor($user);
             });
-        
+
         // Get holiday count by type
         $totalHolidays = $holidays->count();
         $pastHolidays = $holidays->where('date', '<', now())->count();
         $futureHolidays = $holidays->where('date', '>=', now())->count();
-        
+
         return view('hrcore::holidays.my-holidays', compact(
             'holidays',
             'holidaysByMonth',
@@ -101,7 +100,7 @@ class HolidayController extends Controller
 
         return DataTables::of($holidays)
             ->addColumn('date_formatted', function ($holiday) {
-                return FormattingHelper::formatDate($holiday->date) . ' (' . $holiday->day . ')';
+                return FormattingHelper::formatDate($holiday->date).' ('.$holiday->day.')';
             })
             ->addColumn('type_badge', function ($holiday) {
                 $colors = [
@@ -110,28 +109,29 @@ class HolidayController extends Controller
                     'regional' => 'warning',
                     'optional' => 'secondary',
                     'company' => 'success',
-                    'special' => 'danger'
+                    'special' => 'danger',
                 ];
                 $color = $colors[$holiday->type] ?? 'secondary';
-                return '<span class="badge bg-' . $color . '">' . ucfirst($holiday->type) . '</span>';
+
+                return '<span class="badge bg-'.$color.'">'.ucfirst($holiday->type).'</span>';
             })
             ->addColumn('applicability', function ($holiday) {
                 if ($holiday->applicable_for === 'all') {
                     return '<span class="badge bg-success">All Employees</span>';
                 }
-                
-                $badge = '<span class="badge bg-info">' . ucfirst(str_replace('_', ' ', $holiday->applicable_for)) . '</span>';
-                
+
+                $badge = '<span class="badge bg-info">'.ucfirst(str_replace('_', ' ', $holiday->applicable_for)).'</span>';
+
                 if ($holiday->applicable_for === 'department' && $holiday->departments) {
                     $count = count($holiday->departments);
-                    $badge .= ' <small class="text-muted">(' . $count . ' dept' . ($count > 1 ? 's' : '') . ')</small>';
+                    $badge .= ' <small class="text-muted">('.$count.' dept'.($count > 1 ? 's' : '').')</small>';
                 }
-                
+
                 return $badge;
             })
             ->addColumn('tags', function ($holiday) {
                 $tags = '';
-                
+
                 if ($holiday->is_optional) {
                     $tags .= '<span class="badge bg-label-secondary me-1">Optional</span>';
                 }
@@ -147,7 +147,7 @@ class HolidayController extends Controller
                 if ($holiday->is_recurring) {
                     $tags .= '<span class="badge bg-label-success me-1">Recurring</span>';
                 }
-                
+
                 return $tags;
             })
             ->addColumn('status_badge', function ($holiday) {
@@ -159,35 +159,35 @@ class HolidayController extends Controller
             })
             ->addColumn('actions', function ($holiday) {
                 $actions = [];
-                
+
                 if (auth()->user()->can('hrcore.edit-holidays')) {
                     $actions[] = [
                         'label' => __('Edit'),
                         'icon' => 'bx bx-edit',
-                        'onclick' => "editHoliday({$holiday->id})"
+                        'onclick' => "editHoliday({$holiday->id})",
                     ];
-                    
+
                     $actions[] = [
                         'label' => $holiday->is_active ? __('Deactivate') : __('Activate'),
                         'icon' => $holiday->is_active ? 'bx bx-x-circle' : 'bx bx-check-circle',
-                        'onclick' => "toggleStatus({$holiday->id})"
+                        'onclick' => "toggleStatus({$holiday->id})",
                     ];
                 }
-                
+
                 if (auth()->user()->can('hrcore.delete-holidays')) {
-                    if (!empty($actions)) {
+                    if (! empty($actions)) {
                         $actions[] = ['divider' => true];
                     }
                     $actions[] = [
                         'label' => __('Delete'),
                         'icon' => 'bx bx-trash',
-                        'onclick' => "deleteHoliday({$holiday->id})"
+                        'onclick' => "deleteHoliday({$holiday->id})",
                     ];
                 }
-                
+
                 return view('components.datatable-actions', [
                     'id' => $holiday->id,
-                    'actions' => $actions
+                    'actions' => $actions,
                 ])->render();
             })
             ->rawColumns(['type_badge', 'applicability', 'tags', 'status_badge', 'actions'])
@@ -239,7 +239,7 @@ class HolidayController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return Error::response($validator->errors()->first());
             }
-            
+
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -250,7 +250,7 @@ class HolidayController extends Controller
 
             // Prepare data
             $data = $request->all();
-            
+
             // Convert checkbox values
             $data['is_optional'] = $request->has('is_optional');
             $data['is_restricted'] = $request->has('is_restricted');
@@ -269,23 +269,23 @@ class HolidayController extends Controller
             $holiday = Holiday::create($data);
 
             DB::commit();
-            
+
             // Check if request is AJAX
             if ($request->ajax() || $request->wantsJson()) {
                 return Success::response(__('Holiday created successfully!'));
             }
-            
+
             // For regular form submission, redirect with success message
             return redirect()->route('hrcore.holidays.index')
                 ->with('success', __('Holiday created successfully!'));
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to create holiday: ' . $e->getMessage());
-            
+            Log::error('Failed to create holiday: '.$e->getMessage());
+
             if ($request->ajax() || $request->wantsJson()) {
                 return Error::response(__('Failed to create holiday. Please try again.'));
             }
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', __('Failed to create holiday. Please try again.'));
@@ -299,7 +299,7 @@ class HolidayController extends Controller
     {
         try {
             $holiday = Holiday::findOrFail($id);
-            
+
             return Success::response([
                 'id' => $holiday->id,
                 'name' => $holiday->name,
@@ -340,6 +340,7 @@ class HolidayController extends Controller
     public function edit($id)
     {
         $holiday = Holiday::findOrFail($id);
+
         return view('hrcore::holidays.edit', compact('holiday'));
     }
 
@@ -350,7 +351,7 @@ class HolidayController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:191',
-            'code' => 'required|string|max:50|unique:holidays,code,' . $id,
+            'code' => 'required|string|max:50|unique:holidays,code,'.$id,
             'date' => 'required|date',
             'type' => 'required|in:public,religious,regional,optional,company,special',
             'category' => 'nullable|in:national,state,cultural,festival,company_event,other',
@@ -380,7 +381,7 @@ class HolidayController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return Error::response($validator->errors()->first());
             }
-            
+
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -388,12 +389,12 @@ class HolidayController extends Controller
 
         try {
             $holiday = Holiday::findOrFail($id);
-            
+
             DB::beginTransaction();
 
             // Prepare data
             $data = $request->all();
-            
+
             // Convert checkbox values
             $data['is_optional'] = $request->has('is_optional');
             $data['is_restricted'] = $request->has('is_restricted');
@@ -411,23 +412,23 @@ class HolidayController extends Controller
             $holiday->update($data);
 
             DB::commit();
-            
+
             // Check if request is AJAX
             if ($request->ajax() || $request->wantsJson()) {
                 return Success::response(__('Holiday updated successfully!'));
             }
-            
+
             // For regular form submission, redirect with success message
             return redirect()->route('hrcore.holidays.index')
                 ->with('success', __('Holiday updated successfully!'));
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update holiday: ' . $e->getMessage());
-            
+            Log::error('Failed to update holiday: '.$e->getMessage());
+
             if ($request->ajax() || $request->wantsJson()) {
                 return Error::response(__('Failed to update holiday. Please try again.'));
             }
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', __('Failed to update holiday. Please try again.'));
@@ -441,15 +442,16 @@ class HolidayController extends Controller
     {
         try {
             $holiday = Holiday::findOrFail($id);
-            
+
             DB::beginTransaction();
             $holiday->delete();
             DB::commit();
-            
+
             return Success::response(__('Holiday deleted successfully!'));
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to delete holiday: ' . $e->getMessage());
+            Log::error('Failed to delete holiday: '.$e->getMessage());
+
             return Error::response(__('Failed to delete holiday. Please try again.'));
         }
     }
@@ -461,12 +463,13 @@ class HolidayController extends Controller
     {
         try {
             $holiday = Holiday::findOrFail($id);
-            $holiday->is_active = !$holiday->is_active;
+            $holiday->is_active = ! $holiday->is_active;
             $holiday->save();
-            
+
             return Success::response(__('Holiday status updated successfully!'));
         } catch (\Exception $e) {
-            Log::error('Failed to update holiday status: ' . $e->getMessage());
+            Log::error('Failed to update holiday status: '.$e->getMessage());
+
             return Error::response(__('Failed to update holiday status. Please try again.'));
         }
     }

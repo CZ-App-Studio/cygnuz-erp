@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Nwidart\Modules\Facades\Module;
 
 class OrderedMigrationCommand extends Command
@@ -14,10 +13,13 @@ class OrderedMigrationCommand extends Command
                             {--seed : Run seeders after migrations}
                             {--seed-demo : Run demo seeders for full demo setup}
                             {--seed-production : Run production seeders for minimal setup}';
+
     protected $description = 'Run migrations in proper dependency order: Base → SystemCore → Core modules → Dependent modules';
 
     private array $moduleOrder = [];
+
     private array $coreModules = [];
+
     private array $dependentModules = [];
 
     public function handle()
@@ -35,8 +37,9 @@ class OrderedMigrationCommand extends Command
         $this->displayMigrationOrder();
 
         // Step 4: Confirm before proceeding
-        if (!$this->confirm('Proceed with migrations in this order?')) {
+        if (! $this->confirm('Proceed with migrations in this order?')) {
             $this->warn('Migration cancelled.');
+
             return 1;
         }
 
@@ -55,6 +58,7 @@ class OrderedMigrationCommand extends Command
         }
 
         $this->info('✅ Ordered migration process completed successfully!');
+
         return 0;
     }
 
@@ -63,8 +67,9 @@ class OrderedMigrationCommand extends Command
         $modulesPath = base_path('Modules');
         $modules = [];
 
-        if (!File::exists($modulesPath)) {
+        if (! File::exists($modulesPath)) {
             $this->error('Modules directory not found!');
+
             return;
         }
 
@@ -73,15 +78,16 @@ class OrderedMigrationCommand extends Command
 
         foreach ($moduleDirs as $moduleDir) {
             $moduleName = basename($moduleDir);
-            
+
             // Check if module is enabled
             $module = Module::find($moduleName);
-            if ($module && !$module->isEnabled()) {
+            if ($module && ! $module->isEnabled()) {
                 $this->warn("⏩ Skipping disabled module: {$moduleName}");
+
                 continue;
             }
-            
-            $moduleJsonPath = $moduleDir . '/module.json';
+
+            $moduleJsonPath = $moduleDir.'/module.json';
 
             if (File::exists($moduleJsonPath)) {
                 $moduleConfig = json_decode(File::get($moduleJsonPath), true);
@@ -91,7 +97,7 @@ class OrderedMigrationCommand extends Command
                     'isCoreModule' => $moduleConfig['isCoreModule'] ?? false,
                     'priority' => $moduleConfig['priority'] ?? 999,
                     'dependencies' => $moduleConfig['dependencies'] ?? [],
-                    'category' => $moduleConfig['category'] ?? 'Other'
+                    'category' => $moduleConfig['category'] ?? 'Other',
                 ];
             }
         }
@@ -105,7 +111,7 @@ class OrderedMigrationCommand extends Command
             }
         }
 
-        $this->info("📊 Found " . count($this->coreModules) . " core modules and " . count($this->dependentModules) . " dependent modules");
+        $this->info('📊 Found '.count($this->coreModules).' core modules and '.count($this->dependentModules).' dependent modules');
     }
 
     private function createMigrationOrder(): void
@@ -116,7 +122,7 @@ class OrderedMigrationCommand extends Command
         $this->moduleOrder[] = [
             'type' => 'base',
             'name' => 'Base Laravel',
-            'description' => 'Core Laravel framework tables'
+            'description' => 'Core Laravel framework tables',
         ];
 
         // 2. CRMCore first (has contacts table needed by SystemCore)
@@ -124,7 +130,7 @@ class OrderedMigrationCommand extends Command
             $this->moduleOrder[] = [
                 'type' => 'core',
                 'name' => 'CRMCore',
-                'description' => 'CRM Core (contacts, companies - required by SystemCore)'
+                'description' => 'CRM Core (contacts, companies - required by SystemCore)',
             ];
             unset($this->coreModules['CRMCore']);
         }
@@ -134,14 +140,14 @@ class OrderedMigrationCommand extends Command
             $this->moduleOrder[] = [
                 'type' => 'core',
                 'name' => 'SystemCore',
-                'description' => 'System Core (customers, base tables - depends on CRMCore)'
+                'description' => 'System Core (customers, base tables - depends on CRMCore)',
             ];
             unset($this->coreModules['SystemCore']);
         }
 
         // 4. Other core modules ordered by priority
         $orderedCoreModules = $this->coreModules;
-        uasort($orderedCoreModules, function($a, $b) {
+        uasort($orderedCoreModules, function ($a, $b) {
             return $a['priority'] <=> $b['priority'];
         });
 
@@ -149,7 +155,7 @@ class OrderedMigrationCommand extends Command
             $this->moduleOrder[] = [
                 'type' => 'core',
                 'name' => $module['name'],
-                'description' => $module['displayName'] . ' (Core Module)'
+                'description' => $module['displayName'].' (Core Module)',
             ];
         }
 
@@ -166,7 +172,7 @@ class OrderedMigrationCommand extends Command
         $maxIterations = 50; // Prevent infinite loops
         $iteration = 0;
 
-        while (!empty($remaining) && $iteration < $maxIterations) {
+        while (! empty($remaining) && $iteration < $maxIterations) {
             $iteration++;
             $progressMade = false;
 
@@ -174,7 +180,7 @@ class OrderedMigrationCommand extends Command
                 // Check if all dependencies are resolved
                 $canResolve = true;
                 foreach ($module['dependencies'] as $dependency) {
-                    if (!in_array($dependency, $resolved)) {
+                    if (! in_array($dependency, $resolved)) {
                         $canResolve = false;
                         break;
                     }
@@ -184,7 +190,7 @@ class OrderedMigrationCommand extends Command
                     $this->moduleOrder[] = [
                         'type' => 'dependent',
                         'name' => $moduleName,
-                        'description' => $module['displayName'] . ' (depends on: ' . implode(', ', $module['dependencies']) . ')'
+                        'description' => $module['displayName'].' (depends on: '.implode(', ', $module['dependencies']).')',
                     ];
                     $resolved[] = $moduleName;
                     unset($remaining[$moduleName]);
@@ -192,13 +198,13 @@ class OrderedMigrationCommand extends Command
                 }
             }
 
-            if (!$progressMade) {
+            if (! $progressMade) {
                 // Add remaining modules without dependency check
                 foreach ($remaining as $moduleName => $module) {
                     $this->moduleOrder[] = [
                         'type' => 'dependent',
                         'name' => $moduleName,
-                        'description' => $module['displayName'] . ' (circular/missing deps: ' . implode(', ', $module['dependencies']) . ')'
+                        'description' => $module['displayName'].' (circular/missing deps: '.implode(', ', $module['dependencies']).')',
                     ];
                 }
                 break;
@@ -209,20 +215,20 @@ class OrderedMigrationCommand extends Command
     private function displayMigrationOrder(): void
     {
         $this->info("\n📋 Migration Order:");
-        $this->info("═══════════════════════════════════════════════════════════════");
+        $this->info('═══════════════════════════════════════════════════════════════');
 
         foreach ($this->moduleOrder as $index => $item) {
             $number = str_pad($index + 1, 2, '0', STR_PAD_LEFT);
-            $icon = match($item['type']) {
+            $icon = match ($item['type']) {
                 'base' => '🏗️',
                 'core' => '🔧',
                 'dependent' => '📦',
                 default => '❓'
             };
-            
+
             $this->line("$number. $icon {$item['name']} - {$item['description']}");
         }
-        
+
         $this->info("═══════════════════════════════════════════════════════════════\n");
     }
 
@@ -232,7 +238,7 @@ class OrderedMigrationCommand extends Command
 
         foreach ($this->moduleOrder as $index => $item) {
             $number = $index + 1;
-            $this->info("[$number/" . count($this->moduleOrder) . "] Migrating: {$item['name']}");
+            $this->info("[$number/".count($this->moduleOrder)."] Migrating: {$item['name']}");
 
             try {
                 if ($item['type'] === 'base') {
@@ -242,11 +248,11 @@ class OrderedMigrationCommand extends Command
                     // Run module migrations
                     $this->runModuleMigration($item['name']);
                 }
-                
+
                 $this->info("✅ {$item['name']} migrations completed\n");
-                
+
             } catch (\Exception $e) {
-                $this->error("❌ Failed to migrate {$item['name']}: " . $e->getMessage());
+                $this->error("❌ Failed to migrate {$item['name']}: ".$e->getMessage());
                 $this->warn("⚠️  Continuing with next module...\n");
             }
         }
@@ -257,7 +263,7 @@ class OrderedMigrationCommand extends Command
         // Run only the base Laravel migrations (not module migrations)
         Artisan::call('migrate', [
             '--path' => 'database/migrations',
-            '--force' => true
+            '--force' => true,
         ]);
     }
 
@@ -265,29 +271,32 @@ class OrderedMigrationCommand extends Command
     {
         // Check if module is enabled before migrating
         $module = Module::find($moduleName);
-        if ($module && !$module->isEnabled()) {
+        if ($module && ! $module->isEnabled()) {
             $this->warn("⏩ Module $moduleName is disabled, skipping migration...");
+
             return;
         }
-        
+
         $modulePath = base_path("Modules/$moduleName");
-        
-        if (!File::exists($modulePath)) {
+
+        if (! File::exists($modulePath)) {
             $this->warn("Module $moduleName not found, skipping...");
+
             return;
         }
 
         // Check if module has migrations
         $migrationsPath = "$modulePath/database/migrations";
-        if (!File::exists($migrationsPath) || empty(File::files($migrationsPath))) {
+        if (! File::exists($migrationsPath) || empty(File::files($migrationsPath))) {
             $this->comment("No migrations found for $moduleName, skipping...");
+
             return;
         }
 
         // Run module migrations
         Artisan::call('module:migrate', [
             'module' => $moduleName,
-            '--force' => true
+            '--force' => true,
         ]);
     }
 
@@ -301,14 +310,14 @@ class OrderedMigrationCommand extends Command
             }
 
             $number = $index + 1;
-            $this->info("[$number/" . count($this->moduleOrder) . "] Seeding: {$item['name']}");
+            $this->info("[$number/".count($this->moduleOrder)."] Seeding: {$item['name']}");
 
             try {
                 $this->runModuleSeeder($item['name']);
                 $this->info("✅ {$item['name']} seeding completed\n");
-                
+
             } catch (\Exception $e) {
-                $this->error("❌ Failed to seed {$item['name']}: " . $e->getMessage());
+                $this->error("❌ Failed to seed {$item['name']}: ".$e->getMessage());
                 $this->warn("⚠️  Continuing with next module...\n");
             }
         }
@@ -318,22 +327,25 @@ class OrderedMigrationCommand extends Command
     {
         // Check if module is enabled before seeding
         $module = Module::find($moduleName);
-        if ($module && !$module->isEnabled()) {
+        if ($module && ! $module->isEnabled()) {
             $this->warn("⏩ Module $moduleName is disabled, skipping seeder...");
+
             return;
         }
-        
+
         $modulePath = base_path("Modules/$moduleName");
-        
-        if (!File::exists($modulePath)) {
+
+        if (! File::exists($modulePath)) {
             $this->warn("Module $moduleName not found, skipping seeder...");
+
             return;
         }
 
         // Check if module has seeders
         $seedersPath = "$modulePath/database/seeders";
-        if (!File::exists($seedersPath)) {
+        if (! File::exists($seedersPath)) {
             $this->comment("No seeders found for $moduleName, skipping...");
+
             return;
         }
 
@@ -341,10 +353,10 @@ class OrderedMigrationCommand extends Command
         try {
             Artisan::call('module:seed', [
                 'module' => $moduleName,
-                '--force' => true
+                '--force' => true,
             ]);
         } catch (\Exception $e) {
-            $this->comment("Seeder not available or failed for $moduleName: " . $e->getMessage());
+            $this->comment("Seeder not available or failed for $moduleName: ".$e->getMessage());
         }
     }
 }

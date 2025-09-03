@@ -2,9 +2,9 @@
 
 namespace Modules\HRCore\app\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class EmployeeLifecycleState extends Model
 {
@@ -19,12 +19,12 @@ class EmployeeLifecycleState extends Model
         'remarks',
         'approved_by',
         'approved_at',
-        'created_by'
+        'created_by',
     ];
 
     protected $casts = [
         'effective_date' => 'date',
-        'approved_at' => 'datetime'
+        'approved_at' => 'datetime',
     ];
 
     /**

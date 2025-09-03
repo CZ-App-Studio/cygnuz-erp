@@ -6,7 +6,6 @@ use App\ApiClasses\Error;
 use App\ApiClasses\Success;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -45,19 +44,22 @@ class ShiftController extends Controller
                     foreach ($days as $day) {
                         $label = ucfirst(substr($day, 0, 3));
                         $class = $shift->$day ? 'bg-label-success' : 'bg-label-secondary';
-                        $daysHtml .= '<span class="badge ' . $class . '">' . $label . '</span>';
+                        $daysHtml .= '<span class="badge '.$class.'">'.$label.'</span>';
                     }
                     $daysHtml .= '</div>';
+
                     return $daysHtml;
                 })
                 ->addColumn('shift_time', function ($shift) {
                     $startTime = Carbon::parse($shift->start_time)->format('h:i A');
                     $endTime = Carbon::parse($shift->end_time)->format('h:i A');
-                    return $startTime . ' - ' . $endTime;
+
+                    return $startTime.' - '.$endTime;
                 })
                 ->addColumn('status', function ($shift) {
                     $statusClass = $shift->status === Status::ACTIVE ? 'success' : 'secondary';
-                    return '<span class="badge bg-label-' . $statusClass . '">' . ucfirst($shift->status->value) . '</span>';
+
+                    return '<span class="badge bg-label-'.$statusClass.'">'.ucfirst($shift->status->value).'</span>';
                 })
                 ->addColumn('actions', function ($shift) {
                     $actions = [];
@@ -67,7 +69,7 @@ class ShiftController extends Controller
                         $actions[] = [
                             'label' => __('Edit'),
                             'icon' => 'bx bx-edit',
-                            'onclick' => "editShift({$shift->id})"
+                            'onclick' => "editShift({$shift->id})",
                         ];
                     }
 
@@ -76,7 +78,7 @@ class ShiftController extends Controller
                         $actions[] = [
                             'label' => $shift->status === Status::ACTIVE ? __('Deactivate') : __('Activate'),
                             'icon' => $shift->status === Status::ACTIVE ? 'bx bx-x' : 'bx bx-check',
-                            'onclick' => "toggleStatus({$shift->id})"
+                            'onclick' => "toggleStatus({$shift->id})",
                         ];
                     }
 
@@ -84,34 +86,35 @@ class ShiftController extends Controller
                     if (auth()->user()->can('hrcore.delete-shifts')) {
                         // Check if shift is assigned to users
                         $isAssigned = $shift->users()->exists();
-                        
-                        if (!empty($actions)) {
+
+                        if (! empty($actions)) {
                             $actions[] = ['divider' => true];
                         }
-                        
+
                         $deleteAction = [
                             'label' => __('Delete'),
                             'icon' => 'bx bx-trash',
-                            'onclick' => "deleteShift({$shift->id})"
+                            'onclick' => "deleteShift({$shift->id})",
                         ];
-                        
+
                         if ($isAssigned) {
                             $deleteAction['disabled'] = true;
                             $deleteAction['title'] = __('Cannot delete shift assigned to users');
                         }
-                        
+
                         $actions[] = $deleteAction;
                     }
 
                     return view('components.datatable-actions', [
                         'id' => $shift->id,
-                        'actions' => $actions
+                        'actions' => $actions,
                     ])->render();
                 })
                 ->rawColumns(['shift_days', 'shift_time', 'status', 'actions'])
                 ->make(true);
         } catch (Exception $e) {
-            Log::error('Shift datatable error: ' . $e->getMessage());
+            Log::error('Shift datatable error: '.$e->getMessage());
+
             return Error::response('Something went wrong');
         }
     }
@@ -161,13 +164,15 @@ class ShiftController extends Controller
             ]);
 
             DB::commit();
+
             return Success::response([
                 'message' => 'Shift created successfully!',
-                'shift' => $shift
+                'shift' => $shift,
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Shift creation failed: ' . $e->getMessage());
+            Log::error('Shift creation failed: '.$e->getMessage());
+
             return Error::response('Failed to create shift. Please try again.');
         }
     }
@@ -176,11 +181,11 @@ class ShiftController extends Controller
     {
         try {
             $shift = Shift::findOrFail($id);
-            
+
             // Format times for display
             $shift->start_time_formatted = Carbon::parse($shift->start_time)->format('H:i');
             $shift->end_time_formatted = Carbon::parse($shift->end_time)->format('H:i');
-            
+
             return Success::response($shift);
         } catch (Exception $e) {
             return Error::response('Shift not found', 404);
@@ -216,7 +221,7 @@ class ShiftController extends Controller
         DB::beginTransaction();
         try {
             $shift = Shift::findOrFail($id);
-            
+
             $shift->update([
                 'name' => $request->name,
                 'code' => $request->code,
@@ -233,13 +238,15 @@ class ShiftController extends Controller
             ]);
 
             DB::commit();
+
             return Success::response([
                 'message' => 'Shift updated successfully!',
-                'shift' => $shift
+                'shift' => $shift,
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Shift update failed: ' . $e->getMessage());
+            Log::error('Shift update failed: '.$e->getMessage());
+
             return Error::response('Failed to update shift. Please try again.');
         }
     }
@@ -249,21 +256,23 @@ class ShiftController extends Controller
         DB::beginTransaction();
         try {
             $shift = Shift::findOrFail($id);
-            
+
             // Check if shift has users
             if ($shift->users()->exists()) {
                 return Error::response('Cannot delete shift that is assigned to users.');
             }
 
             $shift->delete();
-            
+
             DB::commit();
+
             return Success::response([
-                'message' => 'Shift deleted successfully!'
+                'message' => 'Shift deleted successfully!',
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Shift deletion failed: ' . $e->getMessage());
+            Log::error('Shift deletion failed: '.$e->getMessage());
+
             return Error::response('Failed to delete shift. Please try again.');
         }
     }
@@ -273,18 +282,20 @@ class ShiftController extends Controller
         DB::beginTransaction();
         try {
             $shift = Shift::findOrFail($id);
-            
+
             $shift->status = $shift->status === Status::ACTIVE ? Status::INACTIVE : Status::ACTIVE;
             $shift->save();
-            
+
             DB::commit();
+
             return Success::response([
                 'message' => 'Shift status updated successfully!',
-                'status' => $shift->status
+                'status' => $shift->status,
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Shift status toggle failed: ' . $e->getMessage());
+            Log::error('Shift status toggle failed: '.$e->getMessage());
+
             return Error::response('Failed to update shift status. Please try again.');
         }
     }

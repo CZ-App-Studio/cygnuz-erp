@@ -27,10 +27,10 @@ class MenuPreferenceController extends Controller
         ]);
 
         // Toggle the pin status
-        $preference->is_pinned = !$preference->is_pinned;
+        $preference->is_pinned = ! $preference->is_pinned;
 
         // If pinning for the first time, set the display order to the highest + 1
-        if ($preference->is_pinned && !$preference->exists) {
+        if ($preference->is_pinned && ! $preference->exists) {
             $maxOrder = UserMenuPreference::where('user_id', $userId)
                 ->where('is_pinned', true)
                 ->max('display_order') ?? 0;

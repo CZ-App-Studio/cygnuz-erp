@@ -30,9 +30,9 @@ class Breadcrumb extends Component
     /**
      * Create a new component instance.
      *
-     * @param string $title
-     * @param array $breadcrumbs
-     * @param string|null $homeUrl
+     * @param  string  $title
+     * @param  array  $breadcrumbs
+     * @param  string|null  $homeUrl
      * @return void
      */
     public function __construct($title, $breadcrumbs = [], $homeUrl = null)

@@ -2,9 +2,9 @@
 
 namespace Modules\AICore\Services;
 
-use Nwidart\Modules\Facades\Module;
-use Modules\AICore\Models\AIProvider;
 use Illuminate\Support\Collection;
+use Modules\AICore\Models\AIProvider;
+use Nwidart\Modules\Facades\Module;
 
 class AIProviderAddonService
 {
@@ -14,8 +14,8 @@ class AIProviderAddonService
     protected array $providerAddons = [
         'openai' => 'AICore', // Free with AICore
         'claude' => 'ClaudeAIProvider',
-        'gemini' => 'GeminiAIProvider', 
-        'azure-openai' => 'AzureOpenAIProvider'
+        'gemini' => 'GeminiAIProvider',
+        'azure-openai' => 'AzureOpenAIProvider',
     ];
 
     /**
@@ -24,13 +24,13 @@ class AIProviderAddonService
     public function getEnabledProviderTypes(): array
     {
         $enabledTypes = [];
-        
+
         foreach ($this->providerAddons as $providerType => $addonName) {
             if ($this->isAddonEnabled($addonName)) {
                 $enabledTypes[] = $providerType;
             }
         }
-        
+
         return $enabledTypes;
     }
 
@@ -40,7 +40,7 @@ class AIProviderAddonService
     public function getEnabledProviders(): Collection
     {
         $enabledTypes = $this->getEnabledProviderTypes();
-        
+
         return AIProvider::whereIn('type', $enabledTypes)->get();
     }
 
@@ -50,7 +50,7 @@ class AIProviderAddonService
     public function getActiveEnabledProviders(): Collection
     {
         $enabledTypes = $this->getEnabledProviderTypes();
-        
+
         return AIProvider::active()
             ->whereIn('type', $enabledTypes)
             ->get();
@@ -61,11 +61,12 @@ class AIProviderAddonService
      */
     public function isProviderTypeEnabled(string $providerType): bool
     {
-        if (!isset($this->providerAddons[$providerType])) {
+        if (! isset($this->providerAddons[$providerType])) {
             return false;
         }
-        
+
         $addonName = $this->providerAddons[$providerType];
+
         return $this->isAddonEnabled($addonName);
     }
 
@@ -78,8 +79,9 @@ class AIProviderAddonService
         if ($addonName === 'AICore') {
             return true;
         }
-        
+
         $module = Module::find($addonName);
+
         return $module && $module->isEnabled();
     }
 
@@ -97,19 +99,19 @@ class AIProviderAddonService
                 'price' => '$49.00',
                 'features' => [
                     'Claude 3.5 Sonnet', 'Claude 3 Opus', 'Claude 3 Sonnet', 'Claude 3 Haiku',
-                    'High context windows', 'Advanced reasoning'
-                ]
+                    'High context windows', 'Advanced reasoning',
+                ],
             ],
             'GeminiAIProvider' => [
-                'name' => 'Google Gemini Provider', 
+                'name' => 'Google Gemini Provider',
                 'description' => 'Access Google\'s powerful Gemini models for multimodal and text generation tasks.',
                 'provider_types' => ['gemini'],
                 'models_count' => 4,
                 'price' => '$39.00',
                 'features' => [
                     'Gemini 1.5 Pro', 'Gemini 1.5 Flash', 'Gemini Pro', 'Gemini Pro Vision',
-                    'Multimodal capabilities', 'Large context windows'
-                ]
+                    'Multimodal capabilities', 'Large context windows',
+                ],
             ],
             'AzureOpenAIProvider' => [
                 'name' => 'Azure OpenAI Provider',
@@ -119,15 +121,15 @@ class AIProviderAddonService
                 'price' => '$29.00',
                 'features' => [
                     'Azure GPT-4', 'Azure GPT-3.5 Turbo',
-                    'Enterprise security', 'Azure integration'
-                ]
-            ]
+                    'Enterprise security', 'Azure integration',
+                ],
+            ],
         ];
 
         // Filter to only show addons that are not currently enabled
         $availableAddons = [];
         foreach ($allAddons as $addonName => $addonInfo) {
-            if (!$this->isAddonEnabled($addonName)) {
+            if (! $this->isAddonEnabled($addonName)) {
                 $availableAddons[$addonName] = $addonInfo;
             }
         }
@@ -141,20 +143,22 @@ class AIProviderAddonService
     public function getDisabledProviderAddons(): array
     {
         $disabled = [];
-        
+
         foreach ($this->providerAddons as $providerType => $addonName) {
-            if ($addonName === 'AICore') continue; // Skip core module
-            
+            if ($addonName === 'AICore') {
+                continue;
+            } // Skip core module
+
             $module = Module::find($addonName);
-            if ($module && !$module->isEnabled()) {
+            if ($module && ! $module->isEnabled()) {
                 $disabled[] = [
                     'addon_name' => $addonName,
                     'provider_type' => $providerType,
-                    'status' => 'installed_disabled'
+                    'status' => 'installed_disabled',
                 ];
             }
         }
-        
+
         return $disabled;
     }
 
@@ -163,19 +167,19 @@ class AIProviderAddonService
      */
     public function getProviderAddonInfo(string $providerType): ?array
     {
-        if (!isset($this->providerAddons[$providerType])) {
+        if (! isset($this->providerAddons[$providerType])) {
             return null;
         }
-        
+
         $addonName = $this->providerAddons[$providerType];
         $available = $this->getAvailableProviderAddons();
-        
+
         return [
             'addon_name' => $addonName,
             'provider_type' => $providerType,
             'is_enabled' => $this->isAddonEnabled($addonName),
             'is_core' => $addonName === 'AICore',
-            'info' => $available[$addonName] ?? null
+            'info' => $available[$addonName] ?? null,
         ];
     }
 }

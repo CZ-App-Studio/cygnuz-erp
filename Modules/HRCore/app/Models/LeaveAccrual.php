@@ -4,9 +4,9 @@ namespace Modules\HRCore\app\Models;
 
 use App\Models\User;
 use App\Traits\UserActionsTrait;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
 
 class LeaveAccrual extends Model
 {
@@ -23,14 +23,14 @@ class LeaveAccrual extends Model
         'balance_after',
         'notes',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
         'accrual_date' => 'date',
         'accrued_days' => 'decimal:2',
         'balance_before' => 'decimal:2',
-        'balance_after' => 'decimal:2'
+        'balance_after' => 'decimal:2',
     ];
 
     /**
@@ -63,7 +63,7 @@ class LeaveAccrual extends Model
 
         foreach ($leaveTypes as $leaveType) {
             // Check if we should accrue based on frequency
-            if (!self::shouldAccrue($leaveType, $date)) {
+            if (! self::shouldAccrue($leaveType, $date)) {
                 continue;
             }
 
@@ -90,15 +90,15 @@ class LeaveAccrual extends Model
             case 'monthly':
                 // Accrue on the 1st of each month
                 return $date->day === 1;
-                
+
             case 'quarterly':
                 // Accrue on the 1st day of each quarter
                 return $date->day === 1 && in_array($date->month, [1, 4, 7, 10]);
-                
+
             case 'yearly':
                 // Accrue on January 1st
                 return $date->day === 1 && $date->month === 1;
-                
+
             default:
                 return false;
         }
@@ -111,7 +111,7 @@ class LeaveAccrual extends Model
     {
         $currentYear = $date->year;
         $currentBalance = $employee->getLeaveBalance($leaveType->id);
-        
+
         // Check if already accrued for this period
         $existingAccrual = self::where('user_id', $employee->id)
             ->where('leave_type_id', $leaveType->id)
@@ -124,7 +124,7 @@ class LeaveAccrual extends Model
 
         // Calculate accrual amount
         $accrualAmount = $leaveType->accrual_rate;
-        
+
         // Check max accrual limit
         if ($leaveType->max_accrual_limit && ($currentBalance + $accrualAmount) > $leaveType->max_accrual_limit) {
             $accrualAmount = max(0, $leaveType->max_accrual_limit - $currentBalance);
@@ -142,7 +142,7 @@ class LeaveAccrual extends Model
             'accrued_days' => $accrualAmount,
             'balance_before' => $currentBalance,
             'balance_after' => $currentBalance + $accrualAmount,
-            'notes' => 'Automatic accrual - ' . $leaveType->accrual_frequency
+            'notes' => 'Automatic accrual - '.$leaveType->accrual_frequency,
         ]);
 
         // Update user available leave
@@ -150,11 +150,11 @@ class LeaveAccrual extends Model
             [
                 'user_id' => $employee->id,
                 'leave_type_id' => $leaveType->id,
-                'year' => $currentYear
+                'year' => $currentYear,
             ],
             [
                 'entitled_leaves' => 0,
-                'available_leaves' => 0
+                'available_leaves' => 0,
             ]
         );
 
@@ -168,7 +168,7 @@ class LeaveAccrual extends Model
     public static function getCurrentBalance($userId, $leaveTypeId)
     {
         $currentYear = Carbon::now()->year;
-        
+
         $availableLeave = UserAvailableLeave::where('user_id', $userId)
             ->where('leave_type_id', $leaveTypeId)
             ->where('year', $currentYear)

@@ -2,10 +2,10 @@
 
 namespace Modules\HRCore\database\factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\HRCore\app\Models\CompensatoryOff;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\HRCore\app\Models\CompensatoryOff;
 
 class CompensatoryOffFactory extends Factory
 {
@@ -25,10 +25,10 @@ class CompensatoryOffFactory extends Factory
     {
         $workedDate = $this->faker->dateTimeBetween('-30 days', '-1 days');
         $expiryDate = Carbon::parse($workedDate)->addDays(90);
-        
+
         $statuses = ['pending', 'approved', 'rejected'];
         $status = $this->faker->randomElement($statuses);
-        
+
         $data = [
             'user_id' => User::factory(),
             'worked_date' => $workedDate->format('Y-m-d'),
@@ -41,7 +41,7 @@ class CompensatoryOffFactory extends Factory
             'created_at' => Carbon::parse($workedDate)->addDays(rand(1, 3)),
             'updated_at' => Carbon::parse($workedDate)->addDays(rand(1, 3)),
         ];
-        
+
         // Add status-specific fields
         if ($status === 'approved') {
             $data['approved_by_id'] = User::factory();
@@ -51,7 +51,7 @@ class CompensatoryOffFactory extends Factory
             $data['approved_at'] = Carbon::parse($workedDate)->addDays(rand(1, 5));
             $data['approval_notes'] = $this->faker->sentence(8);
         }
-        
+
         return $data;
     }
 

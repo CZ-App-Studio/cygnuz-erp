@@ -13,7 +13,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class ProductBatch extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, UserActionsTrait, AuditableTrait;
+    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
 
     protected $table = 'product_batches';
 
@@ -31,7 +31,7 @@ class ProductBatch extends Model implements Auditable
         'status',
         'purchase_id',
         'created_by_id',
-        'updated_by_id'
+        'updated_by_id',
     ];
 
     protected $casts = [
@@ -42,7 +42,7 @@ class ProductBatch extends Model implements Auditable
         'cost_price' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -100,9 +100,9 @@ class ProductBatch extends Model implements Auditable
     {
         $date = $date ?: now()->toDateString();
 
-        return $query->where(function($q) use ($date) {
+        return $query->where(function ($q) use ($date) {
             $q->whereNull('expiry_date')
-              ->orWhere('expiry_date', '>=', $date);
+                ->orWhere('expiry_date', '>=', $date);
         });
     }
 

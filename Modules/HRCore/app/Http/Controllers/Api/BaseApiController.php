@@ -15,7 +15,7 @@ class BaseApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
         ], $code);
     }
 
@@ -27,7 +27,7 @@ class BaseApiController extends Controller
         return response()->json([
             'success' => false,
             'message' => $message,
-            'errors' => $errors
+            'errors' => $errors,
         ], $code);
     }
 
@@ -39,7 +39,7 @@ class BaseApiController extends Controller
         return response()->json([
             'success' => false,
             'message' => 'Validation failed',
-            'errors' => $validator->errors()
+            'errors' => $validator->errors(),
         ], 422);
     }
 
@@ -80,8 +80,8 @@ class BaseApiController extends Controller
                 'current_page' => $data->currentPage(),
                 'total' => $data->total(),
                 'per_page' => $data->perPage(),
-                'last_page' => $data->lastPage()
-            ]
+                'last_page' => $data->lastPage(),
+            ],
         ], 200);
     }
 }

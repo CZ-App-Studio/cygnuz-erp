@@ -23,8 +23,9 @@ class ProductionSeeder extends Seeder
         $team = Team::where('code', 'TM-001')->first();
         $designation = Designation::where('code', 'DES-001')->first();
 
-        if (!$shift || !$team || !$designation) {
+        if (! $shift || ! $team || ! $designation) {
             $this->command->error('Default data not found. Please run HRCore production seeder first.');
+
             return;
         }
 
@@ -49,7 +50,7 @@ class ProductionSeeder extends Seeder
         $superAdmin->assignRole('super_admin');
 
         $this->command->info('Production super admin created successfully!');
-        $this->command->info('Email: ' . $superAdmin->email);
+        $this->command->info('Email: '.$superAdmin->email);
         $this->command->info('Password: 123456');
         $this->command->warn('Please change the password immediately after login!');
     }

@@ -23,6 +23,7 @@ class LeaveRequestSeeder extends Seeder
 
         if ($users->isEmpty()) {
             $this->command->warn('No users found for creating leave requests');
+
             return;
         }
 
@@ -31,6 +32,7 @@ class LeaveRequestSeeder extends Seeder
 
         if ($leaveTypes->isEmpty()) {
             $this->command->warn('No leave types found. Please run LeaveTypeSeeder first.');
+
             return;
         }
 
@@ -41,7 +43,7 @@ class LeaveRequestSeeder extends Seeder
         foreach ($users as $user) {
             // Create 3-8 leave requests per user
             $requestCount = rand(3, 8);
-            
+
             for ($i = 0; $i < $requestCount; $i++) {
                 $this->createLeaveRequest($user, $leaveTypes, $startDate, $endDate);
             }
@@ -56,17 +58,17 @@ class LeaveRequestSeeder extends Seeder
     private function createLeaveRequest(User $user, $leaveTypes, Carbon $startDate, Carbon $endDate)
     {
         $leaveType = $leaveTypes->random();
-        
+
         // Generate random dates
         $fromDate = Carbon::create(
             rand($startDate->year, $endDate->year),
             rand($startDate->month, $endDate->month),
             rand(1, 28)
         );
-        
+
         // Randomly decide if half-day leave (20% chance)
         $isHalfDay = rand(1, 100) <= 20;
-        
+
         if ($isHalfDay) {
             $toDate = $fromDate->copy(); // Same day for half-day
             $totalDays = 0.5;
@@ -78,16 +80,16 @@ class LeaveRequestSeeder extends Seeder
             $totalDays = $this->calculateWorkingDays($fromDate, $toDate);
             $halfDayType = null;
         }
-        
+
         // Determine status based on date
         $status = $this->determineStatus($fromDate);
-        
+
         // Randomly add emergency contact (30% chance)
         $hasEmergencyContact = rand(1, 100) <= 30;
-        
+
         // Randomly add travel abroad info (10% chance)
         $isAbroad = rand(1, 100) <= 10;
-        
+
         // Create the leave request
         $leaveRequest = LeaveRequest::create([
             'user_id' => $user->id,
@@ -106,7 +108,7 @@ class LeaveRequestSeeder extends Seeder
             'created_by_id' => $user->id,
             'updated_by_id' => $user->id,
         ]);
-        
+
         // Add approval data if status is not pending
         if ($status !== LeaveRequestStatus::PENDING) {
             $this->addApprovalData($leaveRequest, $status);
@@ -119,18 +121,28 @@ class LeaveRequestSeeder extends Seeder
     private function determineStatus(Carbon $fromDate): LeaveRequestStatus
     {
         $now = Carbon::now();
-        
+
         if ($fromDate->isFuture()) {
             // Future leaves: 70% approved, 20% pending, 10% rejected
             $rand = rand(1, 100);
-            if ($rand <= 70) return LeaveRequestStatus::APPROVED;
-            if ($rand <= 90) return LeaveRequestStatus::PENDING;
+            if ($rand <= 70) {
+                return LeaveRequestStatus::APPROVED;
+            }
+            if ($rand <= 90) {
+                return LeaveRequestStatus::PENDING;
+            }
+
             return LeaveRequestStatus::REJECTED;
         } else {
             // Past leaves: 80% approved, 15% rejected, 5% cancelled
             $rand = rand(1, 100);
-            if ($rand <= 80) return LeaveRequestStatus::APPROVED;
-            if ($rand <= 95) return LeaveRequestStatus::REJECTED;
+            if ($rand <= 80) {
+                return LeaveRequestStatus::APPROVED;
+            }
+            if ($rand <= 95) {
+                return LeaveRequestStatus::REJECTED;
+            }
+
             return LeaveRequestStatus::CANCELLED;
         }
     }
@@ -146,43 +158,43 @@ class LeaveRequestSeeder extends Seeder
                 'Going on vacation to the beach',
                 'Need some rest and relaxation',
                 'Traveling to visit relatives',
-                'Taking a break to recharge'
+                'Taking a break to recharge',
             ],
             'Sick Leave' => [
                 'Feeling unwell and need to rest',
                 'Doctor advised to take rest',
                 'Recovering from flu symptoms',
                 'Not feeling well enough to work',
-                'Need medical attention'
+                'Need medical attention',
             ],
             'Emergency Leave' => [
                 'Family emergency requires immediate attention',
                 'Urgent personal matter to attend to',
                 'Emergency situation at home',
-                'Unexpected urgent issue'
+                'Unexpected urgent issue',
             ],
             'Personal Leave' => [
                 'Personal matter to attend to',
                 'Need to handle personal affairs',
                 'Taking care of personal business',
-                'Personal commitment'
+                'Personal commitment',
             ],
             'Study Leave' => [
                 'Attending professional development course',
                 'Exam preparation time needed',
                 'Educational seminar to attend',
-                'Completing certification requirements'
+                'Completing certification requirements',
             ],
             'Work From Home' => [
                 'Need to work from home today',
                 'Home office setup for better productivity',
                 'Avoiding commute due to weather',
-                'Working remotely for personal reasons'
-            ]
+                'Working remotely for personal reasons',
+            ],
         ];
 
-        $typeNotes = $notes[$leaveTypeName] ?? ['Taking leave for ' . strtolower($leaveTypeName)];
-        
+        $typeNotes = $notes[$leaveTypeName] ?? ['Taking leave for '.strtolower($leaveTypeName)];
+
         return $typeNotes[array_rand($typeNotes)];
     }
 
@@ -196,7 +208,7 @@ class LeaveRequestSeeder extends Seeder
             $q->whereIn('name', ['super_admin', 'hr_manager', 'manager']);
         })->inRandomOrder()->first();
 
-        if (!$approver) {
+        if (! $approver) {
             $approver = User::whereDoesntHave('roles', function ($q) {
                 $q->where('name', 'client');
             })->inRandomOrder()->first();
@@ -207,7 +219,7 @@ class LeaveRequestSeeder extends Seeder
                 $leaveRequest->update([
                     'approved_by_id' => $approver->id,
                     'approved_at' => Carbon::now()->subDays(rand(1, 30)),
-                    'approval_notes' => $this->generateApprovalNotes(true)
+                    'approval_notes' => $this->generateApprovalNotes(true),
                 ]);
                 break;
 
@@ -215,14 +227,14 @@ class LeaveRequestSeeder extends Seeder
                 $leaveRequest->update([
                     'rejected_by_id' => $approver->id,
                     'rejected_at' => Carbon::now()->subDays(rand(1, 30)),
-                    'approval_notes' => $this->generateApprovalNotes(false)
+                    'approval_notes' => $this->generateApprovalNotes(false),
                 ]);
                 break;
 
             case LeaveRequestStatus::CANCELLED:
                 $leaveRequest->update([
                     'cancelled_at' => Carbon::now()->subDays(rand(1, 15)),
-                    'cancel_reason' => $this->generateCancelReason()
+                    'cancel_reason' => $this->generateCancelReason(),
                 ]);
                 break;
         }
@@ -239,7 +251,7 @@ class LeaveRequestSeeder extends Seeder
                 'Approved. Enjoy your time off.',
                 'Request approved. Make sure to complete pending tasks.',
                 'Approved as requested.',
-                'Leave granted. Have a good rest.'
+                'Leave granted. Have a good rest.',
             ];
         } else {
             $notes = [
@@ -247,7 +259,7 @@ class LeaveRequestSeeder extends Seeder
                 'Insufficient leave balance.',
                 'Business critical period, please reschedule.',
                 'Team capacity issues during requested period.',
-                'Please reapply for different dates.'
+                'Please reapply for different dates.',
             ];
         }
 
@@ -266,12 +278,12 @@ class LeaveRequestSeeder extends Seeder
             'Health issue resolved',
             'Travel plans cancelled',
             'Financial constraints',
-            'Emergency situation resolved'
+            'Emergency situation resolved',
         ];
 
         return $reasons[array_rand($reasons)];
     }
-    
+
     /**
      * Calculate working days between two dates
      */
@@ -279,7 +291,7 @@ class LeaveRequestSeeder extends Seeder
     {
         $workingDays = 0;
         $currentDate = $fromDate->copy();
-        
+
         while ($currentDate <= $toDate) {
             // Skip weekends (Saturday = 6, Sunday = 0)
             if ($currentDate->dayOfWeek !== 0 && $currentDate->dayOfWeek !== 6) {
@@ -287,10 +299,10 @@ class LeaveRequestSeeder extends Seeder
             }
             $currentDate->addDay();
         }
-        
+
         return $workingDays;
     }
-    
+
     /**
      * Generate emergency contact name
      */
@@ -299,20 +311,20 @@ class LeaveRequestSeeder extends Seeder
         $firstNames = ['John', 'Jane', 'Michael', 'Sarah', 'David', 'Emily', 'Robert', 'Lisa'];
         $lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Davis', 'Miller', 'Wilson'];
         $relations = ['(Spouse)', '(Parent)', '(Sibling)', '(Friend)', '(Relative)'];
-        
-        return $firstNames[array_rand($firstNames)] . ' ' . 
-               $lastNames[array_rand($lastNames)] . ' ' . 
+
+        return $firstNames[array_rand($firstNames)].' '.
+               $lastNames[array_rand($lastNames)].' '.
                $relations[array_rand($relations)];
     }
-    
+
     /**
      * Generate phone number
      */
     private function generatePhoneNumber(): string
     {
-        return '+1-' . rand(200, 999) . '-' . rand(200, 999) . '-' . rand(1000, 9999);
+        return '+1-'.rand(200, 999).'-'.rand(200, 999).'-'.rand(1000, 9999);
     }
-    
+
     /**
      * Generate abroad location
      */
@@ -330,9 +342,9 @@ class LeaveRequestSeeder extends Seeder
             'Canada - Toronto',
             'Singapore',
             'Dubai, UAE',
-            'Thailand - Bangkok'
+            'Thailand - Bangkok',
         ];
-        
+
         return $locations[array_rand($locations)];
     }
 }

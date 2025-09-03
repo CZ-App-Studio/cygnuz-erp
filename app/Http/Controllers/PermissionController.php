@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Exception;
 
 class PermissionController extends Controller
 {
@@ -17,7 +17,7 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        if (!auth()->user()->can('view-permissions')) {
+        if (! auth()->user()->can('view-permissions')) {
             abort(403);
         }
 
@@ -36,7 +36,7 @@ class PermissionController extends Controller
      */
     public function indexAjax(Request $request)
     {
-        if (!auth()->user()->can('view-permissions')) {
+        if (! auth()->user()->can('view-permissions')) {
             abort(403);
         }
 
@@ -59,22 +59,23 @@ class PermissionController extends Controller
         return DataTables::of($query)
             ->addColumn('roles', function ($permission) {
                 $roles = $permission->roles->pluck('name')->toArray();
+
                 return implode(', ', $roles);
             })
             ->addColumn('actions', function ($permission) {
                 $actions = [];
-                
+
                 if (auth()->user()->can('delete-permissions')) {
                     $actions[] = [
                         'label' => __('Delete'),
                         'icon' => 'bx bx-trash',
-                        'onclick' => "deletePermission({$permission->id})"
+                        'onclick' => "deletePermission({$permission->id})",
                     ];
                 }
-                
+
                 return view('components.datatable-actions', [
                     'id' => $permission->id,
-                    'actions' => $actions
+                    'actions' => $actions,
                 ])->render();
             })
             ->rawColumns(['actions'])
@@ -86,7 +87,7 @@ class PermissionController extends Controller
      */
     public function store(Request $request)
     {
-        if (!auth()->user()->can('create-permissions')) {
+        if (! auth()->user()->can('create-permissions')) {
             abort(403);
         }
 
@@ -94,7 +95,7 @@ class PermissionController extends Controller
             'name' => 'required|string|max:255|unique:permissions,name',
             'module' => 'required|string|max:50',
             'description' => 'nullable|string|max:255',
-            'sort_order' => 'nullable|integer'
+            'sort_order' => 'nullable|integer',
         ]);
 
         try {
@@ -105,7 +106,7 @@ class PermissionController extends Controller
                 'guard_name' => 'web',
                 'module' => $validated['module'],
                 'description' => $validated['description'],
-                'sort_order' => $validated['sort_order'] ?? 0
+                'sort_order' => $validated['sort_order'] ?? 0,
             ]);
 
             // Assign to super admin role
@@ -118,38 +119,37 @@ class PermissionController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'data' => ['message' => __('Permission created successfully')]
+                'data' => ['message' => __('Permission created successfully')],
             ]);
 
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Permission creation failed: ' . $e->getMessage());
+            Log::error('Permission creation failed: '.$e->getMessage());
 
             return response()->json([
                 'status' => 'failed',
-                'data' => __('Failed to create permission')
+                'data' => __('Failed to create permission'),
             ], 500);
         }
     }
-
 
     /**
      * Remove the specified permission
      */
     public function destroy($id)
     {
-        if (!auth()->user()->can('delete-permissions')) {
+        if (! auth()->user()->can('delete-permissions')) {
             abort(403);
         }
 
         try {
             $permission = Permission::findOrFail($id);
-            
+
             // Check if permission is assigned to any roles
             if ($permission->roles()->count() > 0) {
                 return response()->json([
                     'status' => 'failed',
-                    'data' => __('Cannot delete permission that is assigned to roles')
+                    'data' => __('Cannot delete permission that is assigned to roles'),
                 ], 400);
             }
 
@@ -157,15 +157,15 @@ class PermissionController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'data' => ['message' => __('Permission deleted successfully')]
+                'data' => ['message' => __('Permission deleted successfully')],
             ]);
 
         } catch (Exception $e) {
-            Log::error('Permission deletion failed: ' . $e->getMessage());
+            Log::error('Permission deletion failed: '.$e->getMessage());
 
             return response()->json([
                 'status' => 'failed',
-                'data' => __('Failed to delete permission')
+                'data' => __('Failed to delete permission'),
             ], 500);
         }
     }
@@ -175,7 +175,7 @@ class PermissionController extends Controller
      */
     public function syncSuperAdmin()
     {
-        if (!auth()->user()->hasRole('super_admin')) {
+        if (! auth()->user()->hasRole('super_admin')) {
             abort(403);
         }
 
@@ -188,15 +188,15 @@ class PermissionController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'data' => ['message' => __('Super admin permissions synced successfully')]
+                'data' => ['message' => __('Super admin permissions synced successfully')],
             ]);
 
         } catch (Exception $e) {
-            Log::error('Permission sync failed: ' . $e->getMessage());
+            Log::error('Permission sync failed: '.$e->getMessage());
 
             return response()->json([
                 'status' => 'failed',
-                'data' => __('Failed to sync permissions')
+                'data' => __('Failed to sync permissions'),
             ], 500);
         }
     }
