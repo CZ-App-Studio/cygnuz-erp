@@ -203,7 +203,7 @@ $(function () {
           error: function (error) {
             let errorMessage = error.responseJSON?.message || 'Could not ship transfer.';
             Swal.fire({
-              title: pageData.labels.error,
+              title: pageData.labels?.error || 'Error',
               text: errorMessage,
               icon: 'error',
               customClass: {
@@ -271,7 +271,7 @@ $(function () {
             }
             Swal.fire({
               icon: 'success',
-              title: pageData.labels.received,
+              title: pageData.labels?.received || 'Success',
               text: response.message || 'Transfer has been received successfully.',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -281,7 +281,7 @@ $(function () {
           error: function (error) {
             let errorMessage = error.responseJSON?.message || 'Could not receive transfer.';
             Swal.fire({
-              title: pageData.labels.error,
+              title: pageData.labels?.error || 'Error',
               text: errorMessage,
               icon: 'error',
               customClass: {
@@ -300,7 +300,7 @@ $(function () {
     const cancelUrl = pageData.urls.transfersCancel.replace('__TRANSFER_ID__', id);
 
     Swal.fire({
-      title: pageData.labels.cancelTransfer,
+      title: pageData.labels?.cancelTransfer || 'Cancel Transfer',
       html: `
         <div class="mb-3">
           <label for="cancellation_reason" class="form-label">Cancellation Reason *</label>
@@ -343,7 +343,7 @@ $(function () {
             }
             Swal.fire({
               icon: 'success',
-              title: pageData.labels.cancelled,
+              title: pageData.labels?.cancelled || 'Success',
               text: response.message || 'Transfer has been cancelled successfully.',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -353,7 +353,7 @@ $(function () {
           error: function (error) {
             let errorMessage = error.responseJSON?.message || 'Could not cancel transfer.';
             Swal.fire({
-              title: pageData.labels.error,
+              title: pageData.labels?.error || 'Error',
               text: errorMessage,
               icon: 'error',
               customClass: {
@@ -371,11 +371,11 @@ $(function () {
   window.deleteRecord = function(id) {
 
     Swal.fire({
-      title: pageData.labels.confirmDelete,
-      text: pageData.labels.confirmDeleteText,
+      title: pageData.labels?.confirmDelete || 'Confirm Delete',
+      text: pageData.labels?.confirmDeleteText || 'Are you sure you want to delete this transfer?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: pageData.labels.confirmDeleteButton,
+      confirmButtonText: pageData.labels?.confirmDeleteButton || 'Delete',
       customClass: {
         confirmButton: 'btn btn-primary me-3',
         cancelButton: 'btn btn-label-secondary'
@@ -397,7 +397,7 @@ $(function () {
             }
             Swal.fire({
               icon: 'success',
-              title: pageData.labels.deleted,
+              title: pageData.labels?.deleted || 'Success',
               text: response.message || 'Transfer has been deleted.',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -411,7 +411,7 @@ $(function () {
             }
 
             Swal.fire({
-              title: pageData.labels.error,
+              title: pageData.labels?.error || 'Error',
               html: errorMessage,
               icon: 'error',
               customClass: {
