@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\Leave\LeaveRequestApproval;
 use App\Services\HRNotificationService;
 use App\Services\Settings\ModuleSettingsService;
+use Carbon\Carbon;
 use Constants;
 use Exception;
 use Illuminate\Http\Request;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Modules\FileManagerCore\Contracts\FileManagerInterface;
 use Modules\FileManagerCore\DTO\FileUploadRequest;
 use Modules\FileManagerCore\Enums\FileType;
@@ -25,9 +28,6 @@ use Modules\HRCore\app\Models\LeaveRequest;
 use Modules\HRCore\app\Models\LeaveType;
 use Modules\HRCore\app\Models\UserAvailableLeave;
 use Yajra\DataTables\Facades\DataTables;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 
 class LeaveController extends Controller
 {
@@ -393,8 +393,8 @@ class LeaveController extends Controller
             $leaveRequest = LeaveRequest::findOrFail($id);
 
             // Check permissions
-            if (!auth()->user()->can('hrcore.edit-leave') &&
-                (!auth()->user()->can('hrcore.edit-own-leave') || $leaveRequest->user_id !== auth()->id())) {
+            if (! auth()->user()->can('hrcore.edit-leave') &&
+                (! auth()->user()->can('hrcore.edit-own-leave') || $leaveRequest->user_id !== auth()->id())) {
                 return Error::response(__('Unauthorized access'));
             }
 
@@ -420,10 +420,11 @@ class LeaveController extends Controller
                     'abroad_location' => $leaveRequest->abroad_location,
                     'document' => $leaveRequest->document,
                     'leave_duration' => $leaveRequest->is_half_day ? 'half' : 'full',
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to fetch leave request for edit: ' . $e->getMessage());
+            Log::error('Failed to fetch leave request for edit: '.$e->getMessage());
+
             return Error::response(__('Failed to fetch leave request'));
         }
     }
@@ -437,8 +438,8 @@ class LeaveController extends Controller
             $leaveRequest = LeaveRequest::findOrFail($id);
 
             // Check permissions
-            if (!auth()->user()->can('hrcore.edit-leave') &&
-                (!auth()->user()->can('hrcore.edit-own-leave') || $leaveRequest->user_id !== auth()->id())) {
+            if (! auth()->user()->can('hrcore.edit-leave') &&
+                (! auth()->user()->can('hrcore.edit-own-leave') || $leaveRequest->user_id !== auth()->id())) {
                 return Error::response(__('Unauthorized access'));
             }
 
@@ -451,7 +452,7 @@ class LeaveController extends Controller
             $validated = $request->validate([
                 'user_id' => [
                     Rule::requiredIf(auth()->user()->can('hrcore.create-leave-for-others')),
-                    'exists:users,id'
+                    'exists:users,id',
                 ],
                 'leave_type_id' => 'required|exists:leave_types,id',
                 'from_date' => 'required|date',
@@ -479,7 +480,7 @@ class LeaveController extends Controller
                 $toDate = Carbon::parse($request->to_date);
                 $totalDays = 0;
                 for ($date = $fromDate; $date->lte($toDate); $date->addDay()) {
-                    if (!$date->isWeekend()) {
+                    if (! $date->isWeekend()) {
                         $totalDays++;
                     }
                 }
@@ -491,15 +492,15 @@ class LeaveController extends Controller
                 try {
                     // Delete old document if exists
                     if ($leaveRequest->document) {
-                        Storage::delete('public/uploads/leaverequestdocuments/' . $leaveRequest->document);
+                        Storage::delete('public/uploads/leaverequestdocuments/'.$leaveRequest->document);
                     }
 
                     $file = $request->file('document');
-                    $fileName = time() . '_' . $file->getClientOriginalName();
+                    $fileName = time().'_'.$file->getClientOriginalName();
                     $path = $file->storeAs('public/uploads/leaverequestdocuments', $fileName);
                     $leaveRequest->document = $fileName;
                 } catch (\Exception $e) {
-                    Log::error('Document upload failed: ' . $e->getMessage());
+                    Log::error('Document upload failed: '.$e->getMessage());
                 }
             }
 
@@ -511,15 +512,16 @@ class LeaveController extends Controller
                 ->whereIn('status', ['pending', 'approved'])
                 ->where(function ($q) use ($leaveRequest) {
                     $q->whereBetween('from_date', [$leaveRequest->from_date, $leaveRequest->to_date])
-                      ->orWhereBetween('to_date', [$leaveRequest->from_date, $leaveRequest->to_date])
-                      ->orWhere(function ($q2) use ($leaveRequest) {
-                          $q2->where('from_date', '<=', $leaveRequest->from_date)
-                             ->where('to_date', '>=', $leaveRequest->to_date);
-                      });
+                        ->orWhereBetween('to_date', [$leaveRequest->from_date, $leaveRequest->to_date])
+                        ->orWhere(function ($q2) use ($leaveRequest) {
+                            $q2->where('from_date', '<=', $leaveRequest->from_date)
+                                ->where('to_date', '>=', $leaveRequest->to_date);
+                        });
                 });
 
             if ($overlappingQuery->exists()) {
                 \Illuminate\Support\Facades\DB::rollBack();
+
                 return Error::response(__('You already have a leave request for the selected dates.'));
             }
 
@@ -528,7 +530,8 @@ class LeaveController extends Controller
             return Success::response(__('Leave request updated successfully!'));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollBack();
-            Log::error('Failed to update leave request: ' . $e->getMessage());
+            Log::error('Failed to update leave request: '.$e->getMessage());
+
             return Error::response(__('Failed to update leave request. Please try again.'));
         }
     }
@@ -1118,7 +1121,7 @@ class LeaveController extends Controller
 
             // Delete any associated documents if they exist
             if ($leaveRequest->document) {
-                Storage::delete('public/uploads/leaverequestdocuments/' . $leaveRequest->document);
+                Storage::delete('public/uploads/leaverequestdocuments/'.$leaveRequest->document);
             }
 
             // Delete the leave request
@@ -1129,8 +1132,8 @@ class LeaveController extends Controller
             return Success::response([
                 'message' => __('Leave request #:id for :name has been deleted successfully', [
                     'id' => $leaveId,
-                    'name' => $userName
-                ])
+                    'name' => $userName,
+                ]),
             ]);
 
         } catch (Exception $e) {

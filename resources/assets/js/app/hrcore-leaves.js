@@ -379,7 +379,9 @@ window.handleLeaveAction = function(id, status) {
             Swal.fire({
               icon: 'success',
               title: pageData.labels.success,
-              text: response.message
+              text: response.message,
+              showCancelButton: false,
+              confirmButtonText: 'OK'
             });
             
             // Reload table
