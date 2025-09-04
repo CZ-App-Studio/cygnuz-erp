@@ -235,7 +235,7 @@ class TimesheetController extends Controller
      */
     public function edit(Timesheet $timesheet)
     {
-       $timesheet = Timesheet::findOrFail($id);
+        $timesheet = Timesheet::findOrFail($id);
 
         if (! $timesheet->canBeEditedBy(Auth::user())) {
             return Error::response(__('You do not have permission to edit this timesheet.'));
@@ -319,8 +319,8 @@ class TimesheetController extends Controller
      */
     public function approve(Timesheet $timesheet)
     {
-       $timesheet = Timesheet::findOrFail($id);
-      
+        $timesheet = Timesheet::findOrFail($id);
+
         \Illuminate\Support\Facades\Log::debug('Approve timesheet attempt', [
             'timesheet_id' => $timesheet->id,
             'timesheet_status' => $timesheet->status->value,
@@ -347,7 +347,7 @@ class TimesheetController extends Controller
      */
     public function reject(Timesheet $timesheet)
     {
-       if (!$timesheet->canBeApprovedBy(Auth::user())) {
+        if (! $timesheet->canBeApprovedBy(Auth::user())) {
             return Error::response(__('You do not have permission to reject this timesheet.'));
         }
 
@@ -365,7 +365,7 @@ class TimesheetController extends Controller
      */
     public function submit(Timesheet $timesheet)
     {
-      
+
         if ($timesheet->user_id !== Auth::id()) {
             return Error::response(__('You can only submit your own timesheets.'));
         }
