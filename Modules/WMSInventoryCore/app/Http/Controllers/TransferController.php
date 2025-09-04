@@ -709,6 +709,30 @@ class TransferController extends Controller
     }
 
     /**
+     * Generate printable transfer document.
+     *
+     * @param  int  $id
+     * @return Renderable
+     */
+    public function print($id)
+    {
+        $this->authorize('wmsinventory.view-transfers');
+        $transfer = Transfer::with([
+            'sourceWarehouse',
+            'destinationWarehouse',
+            'products.product.unit',
+            'createdBy',
+            'approvedBy',
+            'shippedBy',
+            'receivedBy',
+        ])->findOrFail($id);
+
+        return view('wmsinventorycore::transfers.print', [
+            'transfer' => $transfer,
+        ]);
+    }
+
+    /**
      * Cancel a transfer.
      *
      * @param  int  $id

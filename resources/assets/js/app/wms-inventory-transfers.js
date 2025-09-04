@@ -103,11 +103,11 @@ $(function () {
     const approveUrl = pageData.urls.transfersApprove.replace('__TRANSFER_ID__', id);
 
     Swal.fire({
-      title: pageData.labels.confirmApprove,
-      text: pageData.labels.confirmApproveText,
+      title: pageData.labels?.confirmApprove || 'Confirm Approval',
+      text: pageData.labels?.confirmApproveText || 'Are you sure you want to approve this transfer?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: pageData.labels.confirmApproveButton,
+      confirmButtonText: pageData.labels?.confirmApproveButton || 'Approve',
       customClass: {
         confirmButton: 'btn btn-primary me-3',
         cancelButton: 'btn btn-label-secondary'
@@ -144,7 +144,7 @@ $(function () {
     const shipUrl = pageData.urls.transfersShip.replace('__TRANSFER_ID__', id);
 
     Swal.fire({
-      title: pageData.labels.shipTransfer,
+      title: pageData.labels?.shipTransfer || 'Ship Transfer',
       html: `
         <div class="mb-3">
           <label for="ship_date" class="form-label">Ship Date</label>
@@ -193,7 +193,7 @@ $(function () {
             }
             Swal.fire({
               icon: 'success',
-              title: pageData.labels.shipped,
+              title: pageData.labels?.shipped || 'Success',
               text: response.message || 'Transfer has been shipped successfully.',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -203,7 +203,7 @@ $(function () {
           error: function (error) {
             let errorMessage = error.responseJSON?.message || 'Could not ship transfer.';
             Swal.fire({
-              title: pageData.labels.error,
+              title: pageData.labels?.error || 'Error',
               text: errorMessage,
               icon: 'error',
               customClass: {
@@ -222,7 +222,7 @@ $(function () {
     const receiveUrl = pageData.urls.transfersReceive.replace('__TRANSFER_ID__', id);
 
     Swal.fire({
-      title: pageData.labels.receiveTransfer,
+      title: pageData.labels?.receiveTransfer || 'Receive Transfer',
       html: `
         <div class="mb-3">
           <label for="arrival_date" class="form-label">Arrival Date</label>
@@ -271,7 +271,7 @@ $(function () {
             }
             Swal.fire({
               icon: 'success',
-              title: pageData.labels.received,
+              title: pageData.labels?.received || 'Success',
               text: response.message || 'Transfer has been received successfully.',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -281,7 +281,7 @@ $(function () {
           error: function (error) {
             let errorMessage = error.responseJSON?.message || 'Could not receive transfer.';
             Swal.fire({
-              title: pageData.labels.error,
+              title: pageData.labels?.error || 'Error',
               text: errorMessage,
               icon: 'error',
               customClass: {
@@ -300,7 +300,7 @@ $(function () {
     const cancelUrl = pageData.urls.transfersCancel.replace('__TRANSFER_ID__', id);
 
     Swal.fire({
-      title: pageData.labels.cancelTransfer,
+      title: pageData.labels?.cancelTransfer || 'Cancel Transfer',
       html: `
         <div class="mb-3">
           <label for="cancellation_reason" class="form-label">Cancellation Reason *</label>
@@ -343,7 +343,7 @@ $(function () {
             }
             Swal.fire({
               icon: 'success',
-              title: pageData.labels.cancelled,
+              title: pageData.labels?.cancelled || 'Success',
               text: response.message || 'Transfer has been cancelled successfully.',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -353,7 +353,7 @@ $(function () {
           error: function (error) {
             let errorMessage = error.responseJSON?.message || 'Could not cancel transfer.';
             Swal.fire({
-              title: pageData.labels.error,
+              title: pageData.labels?.error || 'Error',
               text: errorMessage,
               icon: 'error',
               customClass: {
@@ -371,11 +371,11 @@ $(function () {
   window.deleteRecord = function(id) {
 
     Swal.fire({
-      title: pageData.labels.confirmDelete,
-      text: pageData.labels.confirmDeleteText,
+      title: pageData.labels?.confirmDelete || 'Confirm Delete',
+      text: pageData.labels?.confirmDeleteText || 'Are you sure you want to delete this transfer?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: pageData.labels.confirmDeleteButton,
+      confirmButtonText: pageData.labels?.confirmDeleteButton || 'Delete',
       customClass: {
         confirmButton: 'btn btn-primary me-3',
         cancelButton: 'btn btn-label-secondary'
@@ -397,7 +397,7 @@ $(function () {
             }
             Swal.fire({
               icon: 'success',
-              title: pageData.labels.deleted,
+              title: pageData.labels?.deleted || 'Success',
               text: response.message || 'Transfer has been deleted.',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -411,7 +411,7 @@ $(function () {
             }
 
             Swal.fire({
-              title: pageData.labels.error,
+              title: pageData.labels?.error || 'Error',
               html: errorMessage,
               icon: 'error',
               customClass: {
@@ -424,4 +424,44 @@ $(function () {
       }
     });
   };
+
+  // Event handlers for ship, cancel, and print buttons
+  $(document).on('click', '.ship-record', function(e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    if (typeof window.shipRecord === 'function') {
+      window.shipRecord(id);
+    }
+  });
+
+  $(document).on('click', '.cancel-record', function(e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    if (typeof window.cancelRecord === 'function') {
+      window.cancelRecord(id);
+    }
+  });
+
+  $(document).on('click', '.receive-record', function(e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    if (typeof window.receiveRecord === 'function') {
+      window.receiveRecord(id);
+    }
+  });
+
+  // Print button handler
+  $(document).on('click', '#print-transfer', function(e) {
+    e.preventDefault();
+    const transferId = $(this).data('id');
+    
+    if (pageData.urls.transfersPrint) {
+      const printUrl = pageData.urls.transfersPrint.replace('__TRANSFER_ID__', transferId);
+      // Open print page in new window
+      window.open(printUrl, '_blank', 'width=800,height=600,scrollbars=yes');
+    } else {
+      // Fallback: use browser print for current page
+      window.print();
+    }
+  });
 });

@@ -181,6 +181,13 @@ class WMSInventoryCoreSettings extends BaseModuleSettings
             ],
 
             'transfers' => [
+                'transfer_prefix' => [
+                    'type' => 'text',
+                    'label' => __('Transfer Code Prefix'),
+                    'help' => __('Prefix for transfer codes (e.g., TRN-, TR-, etc.)'),
+                    'default' => 'TRN-',
+                    'validation' => 'nullable|string|max:10',
+                ],
                 'require_approval_for_transfers' => [
                     'type' => 'toggle',
                     'label' => __('Require Approval for Transfers'),

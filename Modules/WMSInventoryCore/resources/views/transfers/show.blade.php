@@ -18,7 +18,8 @@
         transfersShip: @json(route('wmsinventorycore.transfers.ship', ['transfer' => $transfer->id])),
         transfersReceive: @json(route('wmsinventorycore.transfers.receive', ['transfer' => $transfer->id])),
         transfersCancel: @json(route('wmsinventorycore.transfers.cancel', ['transfer' => $transfer->id])),
-        transfersDelete: @json(route('wmsinventorycore.transfers.destroy', ['transfer' => $transfer->id]))
+        transfersDelete: @json(route('wmsinventorycore.transfers.destroy', ['transfer' => $transfer->id])),
+        transfersPrint: @json(route('wmsinventorycore.transfers.print', ['transfer' => $transfer->id]))
       }
     };
   </script>
@@ -34,7 +35,7 @@
 @endphp
 
 <x-breadcrumb
-  :title="'#' . $transfer->id"
+  :title="$transfer->display_code"
   :breadcrumbs="$breadcrumbs"
   :homeUrl="route('wmsinventorycore.dashboard.index')"
 />
@@ -81,7 +82,7 @@
           <div class="col-md-6">
             <div class="mb-3">
               <h6 class="fw-semibold">{{ __('Transfer ID') }}</h6>
-              <p>#{{ $transfer->id }}</p>
+              <p>{{ $transfer->display_code }}</p>
             </div>
             <div class="mb-3">
               <h6 class="fw-semibold">{{ __('Date') }}</h6>
