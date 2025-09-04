@@ -288,6 +288,10 @@ Route::middleware(['auth', 'verified'])->prefix('inventory')->name('wmsinventory
         Route::post('/purchases/{purchase}/reject', [PurchaseController::class, 'reject'])->name('purchases.reject');
     });
 
+    Route::middleware(['permission:wmsinventory.edit-purchase'])->group(function () {
+        Route::post('/purchases/{purchase}/update-payment-status', [PurchaseController::class, 'updatePaymentStatus'])->name('purchases.update-payment-status');
+    });
+
     Route::middleware(['permission:wmsinventory.receive-purchase'])->group(function () {
         Route::get('/purchases/{purchase}/receive', [PurchaseController::class, 'showReceive'])->name('purchases.show-receive');
         Route::post('/purchases/{purchase}/receive', [PurchaseController::class, 'receive'])->name('purchases.receive');

@@ -613,7 +613,29 @@ function executeReceiveAll(id) {
  * Execute purchase order duplication
  */
 function executeDuplication(id) {
-    window.location.href = pageData.urls.duplicate.replace(':id', id);
+    $.ajax({
+        url: pageData.urls.duplicate.replace(':id', id),
+        type: 'POST',
+        success: function (response) {
+            showAlert('success', pageData.labels.duplicateSuccessMessage || 'Purchase order duplicated successfully');
+            
+            // Redirect to edit page if response contains redirect URL
+            if (response.redirect) {
+                window.location.href = response.redirect;
+            } else {
+                // Refresh DataTable if exists
+                if ($.fn.DataTable.isDataTable('#purchasesTable')) {
+                    $('#purchasesTable').DataTable().ajax.reload(null, false);
+                } else {
+                    window.location.reload();
+                }
+            }
+        },
+        error: function (xhr) {
+            const errorMessage = xhr.responseJSON?.data || pageData.labels.duplicateError || 'Failed to duplicate purchase order';
+            showAlert('error', errorMessage);
+        }
+    });
 }
 
 /**
