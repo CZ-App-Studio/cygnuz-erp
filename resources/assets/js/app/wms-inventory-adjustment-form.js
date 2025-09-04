@@ -73,11 +73,12 @@ $(function () {
   $('#add-product-btn').on('click', function() {
     const selectedProduct = productSearch.select2('data')[0];
     
-    if (!selectedProduct) {
+    // Check if no product is selected or if the selected product is empty/invalid
+    if (!selectedProduct || !selectedProduct.id || selectedProduct.id === '' || selectedProduct.id === null) {
       Swal.fire({
         icon: 'warning',
         title: 'No Product Selected',
-        text: 'Please select a product first.',
+        text: 'Please select a product from the dropdown before adding.',
         customClass: {
           confirmButton: 'btn btn-primary'
         }
