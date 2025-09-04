@@ -62,7 +62,7 @@ class NewLeaveRequest extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $actionUrl = route('hrcore.leave.show', $this->leaveRequest->id);
+        $actionUrl = route('hrcore.leaves.show', $this->leaveRequest->id);
 
         return (new MailMessage)
             ->subject($this->title)
@@ -91,7 +91,7 @@ class NewLeaveRequest extends Notification implements ShouldQueue
             'type' => 'new_leave_request',
             'title' => $this->title,
             'message' => $this->message,
-            'action_url' => route('hrcore.leave.show', $this->leaveRequest->id),
+            'action_url' => route('hrcore.leaves.show', $this->leaveRequest->id),
             'metadata' => [
                 'leave_request_id' => $this->leaveRequest->id,
                 'employee_id' => $this->leaveRequest->user_id,
@@ -119,7 +119,7 @@ class NewLeaveRequest extends Notification implements ShouldQueue
                 'type' => 'leave_request',
                 'action' => 'new_request',
                 'leave_request_id' => $this->leaveRequest->id,
-                'click_action' => route('hrcore.leave.show', $this->leaveRequest->id),
+                'click_action' => route('hrcore.leaves.show', $this->leaveRequest->id),
             ],
         ];
     }
