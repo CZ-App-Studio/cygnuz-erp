@@ -148,7 +148,12 @@ function setupEventListeners() {
     // File input change
     $('#attachment').on('change', function() {
         const fileName = this.files[0]?.name || '';
-        $(this).next('.form-label').text(fileName || pageData.labels.chooseFile);
+        const label = $(this).prev('.form-label');
+        if (fileName) {
+            label.html(`${pageData.labels.attachment || 'Attachment'} <span class="text-success">(${fileName})</span>`);
+        } else {
+            label.text(pageData.labels.attachment || 'Attachment');
+        }
     });
 }
 
@@ -186,7 +191,10 @@ function resetForm() {
     $('#transactionForm').attr('action', pageData.urls.store);
     $('#offcanvasLabel').text(pageData.labels.addTransaction);
     $('.category-select').val(null).trigger('change');
-    $('#attachment').next('.form-label').text(pageData.labels.chooseFile);
+    $('#attachment').prev('.form-label').text(pageData.labels.attachment || 'Attachment');
+    
+    // Reset category filtering - show all categories
+    filterCategoriesByType('');
     
     // Clear tagify
     if (tagify) {
@@ -222,10 +230,22 @@ function editTransaction(id) {
                 $('#offcanvasLabel').text(pageData.labels.editTransaction);
                 
                 $('#type').val(transaction.type);
+                
+                // Filter categories by type BEFORE setting the value
+                filterCategoriesByType(transaction.type);
+                
                 $('#amount').val(transaction.amount);
                 $('#category_id').val(transaction.category_id).trigger('change');
                 $('#description').val(transaction.description);
-                $('#transaction_date').val(transaction.transaction_date);
+                
+                // Fix date handling to prevent timezone conversion issues
+                let transactionDate = transaction.transaction_date;
+                if (transactionDate && transactionDate.includes('T')) {
+                    // If it's a datetime, extract just the date part
+                    transactionDate = transactionDate.split('T')[0];
+                }
+                $('#transaction_date').val(transactionDate);
+                
                 $('#reference_number').val(transaction.reference_number);
                 $('#payment_method').val(transaction.payment_method);
                 
@@ -233,6 +253,23 @@ function editTransaction(id) {
                 if (transaction.tags && tagify) {
                     tagify.removeAllTags();
                     tagify.addTags(transaction.tags);
+                }
+                
+                // Show existing attachment info
+                const attachmentLabel = $('#attachment').prev('.form-label');
+                if (transaction.files && transaction.files.length > 0) {
+                    const fileInfo = transaction.files[0]; // Show first file
+                    attachmentLabel.html(
+                        `${pageData.labels.attachment || 'Attachment'} <span class="text-success">(${fileInfo.name})</span> <small class="text-muted">${fileInfo.size || ''}</small>`
+                    );
+                } else if (transaction.attachment_url) {
+                    // Legacy attachment
+                    const fileName = transaction.attachment_path ? transaction.attachment_path.split('/').pop() : 'Existing file';
+                    attachmentLabel.html(
+                        `${pageData.labels.attachment || 'Attachment'} <span class="text-success">(${fileName})</span> <small class="text-muted">(legacy)</small>`
+                    );
+                } else {
+                    attachmentLabel.text(pageData.labels.attachment || 'Attachment');
                 }
                 
                 // Wait a bit for the view offcanvas to fully close before opening edit form
@@ -343,20 +380,42 @@ function filterCategoriesByType(type) {
     const categorySelect = $('#category_id');
     const currentValue = categorySelect.val();
     
-    // Show/hide options based on type
-    categorySelect.find('option').each(function() {
-        const optionType = $(this).data('type');
-        if (!optionType || optionType === type) {
-            $(this).show();
-        } else {
-            $(this).hide();
-        }
-    });
+    if (!type) {
+        // Show all options if no type selected
+        categorySelect.find('option').show();
+        return;
+    }
     
-    // Clear selection if current category doesn't match type
-    const selectedOption = categorySelect.find('option:selected');
-    if (selectedOption.data('type') && selectedOption.data('type') !== type) {
-        categorySelect.val(null).trigger('change');
+    // First, clear the current selection
+    categorySelect.val(null).trigger('change');
+    
+    // Remove all options except the first (placeholder)
+    categorySelect.find('option:not(:first)').remove();
+    
+    // Re-populate with filtered categories from pageData
+    if (window.pageData && window.pageData.categories) {
+        const filteredCategories = window.pageData.categories.filter(category => category.type === type);
+        
+        filteredCategories.forEach(category => {
+            const option = new Option(category.name, category.id);
+            option.setAttribute('data-type', category.type);
+            categorySelect.append(option);
+        });
+    } else {
+        // Fallback to the original method if pageData is not available
+        categorySelect.find('option').each(function() {
+            const optionType = $(this).data('type');
+            if (!optionType || optionType === type) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+    
+    // Refresh Select2 if it's initialized
+    if (categorySelect.hasClass('select2-hidden-accessible')) {
+        categorySelect.trigger('change.select2');
     }
 }
 
