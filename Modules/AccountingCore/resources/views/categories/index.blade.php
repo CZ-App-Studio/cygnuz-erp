@@ -41,6 +41,7 @@
             <th>{{ __('Type') }}</th>
             <th>{{ __('Parent Category') }}</th>
             <th>{{ __('Icon') }}</th>
+            <th>{{ __('Color') }}</th>
             <th>{{ __('Transactions') }}</th>
             <th>{{ __('Status') }}</th>
             <th>{{ __('Actions') }}</th>
