@@ -4,15 +4,13 @@
 
 @section('vendor-style')
   @vite([
-    'resources/assets/vendor/libs/select2/select2.scss',
-    'resources/assets/vendor/libs/dropzone/dropzone.scss'
+    'resources/assets/vendor/libs/select2/select2.scss'
   ])
 @endsection
 
 @section('vendor-script')
   @vite([
-    'resources/assets/vendor/libs/select2/select2.js',
-    'resources/assets/vendor/libs/dropzone/dropzone.js'
+    'resources/assets/vendor/libs/select2/select2.js'
   ])
 @endsection
 
@@ -226,8 +224,8 @@
                 <span class="text-danger">*</span>
               @endif
             </label>
-            <div class="dropzone" id="productImageDropzone"></div>
-            <input type="hidden" name="image" id="product_image_path" @if(module_setting('WMSInventoryCore', 'require_product_images', false)) required @endif>
+            <input type="file" class="form-control" id="image" name="image" accept="image/*" @if(module_setting('WMSInventoryCore', 'require_product_images', false)) required @endif>
+            <small class="form-text text-muted">{{ __('Supported formats: JPG, PNG, GIF. Max size: 2MB') }}</small>
             @error('image')
               <div class="text-danger">{{ $message }}</div>
             @enderror

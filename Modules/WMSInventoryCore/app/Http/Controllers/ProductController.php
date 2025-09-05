@@ -10,6 +10,10 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\FileManagerCore\DTO\FileUploadRequest;
+use Modules\FileManagerCore\Enums\FileType;
+use Modules\FileManagerCore\Enums\FileVisibility;
+use Modules\FileManagerCore\Services\FileManagerService;
 use Modules\WMSInventoryCore\app\Services\WMSInventoryCoreSettingsService;
 use Modules\WMSInventoryCore\Models\Category;
 use Modules\WMSInventoryCore\Models\Inventory;
@@ -111,6 +115,9 @@ class ProductController extends Controller
 
             $data[] = [
                 'id' => $product->id,
+                'image' => $product->hasProductImage()
+                    ? '<img src="'.$product->getProductImageUrl().'" alt="'.$product->name.'" style="width: 50px; height: 50px; object-fit: cover;" class="rounded">'
+                    : '<div class="d-flex align-items-center justify-content-center bg-light rounded" style="width: 50px; height: 50px;"><i class="bx bx-image text-muted"></i></div>',
                 'name' => $product->name,
                 'sku' => $product->sku ?? '-',
                 'barcode' => $product->barcode ?? '-',
@@ -178,9 +185,9 @@ class ProductController extends Controller
 
         // Check if product images are required
         if (WMSInventoryCoreSettingsService::requireProductImages()) {
-            $rules['image'] = 'required|string';
+            $rules['image'] = 'required|file|image|max:2048';
         } else {
-            $rules['image'] = 'nullable|string';
+            $rules['image'] = 'nullable|file|image|max:2048';
         }
 
         $validated = $request->validate($rules);
@@ -207,10 +214,25 @@ class ProductController extends Controller
                     'status' => $validated['status'],
                     'track_weight' => $request->boolean('track_weight'),
                     'track_quantity' => $request->boolean('track_quantity'),
-                    'image' => $validated['image'] ?? null,
                     'created_by_id' => auth()->id(),
                     'updated_by_id' => auth()->id(),
                 ]);
+
+                // Handle image upload using FileManagerCore
+                if ($request->hasFile('image')) {
+                    $fileManager = app(FileManagerService::class);
+
+                    $uploadRequest = FileUploadRequest::fromRequest(
+                        $request->file('image'),
+                        FileType::PRODUCT_IMAGE,
+                        Product::class,
+                        $product->id
+                    )->withVisibility(FileVisibility::PUBLIC)
+                        ->withDisk('public')
+                        ->withDescription("Product image for {$product->name}");
+
+                    $fileManager->uploadFile($uploadRequest);
+                }
             });
 
             return redirect()->route('wmsinventorycore.products.show', $product->id)
@@ -331,11 +353,11 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
         ];
 
-        // Check if product images are required
-        if (WMSInventoryCoreSettingsService::requireProductImages()) {
-            $rules['image'] = 'required|string';
+        // Check if product images are required and not updating existing image
+        if (WMSInventoryCoreSettingsService::requireProductImages() && ! $product->hasProductImage()) {
+            $rules['image'] = 'required|file|image|max:2048';
         } else {
-            $rules['image'] = 'nullable|string';
+            $rules['image'] = 'nullable|file|image|max:2048';
         }
 
         $validated = $request->validate($rules);
@@ -356,9 +378,31 @@ class ProductController extends Controller
                     'status' => $validated['status'],
                     'track_weight' => $request->boolean('track_weight'),
                     'track_quantity' => $request->boolean('track_quantity'),
-                    'image' => $validated['image'] ?? $product->image,
                     'updated_by_id' => auth()->id(),
                 ]);
+
+                // Handle new image upload using FileManagerCore
+                if ($request->hasFile('image')) {
+                    // Delete existing image if any
+                    $existingImage = $product->getProductImage();
+                    if ($existingImage) {
+                        app(FileManagerService::class)->deleteFile($existingImage);
+                    }
+
+                    // Upload new image
+                    $fileManager = app(FileManagerService::class);
+
+                    $uploadRequest = FileUploadRequest::fromRequest(
+                        $request->file('image'),
+                        FileType::PRODUCT_IMAGE,
+                        Product::class,
+                        $product->id
+                    )->withVisibility(FileVisibility::PUBLIC)
+                        ->withDisk('public')
+                        ->withDescription("Product image for {$product->name}");
+
+                    $fileManager->uploadFile($uploadRequest);
+                }
             });
 
             return redirect()->route('wmsinventorycore.products.show', $product->id)

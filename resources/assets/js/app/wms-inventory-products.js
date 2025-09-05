@@ -29,6 +29,14 @@ $(function () {
       },
       columns: [
         { data: 'id', name: 'id', title: 'ID' },
+        { 
+          data: 'image', 
+          name: 'image', 
+          title: 'Image',
+          orderable: false,
+          searchable: false,
+          width: '80px'
+        },
         { data: 'name', name: 'name', title: 'Name' },
         { data: 'sku', name: 'sku', title: 'SKU' },
         { data: 'barcode', name: 'barcode', title: 'Barcode' },
@@ -81,6 +89,14 @@ $(function () {
         }
       ],
       order: [[0, 'desc']],
+      columnDefs: [
+        {
+          targets: [1], // Image column
+          render: function(data, type, row) {
+            return data; // Allow HTML rendering
+          }
+        }
+      ],
       pageLength: 10,
       lengthMenu: [10, 25, 50, 75, 100],
       responsive: true,

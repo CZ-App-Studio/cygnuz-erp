@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\FileManagerCore\Traits\HasFiles;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Product extends Model implements Auditable
 {
-    use AuditableTrait, HasFactory, SoftDeletes, UserActionsTrait;
+    use AuditableTrait, HasFactory, HasFiles, SoftDeletes, UserActionsTrait;
 
     protected $table = 'products';
 
@@ -200,5 +201,36 @@ class Product extends Model implements Auditable
     public function getCurrentStock($warehouseId)
     {
         return $this->getStockInWarehouse($warehouseId);
+    }
+
+    /**
+     * Get the product image file.
+     */
+    public function getProductImage()
+    {
+        return $this->fileByType(\Modules\FileManagerCore\Enums\FileType::PRODUCT_IMAGE);
+    }
+
+    /**
+     * Get the product image URL.
+     */
+    public function getProductImageUrl(): ?string
+    {
+        $imageFile = $this->getProductImage();
+
+        if ($imageFile) {
+            return app(\Modules\FileManagerCore\Contracts\FileManagerInterface::class)
+                ->getFileUrl($imageFile);
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if product has an image.
+     */
+    public function hasProductImage(): bool
+    {
+        return $this->getProductImage() !== null;
     }
 }

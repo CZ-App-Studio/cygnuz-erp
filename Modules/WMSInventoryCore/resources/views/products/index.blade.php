@@ -86,6 +86,7 @@
         <thead>
           <tr>
             <th>{{ __('ID') }}</th>
+            <th>{{ __('Image') }}</th>
             <th>{{ __('Name') }}</th>
             <th>{{ __('SKU') }}</th>
             <th>{{ __('Barcode') }}</th>

@@ -4,15 +4,13 @@
 
 @section('vendor-style')
   @vite([
-    'resources/assets/vendor/libs/select2/select2.scss',
-    'resources/assets/vendor/libs/dropzone/dropzone.scss'
+    'resources/assets/vendor/libs/select2/select2.scss'
   ])
 @endsection
 
 @section('vendor-script')
   @vite([
-    'resources/assets/vendor/libs/select2/select2.js',
-    'resources/assets/vendor/libs/dropzone/dropzone.js'
+    'resources/assets/vendor/libs/select2/select2.js'
   ])
 @endsection
 
@@ -230,16 +228,17 @@
           <div class="mb-3">
             <label for="image" class="form-label">
               {{ __('Product Image') }}
-              @if(module_setting('WMSInventoryCore', 'require_product_images', false))
+              @if(module_setting('WMSInventoryCore', 'require_product_images', false) && !$product->hasProductImage())
                 <span class="text-danger">*</span>
               @endif
             </label>
-            <div class="dropzone" id="productImageDropzone"></div>
-            <input type="hidden" name="image" id="product_image_path" value="{{ $product->image }}" @if(module_setting('WMSInventoryCore', 'require_product_images', false)) required @endif>
-            @if($product->image)
+            <input type="file" class="form-control" id="image" name="image" accept="image/*" @if(module_setting('WMSInventoryCore', 'require_product_images', false) && !$product->hasProductImage()) required @endif>
+            <small class="form-text text-muted">{{ __('Supported formats: JPG, PNG, GIF. Max size: 2MB') }}</small>
+            @if($product->hasProductImage())
               <div class="mt-2">
                 <p>{{ __('Current Image') }}:</p>
-                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid" style="max-width: 200px;">
+                <img src="{{ $product->getProductImageUrl() }}" alt="{{ $product->name }}" class="img-fluid" style="max-width: 200px;">
+                <p><small class="text-muted">{{ __('Upload a new image to replace the current one') }}</small></p>
               </div>
             @endif
             @error('image')
