@@ -73,9 +73,16 @@
             </div>
 
             <div class="mb-3">
-                <label for="rate" class="form-label">{{ __('Rate (%)') }} <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" id="rate" name="rate" step="0.0001" min="0" max="100" required>
+                <label for="rate" class="form-label">
+                    <span id="rate-label">{{ __('Rate (%)') }}</span>
+                    <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control" id="rate" name="rate" step="0.0001" min="0" required>
                 <div class="invalid-feedback"></div>
+                <div class="form-text" id="rate-help">
+                    <span id="percentage-help">{{ __('Enter percentage value (0-100)') }}</span>
+                    <span id="fixed-help" style="display: none;">{{ __('Enter fixed amount') }}</span>
+                </div>
             </div>
 
             <div class="mb-3">

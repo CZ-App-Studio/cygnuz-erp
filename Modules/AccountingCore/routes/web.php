@@ -69,6 +69,7 @@ Route::prefix('accountingcore')->name('accountingcore.')->middleware(['auth', 'w
         Route::get('/', [TaxRateController::class, 'index'])->name('index');
         Route::get('/datatable', [TaxRateController::class, 'getDataAjax'])->name('datatable');
         Route::get('/active', [TaxRateController::class, 'getActiveTaxRates'])->name('active');
+        Route::get('/default', [TaxRateController::class, 'getDefaultTaxRate'])->name('default');
         Route::get('/{taxRate}', [TaxRateController::class, 'getTaxRateAjax'])->name('show');
         Route::post('/', [TaxRateController::class, 'store'])->name('store');
         Route::put('/{taxRate}', [TaxRateController::class, 'update'])->name('update');
