@@ -145,6 +145,16 @@ Route::middleware([
 
         Route::get('/lang/{locale}', [LanguageController::class, 'swap']);
 
+        // License Management Routes
+        Route::prefix('license')->name('license.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\LicenseController::class, 'index'])->name('index');
+            Route::post('/activate-main-app', [\App\Http\Controllers\LicenseController::class, 'activateMain'])->name('activate-main-app');
+            Route::post('/activate-addon', [\App\Http\Controllers\LicenseController::class, 'activateAddon'])->name('activate-addon');
+            Route::get('/status', [\App\Http\Controllers\LicenseController::class, 'getStatus'])->name('status');
+            Route::post('/validate', [\App\Http\Controllers\LicenseController::class, 'validateLicense'])->name('validate');
+            Route::post('/clear-cache', [\App\Http\Controllers\LicenseController::class, 'clearCache'])->name('clear-cache');
+        });
+
         Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
         // Role Management

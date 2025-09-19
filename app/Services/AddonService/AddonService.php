@@ -79,10 +79,10 @@ class AddonService implements IAddonService
     public function getEnabledAddons(): array
     {
         $enabledAddons = [];
-        $allModules = Module::enabled();
+        $allModules = Module::all();
 
         foreach ($allModules as $module) {
-            if (! $this->isCoreModule($module->getName())) {
+            if ($module->isEnabled() && ! $this->isCoreModule($module->getName())) {
                 $enabledAddons[] = $module->getName();
             }
         }
